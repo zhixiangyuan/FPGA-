@@ -1,0 +1,6 @@
+/runs/
+/evidence/
+/summary.json
+/abort_contract_latest.txt
+__pycache__/
+*.pyc
