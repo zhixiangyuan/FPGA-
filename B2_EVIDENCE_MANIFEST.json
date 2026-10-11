@@ -1,0 +1,406 @@
+{
+  "local_date": "2026-10-11",
+  "scope": "Captain-approved B2-1/B2-2 single-VL functional baseline, frozen before B2-4; full integration/synthesis remain incomplete",
+  "b1_frozen_git_commit": "302b944afc111aa232688d700911704d667c7a37",
+  "sources": [
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\rtl\\afdx_protocol_candidate_top.v",
+      "bytes": 4273,
+      "sha256": "1420d8d0ea5aca850cc3e509f03717d0866e2edea64a2177605570a9d4f2e738"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\rtl\\afdx_protocol_rx_top.v",
+      "bytes": 5541,
+      "sha256": "78bf1bfb675ea40d032cf49667a10c40f8e2a1c0b9fa5648aed8d1b90eddc3d5"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\rtl\\afdx_single_vl_rx_candidate.v",
+      "bytes": 11324,
+      "sha256": "d9f70c2aec4a71995eb16a7f4030165c6fe4e2378d128588dd2268cf98573558"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\rtl\\afdx_single_vl_sn_gate.v",
+      "bytes": 2469,
+      "sha256": "7ff9e5bf97f9f57f85c305435e2f5659ed4025dfad8c4ff864b1c1fedebe7425"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\sim\\tb_b2_full_protocol.sv",
+      "bytes": 14355,
+      "sha256": "7c719e772bac7f1a1e253bc1d43cf87b6e88db71a0588660b47b67be6583e866"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\sim\\tb_b2_protocol_loop.sv",
+      "bytes": 12310,
+      "sha256": "d5e66db4e00bd71882af458ca9207011a7393f50396daf57b552e47e89fd2af8"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\sim\\tb_b2_rx_candidate.sv",
+      "bytes": 5415,
+      "sha256": "a74d35d08c9e23c29291589194375ccab40f5a9fb004e5a553f1df5db91e7b53"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\sim\\tb_b2_rx_pressure.sv",
+      "bytes": 5347,
+      "sha256": "187d09b568b6012f3943bc3e557eb3974caa2e8d94e8b234b6e32077d321a3d9"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\scripts\\create_b2_manifest.py",
+      "bytes": 2612,
+      "sha256": "a4d85f63efcba994d81d07d27597b0d69e7c8053b6724c9f2a2e6e4d6728a6b7"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\scripts\\generate_b2_full_golden.py",
+      "bytes": 5037,
+      "sha256": "5d195e27649b9297c1900cb4f5e8d5775e261ef5084a4501a1ad83676880406c"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\scripts\\generate_b2_golden.py",
+      "bytes": 4852,
+      "sha256": "8e8d6f57721b21315fe559218865e5be9b5f1f62dce94bc3a5bd8969c04e1236"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\scripts\\run_b2_full.py",
+      "bytes": 4514,
+      "sha256": "b0373d1c40e96980662fcc24ecfb34c5b926ec661d91085003aa84d3ac5f59c4"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\scripts\\run_b2_loop.py",
+      "bytes": 4275,
+      "sha256": "4d736b86a4ccb2635fc611c851c9ffc3e5fffa7208f85fd073804437b5d469d4"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\scripts\\run_b2_unit.py",
+      "bytes": 3732,
+      "sha256": "83658d931ea8854ccb88e3ffa5be97fe17ddc2270bbe08d417a969a1365e1890"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\scripts\\verify_b2_full.py",
+      "bytes": 4313,
+      "sha256": "3457131931d246894ef40f0e2eedb7b89ab3fb673e474c21338ddf34a5e0b944"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\scripts\\verify_b2_outputs.py",
+      "bytes": 5195,
+      "sha256": "6ee56eb63839d12039f6272042c13687a90547219bb8432642baa43ea0f84190"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\scripts\\write_b2_status.py",
+      "bytes": 4590,
+      "sha256": "b274bd7abd074415aa149b20d236ebb3e30042fbeafa30f0e6516ef67e69e67e"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\scripts\\run_b2_history.ps1",
+      "bytes": 2462,
+      "sha256": "9fb4b470e88e996ad60f7edcad6854d3fbc3a34876a3ddfa7b609c64013ddbc5"
+    }
+  ],
+  "reports_and_status": [
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\阶段5-B2_SN状态转换待审核.md",
+      "bytes": 5689,
+      "sha256": "cb5cd8e3c6fd11bfb95509c14b36e7c0b14821e26a6fde857626cf3e2e238f1d"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\阶段5-B2_SN规则冻结与状态转换表.md",
+      "bytes": 2978,
+      "sha256": "855306012c06cc9d6a312dfbfe189a7c422c4f3388c35368e0a2036bc5152d34"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\阶段5-B2_AFDX接收协议开发与闭环验收报告.md",
+      "bytes": 10628,
+      "sha256": "8b213bdabb89f9501b328d0f76aa34fa5a1cd09256f67131c78f7addee868e7f"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\阶段5-B2-4_综合与功能网表验收实施计划.md",
+      "bytes": 11968,
+      "sha256": "be6bb5a4191c5bc994a872307e9f8a721a9e1b5188ca92833955b37660c1c377"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\current_status.json",
+      "bytes": 2267,
+      "sha256": "fe50ad6aca12f267346335f41da9be18ae160109bc9162ea7d6d3165b09a31eb"
+    }
+  ],
+  "executed_evidence": [
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\unit_002\\summary.json",
+      "bytes": 916,
+      "sha256": "92697cd555a90cb1c9a8bb07ac49bde5fe20558867da0d90d716f11a2f74284e"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\unit_002\\transcript.log",
+      "bytes": 2949,
+      "sha256": "e192b45449fbc75a3ef62a59d23e46990351e57f89a9ed9486a58249799bbc50"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\unit_002\\console.log",
+      "bytes": 3011,
+      "sha256": "426b295a9f4870d123e98e2b8074f7413651e89741b86d7ab5a93549824d10ae"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\unit_002\\waves.wlf",
+      "bytes": 49152,
+      "sha256": "77df916b4003faf115918ceea7a03cbf93aab920bfbe3065ee583bae7176038f"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\unit_002\\actual_payload.csv",
+      "bytes": 42011,
+      "sha256": "c7d0c34f0b637454347d6f85720aea81340b292d6b1d91e1cd1dddc3ebec99df"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\unit_002\\golden\\cases.json",
+      "bytes": 6635,
+      "sha256": "fd9cb07ad802dabe34ef8eeaf833819d9576f951246e493c5d4c543528aa9b53"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\unit_002\\golden\\client.mem",
+      "bytes": 10368,
+      "sha256": "076d579c6e78613a75f8678960af54a8a9df78984f31e3df177e49a9ad129928"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\unit_002\\golden\\meta.mem",
+      "bytes": 1122,
+      "sha256": "294331d162d32a57ce45b727f0030546b7d34d97d016e7fe3a2fa8b6afad214c"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\unit_002\\golden\\payload.mem",
+      "bytes": 7316,
+      "sha256": "fa2b680c32547d031eb580b5975b51fb9ca65373f3aeb0d8b1948cb0d80f19fa"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\unit_002\\golden\\sha256.json",
+      "bytes": 427,
+      "sha256": "03ba6b8ad48e32c5a17c3648a1f9c687b3ae16ef5142534d5364ed462eb53513"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\unit_002\\golden\\wire.mem",
+      "bytes": 11184,
+      "sha256": "07e7181999efeeab64196c2aec7b2095a261a0dc0e019efae36986b4245e1a2e"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\pressure_001\\summary.json",
+      "bytes": 923,
+      "sha256": "be4e702085c2873448189768cf9ba2f56835a0b85494b33e029a20bcdbb2c158"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\pressure_001\\transcript.log",
+      "bytes": 2977,
+      "sha256": "70ba8cac2b5018a4d53297d6a97168e350d813fccd3b03c850728eb9c32bd2a6"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\pressure_001\\console.log",
+      "bytes": 3039,
+      "sha256": "8d7f80fa4d3b2defc77ab476bdf5efb7616338c7305b9f2af666064f2e6b0f57"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\pressure_001\\waves.wlf",
+      "bytes": 49152,
+      "sha256": "86c9afd2b6a94ef80b9b44014e06bd4f51fd89e449c9645d114b156d4bc4a4f5"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\pressure_001\\actual_payload.csv",
+      "bytes": 1180,
+      "sha256": "f8957873fffb9b0d303d085eb7e4d07d9f573d6ebde6a0978c9f59210d9f66a1"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\pressure_001\\golden\\cases.json",
+      "bytes": 6635,
+      "sha256": "fd9cb07ad802dabe34ef8eeaf833819d9576f951246e493c5d4c543528aa9b53"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\pressure_001\\golden\\client.mem",
+      "bytes": 10368,
+      "sha256": "076d579c6e78613a75f8678960af54a8a9df78984f31e3df177e49a9ad129928"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\pressure_001\\golden\\meta.mem",
+      "bytes": 1122,
+      "sha256": "294331d162d32a57ce45b727f0030546b7d34d97d016e7fe3a2fa8b6afad214c"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\pressure_001\\golden\\payload.mem",
+      "bytes": 7316,
+      "sha256": "fa2b680c32547d031eb580b5975b51fb9ca65373f3aeb0d8b1948cb0d80f19fa"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\pressure_001\\golden\\sha256.json",
+      "bytes": 427,
+      "sha256": "03ba6b8ad48e32c5a17c3648a1f9c687b3ae16ef5142534d5364ed462eb53513"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\pressure_001\\golden\\wire.mem",
+      "bytes": 11184,
+      "sha256": "07e7181999efeeab64196c2aec7b2095a261a0dc0e019efae36986b4245e1a2e"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\loop_004\\summary.json",
+      "bytes": 4168,
+      "sha256": "6b296f302df996d7bec8dd9e68c93178c90af89dc62781fac22289df65735875"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\loop_004\\transcript.log",
+      "bytes": 9055,
+      "sha256": "326d6ea3550c49a67ae9b96552a7e46e2467bd032d5d0c0a1f67338ef823be28"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\loop_004\\console.log",
+      "bytes": 9239,
+      "sha256": "ec5f5af0aa943eb3022c0a3cb6684b2e0127f877b6a5485fca8aa68561fc0e4d"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\loop_004\\waves.wlf",
+      "bytes": 90112,
+      "sha256": "e7e4383edde89dbf1048315102817ba8804ed578bb20f09560aea73229c1ef24"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\loop_004\\actual_payload.csv",
+      "bytes": 47417,
+      "sha256": "864c9a42ecd45a209d7d89027a2a267ebf1cbc2b380cc1550420d8985b7da738"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\loop_004\\actual_tx_gmii.csv",
+      "bytes": 34125,
+      "sha256": "0d98e684989ba0ef75cb33e04ef30f54c46a3ad17694e140c64bf96f853221f5"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\loop_004\\verification.json",
+      "bytes": 736,
+      "sha256": "8eca8d0ddfcb33e5ac6afb6717ecad6e513dbf049937e5333c51a6a2c9dd21a2"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\loop_004\\golden\\cases.json",
+      "bytes": 6635,
+      "sha256": "fd9cb07ad802dabe34ef8eeaf833819d9576f951246e493c5d4c543528aa9b53"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\loop_004\\golden\\client.mem",
+      "bytes": 10368,
+      "sha256": "076d579c6e78613a75f8678960af54a8a9df78984f31e3df177e49a9ad129928"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\loop_004\\golden\\meta.mem",
+      "bytes": 1122,
+      "sha256": "294331d162d32a57ce45b727f0030546b7d34d97d016e7fe3a2fa8b6afad214c"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\loop_004\\golden\\payload.mem",
+      "bytes": 7316,
+      "sha256": "fa2b680c32547d031eb580b5975b51fb9ca65373f3aeb0d8b1948cb0d80f19fa"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\loop_004\\golden\\sha256.json",
+      "bytes": 427,
+      "sha256": "03ba6b8ad48e32c5a17c3648a1f9c687b3ae16ef5142534d5364ed462eb53513"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\loop_004\\golden\\wire.mem",
+      "bytes": 11184,
+      "sha256": "07e7181999efeeab64196c2aec7b2095a261a0dc0e019efae36986b4245e1a2e"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\history_001\\summary.json",
+      "bytes": 360,
+      "sha256": "df790420847e79fc8d0a8bba0ce35d69068e757827ee4ce1e81cef9278225c40"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\history_001\\console.log",
+      "bytes": 17068,
+      "sha256": "4ea3d86caf04b7186a5a9ea41e531ea7f1aed55806f1c7fdf24c82c15388b07e"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\summary.json",
+      "bytes": 4445,
+      "sha256": "05253e2e559f80175e3e0f6542b2b5617a94d815cf2426cb47118ef61473ad89"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\transcript.log",
+      "bytes": 9604,
+      "sha256": "208f8411ecaac65a6ceeaeebe97edd00923b760fb482aeb045108a72d7351036"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\console.log",
+      "bytes": 9799,
+      "sha256": "58e84acecdf19114fe7db9dd529b7b2c3b5c36ccaceb4861e6fd56f7217ad878"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\waves.wlf",
+      "bytes": 73728,
+      "sha256": "2a161a6b4b8eac88e78ea073605f34a13865d2c7b3dbb172d5dfb4a0be821e7a"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\actual_payload.csv",
+      "bytes": 68640,
+      "sha256": "27ca2b0b061f32f1d18dc2b20a34253dbb75241174937945ba2c5dd698bf4076"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\actual_tx_gmii.csv",
+      "bytes": 387738,
+      "sha256": "7189d8475b34ede6393c2df16cefce30c0729a3883e8bcea1abf8ecac8bfaf9b"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\sn_decisions.csv",
+      "bytes": 10323,
+      "sha256": "ef6c863aad1890c1e60465bc16f6a4a4951495414c7479ff5b5b9b379e060b5a"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\verification.json",
+      "bytes": 1021,
+      "sha256": "6f72f1e1b6531a4afb5a6e209639a3bdc4b3fb873a82dee4b440ed3c8da1e38b"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\golden\\cases.json",
+      "bytes": 121669,
+      "sha256": "693be13ad58f9a6c0a8be2b1120d6ad39368e88a54fa47df81c3599c75e46b58"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\golden\\client.mem",
+      "bytes": 82268,
+      "sha256": "0d0f2ee914738d28de35e553bd79bd27e1b5ad41bfdae9442d96f8fa38afb47d"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\golden\\constants.vh",
+      "bytes": 260,
+      "sha256": "e73465ce5308fc3ced493b903c5995baa24dae1010ac1463e799260c80e9a94c"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\golden\\expect.mem",
+      "bytes": 10506,
+      "sha256": "45cc384f3f0d1361ae43ab4d45ccc86a632af27eb9b579ea96790de159464cb2"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\golden\\meta.mem",
+      "bytes": 20394,
+      "sha256": "b26e5bd47eb230b7b1bb9475cc1c89a1a6e8882c0d2ac3e1aee551035ee3a99e"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\golden\\payload.mem",
+      "bytes": 12608,
+      "sha256": "4dd210132dc3ee40193dee83cebafe83aaa555d7bed5be66e2a952c7c1d66fe3"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\golden\\scenario.vh",
+      "bytes": 5447,
+      "sha256": "c72a4f5192b6b93f418f2810f7024cf4996dbd660c62bb62f3c69170c0bde3c9"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\golden\\sha256.json",
+      "bytes": 685,
+      "sha256": "208d592b685307c7b2898222c36b5ac243fb5c0575cc8ce47ab6675f8be2d247"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\full_003\\golden\\wire.mem",
+      "bytes": 97100,
+      "sha256": "c78675d855a651dde07ab12f61adabcc85072b765bf8647c1991a2d6719786d2"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\history_002\\summary.json",
+      "bytes": 360,
+      "sha256": "34708ab1e49c80bda7c754355202004da5db491071bd2200f91a362e52f467e9"
+    },
+    {
+      "path": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\runs\\history_002\\console.log",
+      "bytes": 17068,
+      "sha256": "0c99def12c6591ffbded7e567b75dde4c023d985740107b8a9a99ec926e00b18"
+    }
+  ]
+}
