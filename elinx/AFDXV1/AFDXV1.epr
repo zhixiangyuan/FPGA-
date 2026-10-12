@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Product Version: eLinx v1.0.0.0-->
+<!--								-->
+<!--Copyright 2017-2024 eHiWay, Inc. All Rights Reserved.-->
+<Project Path="/AFDXV1.epr">
+    <Configuration>
+        <Option Name="ActiveSimSet" Val=""/>
+        <Option Name="Project Type" Val="RTL"/>
+        <Option Name="SimulationTopModule" Val=""/>
+        <Option Name="Win_Version" Val="x86"/>
+    </Configuration>
+    <FileSets>
+        <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
+            <File Path="/AFDXV1.srcs/sources_1/new/afdx_bag_gate.v"/>
+            <File Path="/AFDXV1.srcs/sources_1/new/afdx_byte_fifo.v"/>
+            <File Path="/AFDXV1.srcs/sources_1/new/afdx_ipv4_checksum.v"/>
+            <File Path="/AFDXV1.srcs/sources_1/new/afdx_network_tx_top.v"/>
+            <File Path="/AFDXV1.srcs/sources_1/new/afdx_protocol_rx_top.v"/>
+            <File Path="/AFDXV1.srcs/sources_1/new/afdx_single_vl_rx_candidate.v"/>
+            <File Path="/AFDXV1.srcs/sources_1/new/afdx_single_vl_sn_gate.v"/>
+            <File Path="/AFDXV1.srcs/sources_1/new/afdx_single_vl_tx.v"/>
+            <File Path="/AFDXV1.srcs/sources_1/new/mac_crc32_byte.v"/>
+            <File Path="/AFDXV1.srcs/sources_1/new/mac_frame_store.v"/>
+            <File Path="/AFDXV1.srcs/sources_1/new/mac_gmii_core.v"/>
+            <File Path="/AFDXV1.srcs/sources_1/new/mac_gmii_rx.v"/>
+            <File Path="/AFDXV1.srcs/sources_1/new/mac_gmii_tx.v"/>
+            <File Path="/AFDXV1.srcs/sources_1/new/afdx_app_echo_queue.v"/>
+            <File Path="/AFDXV1.srcs/sources_1/new/afdx_gmii_candidate_boundary.v"/>
+            <File Path="/AFDXV1.srcs/sources_1/new/AFDX_top.v"/>
+        </FileSet>
+        <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
+            <File Path="/AFDXV1.srcs/constrs_1/new/clock_125mhz.edc"/>
+            <Config>
+                <Option Name="TargetConstrsFile" Val="/AFDXV1.srcs/constrs_1/new/clock_125mhz.edc"/>
+            </Config>
+        </FileSet>
+    </FileSets>
+    <Runs>
+        <Run Id="synth_1" Type="Synthesis" SrcSet="sources_1" ConstrsSet="constrs_1" State="current" Parent="" Configuration="">
+            <Option Id="Compilation Flow">Classic Flow</Option>
+            <Option Id="Device">EQ6HL45</Option>
+            <Option Id="IPRepositories"></Option>
+            <Option Id="LanguageVersion">VERILOG_2001</Option>
+            <Option Id="Package">CSG225</Option>
+            <Option Id="Series">eHiChip6</Option>
+            <Option Id="TargetLanguage">VERILOG</Option>
+            <Option Id="TopModule">AFDX_top</Option>
+        </Run>
+    </Runs>
+    <PRFlow>
+        <PartitionDefs/>
+        <PRConfigurations/>
+    </PRFlow>
+</Project>

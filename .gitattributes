@@ -1,0 +1,2 @@
+# Preserve exact source/evidence hashes across Windows Git restores.
+* -text

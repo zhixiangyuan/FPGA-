@@ -1,0 +1,203 @@
+{
+  "result": "PASS",
+  "scope": "Candidate GUI Run Synthesis audit; warning text copied from real synthesis report",
+  "project_manifest_sha256": "1c4bb9c24d76fd4104a6ccbe2fd0678df3fb7d2a2968b82116e6090b7ce5602d",
+  "synthesis_audit_sha256": "3b9dbd282ee1b075ec5741e054b2542446ca08558833679b562578e46deb5e21",
+  "device": "EQ6HL45/CSG225",
+  "top": "AFDX_top",
+  "clock_constraint_ns": 8,
+  "resources": {
+    "LUTs": 2784,
+    "FFs": 1069,
+    "CLBs": 404,
+    "Memorys": 28,
+    "DSPs": 0,
+    "PLLs": 0,
+    "Pins": 22
+  },
+  "warning_count": 25,
+  "warnings": [
+    {
+      "index": 1,
+      "line": 2244,
+      "code": 10270,
+      "message": "Verilog HDL Case Statement warning at mac_gmii_tx.v(42): incomplete case statement has no default case item",
+      "classification": "Frozen MAC gmii_txd is preassigned zero; no production change"
+    },
+    {
+      "index": 2,
+      "line": 2245,
+      "code": 10230,
+      "message": "Verilog HDL assignment warning at mac_gmii_tx.v(54): truncated value with size 32 to match size of target (3)",
+      "classification": "Frozen MAC bounded width truncation"
+    },
+    {
+      "index": 3,
+      "line": 2247,
+      "code": 10230,
+      "message": "Verilog HDL assignment warning at mac_gmii_tx.v(77): truncated value with size 32 to match size of target (3)",
+      "classification": "Frozen MAC bounded width truncation"
+    },
+    {
+      "index": 4,
+      "line": 2248,
+      "code": 10230,
+      "message": "Verilog HDL assignment warning at mac_gmii_tx.v(78): truncated value with size 32 to match size of target (6)",
+      "classification": "Frozen MAC bounded width truncation"
+    },
+    {
+      "index": 5,
+      "line": 2249,
+      "code": 10230,
+      "message": "Verilog HDL assignment warning at mac_gmii_tx.v(79): truncated value with size 32 to match size of target (3)",
+      "classification": "Frozen MAC bounded width truncation"
+    },
+    {
+      "index": 6,
+      "line": 2250,
+      "code": 10230,
+      "message": "Verilog HDL assignment warning at mac_gmii_tx.v(80): truncated value with size 32 to match size of target (3)",
+      "classification": "Frozen MAC bounded width truncation"
+    },
+    {
+      "index": 7,
+      "line": 2251,
+      "code": 10230,
+      "message": "Verilog HDL assignment warning at mac_gmii_tx.v(84): truncated value with size 32 to match size of target (3)",
+      "classification": "Frozen MAC bounded width truncation"
+    },
+    {
+      "index": 8,
+      "line": 2252,
+      "code": 10230,
+      "message": "Verilog HDL assignment warning at mac_gmii_tx.v(85): truncated value with size 32 to match size of target (3)",
+      "classification": "Frozen MAC bounded width truncation"
+    },
+    {
+      "index": 9,
+      "line": 2253,
+      "code": 10230,
+      "message": "Verilog HDL assignment warning at mac_gmii_tx.v(89): truncated value with size 32 to match size of target (3)",
+      "classification": "Frozen MAC bounded width truncation"
+    },
+    {
+      "index": 10,
+      "line": 2254,
+      "code": 10230,
+      "message": "Verilog HDL assignment warning at mac_gmii_tx.v(91): truncated value with size 32 to match size of target (3)",
+      "classification": "Frozen MAC bounded width truncation"
+    },
+    {
+      "index": 11,
+      "line": 2255,
+      "code": 10230,
+      "message": "Verilog HDL assignment warning at mac_gmii_tx.v(93): truncated value with size 32 to match size of target (3)",
+      "classification": "Frozen MAC bounded width truncation"
+    },
+    {
+      "index": 12,
+      "line": 2261,
+      "code": 10230,
+      "message": "Verilog HDL assignment warning at mac_gmii_rx.v(36): truncated value with size 32 to match size of target (16)",
+      "classification": "Frozen MAC bounded width truncation"
+    },
+    {
+      "index": 13,
+      "line": 2263,
+      "code": 10230,
+      "message": "Verilog HDL assignment warning at mac_gmii_rx.v(80): truncated value with size 32 to match size of target (16)",
+      "classification": "Frozen MAC bounded width truncation"
+    },
+    {
+      "index": 14,
+      "line": 2266,
+      "code": 10036,
+      "message": "Verilog HDL or VHDL warning at afdx_single_vl_rx_candidate.v(153): object \"frame_reject\" assigned a value but never read",
+      "classification": "Unused frozen Parser frame_reject register"
+    },
+    {
+      "index": 15,
+      "line": 2269,
+      "code": 276020,
+      "message": "Inferred RAM node \"afdx_protocol_rx_top:protocol|afdx_network_tx_top:tx_mac|mac_gmii_core:mac|mac_gmii_tx:tx|mac_frame_store:bank|afdx_byte_fifo:bytes|storage_rtl_0\" from synchronous design logic.  Pass-through logic has been added to match the read-during-write behavior of the original design.",
+      "classification": "RAM bypass added to preserve read-during-write semantics"
+    },
+    {
+      "index": 16,
+      "line": 2270,
+      "code": 276020,
+      "message": "Inferred RAM node \"afdx_protocol_rx_top:protocol|afdx_network_tx_top:tx_mac|mac_gmii_core:mac|mac_gmii_rx:rx|mac_frame_store:bank0|afdx_byte_fifo:bytes|storage_rtl_0\" from synchronous design logic.  Pass-through logic has been added to match the read-during-write behavior of the original design.",
+      "classification": "RAM bypass added to preserve read-during-write semantics"
+    },
+    {
+      "index": 17,
+      "line": 2271,
+      "code": 276020,
+      "message": "Inferred RAM node \"afdx_protocol_rx_top:protocol|afdx_network_tx_top:tx_mac|mac_gmii_core:mac|mac_gmii_rx:rx|mac_frame_store:bank1|afdx_byte_fifo:bytes|storage_rtl_0\" from synchronous design logic.  Pass-through logic has been added to match the read-during-write behavior of the original design.",
+      "classification": "RAM bypass added to preserve read-during-write semantics"
+    },
+    {
+      "index": 18,
+      "line": 2272,
+      "code": 276020,
+      "message": "Inferred RAM node \"afdx_app_echo_queue:application|bank0_rtl_0\" from synchronous design logic.  Pass-through logic has been added to match the read-during-write behavior of the original design.",
+      "classification": "RAM bypass added to preserve read-during-write semantics"
+    },
+    {
+      "index": 19,
+      "line": 2273,
+      "code": 276020,
+      "message": "Inferred RAM node \"afdx_app_echo_queue:application|bank1_rtl_0\" from synchronous design logic.  Pass-through logic has been added to match the read-during-write behavior of the original design.",
+      "classification": "RAM bypass added to preserve read-during-write semantics"
+    },
+    {
+      "index": 20,
+      "line": 2274,
+      "code": 276020,
+      "message": "Inferred RAM node \"afdx_protocol_rx_top:protocol|afdx_single_vl_rx_candidate:rx_protocol|bank0_rtl_0\" from synchronous design logic.  Pass-through logic has been added to match the read-during-write behavior of the original design.",
+      "classification": "RAM bypass added to preserve read-during-write semantics"
+    },
+    {
+      "index": 21,
+      "line": 2275,
+      "code": 276020,
+      "message": "Inferred RAM node \"afdx_protocol_rx_top:protocol|afdx_single_vl_rx_candidate:rx_protocol|bank1_rtl_0\" from synchronous design logic.  Pass-through logic has been added to match the read-during-write behavior of the original design.",
+      "classification": "RAM bypass added to preserve read-during-write semantics"
+    },
+    {
+      "index": 22,
+      "line": 2422,
+      "code": 13024,
+      "message": "Output pins are stuck at VCC or GND",
+      "classification": "Constant output summary"
+    },
+    {
+      "index": 23,
+      "line": 2423,
+      "code": 13410,
+      "message": "Pin \"tx_ready\" is stuck at GND",
+      "classification": "Candidate tx_ready explicitly tied zero"
+    },
+    {
+      "index": 24,
+      "line": 2427,
+      "code": 21074,
+      "message": "Design contains 1 input pin(s) that do not drive logic",
+      "classification": "Unused input summary"
+    },
+    {
+      "index": 25,
+      "line": 2428,
+      "code": 15610,
+      "message": "No output dependent on input pin \"rx_ready\"",
+      "classification": "Candidate rx_ready intentionally ignored"
+    }
+  ],
+  "critical_status": {
+    "EQ6_NATIVE_NETLIST_EQUIVALENCE": "NOT VERIFIED",
+    "physical_IO_fit": "NOT VERIFIED",
+    "POST_SYNTH_TIMING": "NOT VERIFIED",
+    "Implementation": "NOT RUN",
+    "Bitstream": "NOT RUN"
+  }
+}

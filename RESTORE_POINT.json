@@ -1,0 +1,33 @@
+{
+  "project": "AFDX school V1.0 candidate",
+  "approval_scope": "Stage1 team single-VL GMII candidate only",
+  "stable_tag": "afdx-v1.0-stage1-system-verified-2026-10-12",
+  "stable_commit": "668094d8d4bcb5e4f2a447274b61a88129c991ec",
+  "previous_candidate_tag": "afdx-v1.0-stage1-candidate-2026-10-12",
+  "previous_candidate_commit": "a124c4359ba9c79db30f6544a5dedca53cc70e22",
+  "full_netlist_run": "netlist_001",
+  "full_netlist_result": "PASS",
+  "full_netlist_verification_sha256": "c06ac160f1719fb5a015a8f4f4049755ebe0749e6b2c5dc21f41854f2347c72e",
+  "final_report_sha256": "d6c721c08c1d2968a0cde927183b93dfc509dd8909e699ff23b7ab4f14b8e051",
+  "offline_delivery_archive": {
+    "path": "delivery/V1.0_complete_20261012.zip",
+    "bytes": 57173744,
+    "sha256": "1015dc36af7c1bffc539a262b7e3ae9c4802fe67c201f7d9cb18242e560b0700",
+    "hashed_package_members": 967
+  },
+  "offline_git_bundle": {
+    "path": "delivery/V1.0_complete_20261012.git.bundle",
+    "bytes": 81841,
+    "sha256": "bfe4b27ca4305cf1029937c383252390555af1a7bbd6ee43ad24ac8982e4b679"
+  },
+  "distribution_note": "The offline archive includes Altera simulation models and EDA artifacts. Keep it outside GitHub unless redistribution rights for every included vendor artifact are confirmed.",
+  "unverified": [
+    "official eight-port compatibility",
+    "100 Mbps",
+    "official worst-case latency and jitter",
+    "POST_SYNTH_TIMING",
+    "EQ6_NATIVE_NETLIST_EQUIVALENCE",
+    "physical I/O fit"
+  ],
+  "stage2": "NOT STARTED"
+}
