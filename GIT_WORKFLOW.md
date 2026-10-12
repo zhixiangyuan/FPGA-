@@ -1,6 +1,6 @@
 # Git版本管理约定
 
-统一工程当前位于隔离候选目录。Stage E1 已完成：GitHub 私有仓库的 `dev` 已同步，候选提交 `8e31c6414e93b56244f29ce1087ce216daffab04` 与全部 6 个原有标签均可从远端读取，独立克隆核验通过。`dev` 历史包含原始 Initial commit `a631d0dbaf5515b47077f16cbf02292a6b7be176`；V1.0 冻结提交 `668094d8d4bcb5e4f2a447274b61a88129c991ec` 仍由原标签保护。远端 `main` 仍指向 Initial commit。Stage E2 的 `dev` 到 `main` Pull Request 需经队长审核，合并前不更新 `main`。
+统一工程当前位于隔离候选目录。Stage E1 已完成：GitHub 私有仓库的 `dev` 已同步，候选提交 `8e31c6414e93b56244f29ce1087ce216daffab04` 与全部 6 个原有标签均可从远端读取，独立克隆核验通过。`dev` 历史包含原始 Initial commit `a631d0dbaf5515b47077f16cbf02292a6b7be176`；V1.0 冻结提交 `668094d8d4bcb5e4f2a447274b61a88129c991ec` 仍由原标签保护。远端 `main` 仍指向 Initial commit。Stage E2 Pull Request [#1](https://github.com/zhixiangyuan/FPGA-/pull/1) 当前可合并，须经队长批准后才更新`main`。
 
 ## 分支和阶段版本
 

@@ -98,4 +98,4 @@ GUI综合成功后，已从该真实综合工程导出功能网表 `build/logs/e
 - 6个原有标签均以原名称和原目标推送。V1.0稳定标签仍指向`668094d8d4bcb5e4f2a447274b61a88129c991ec`。B1/B2标签保存独立历史链，完整恢复克隆需执行`git fetch origin --tags`。
 - 独立克隆核对通过：14个可达提交与候选仓库一致；67个跟踪文件SHA-256一致；13份冻结核心和8项Golden数据通过清单核验。原V1.0证据清单中的41个源码哈希与冻结提交`668094d8`一致。
 - 在独立克隆目录执行`python scripts/prepare_v1_elinx.py`成功，生成工程副本的16个源文件哈希一致，顶层、器件、封装及8 ns约束核对通过。该步骤只生成综合工程，不代表新目录已运行综合或完整VO回归。
-- 远端`main`仍指向原始 Initial commit；Stage E2的合并尚待队长批准。Stage E3和Stage F均未执行。
+- 远端`main`仍指向原始 Initial commit；Stage E2 Pull Request [#1](https://github.com/zhixiangyuan/FPGA-/pull/1) 当前无冲突并可合并，但合并尚待队长批准。Stage E3和Stage F均未执行。

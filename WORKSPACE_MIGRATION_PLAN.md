@@ -18,7 +18,7 @@
 
 ## 当前状态
 
-Stage E2 正在准备 `dev` 到 `main` 的 Pull Request。远端 `main` 当前仍为`a631d0dbaf5515b47077f16cbf02292a6b7be176`；候选`dev`包含该提交、V1.0冻结提交`668094d8d4bcb5e4f2a447274b61a88129c991ec`及后续准备提交`5cf6e2e9d511252663e0fa2cf75f41cee53b3901`。合并必须使用普通 Merge Commit，并等待队长批准。
+Stage E2 Pull Request [#1](https://github.com/zhixiangyuan/FPGA-/pull/1) 已创建。GitHub 当前报告该 PR 可合并；`dev`相对`main` ahead、behind 0。远端 `main` 当前仍为`a631d0dbaf5515b47077f16cbf02292a6b7be176`；候选`dev`包含该提交、V1.0冻结提交`668094d8d4bcb5e4f2a447274b61a88129c991ec`及后续准备提交`5cf6e2e9d511252663e0fa2cf75f41cee53b3901`。合并必须使用普通 Merge Commit，并等待队长批准。
 
 Stage E3 只能在队长批准并完成`main`合并后执行，内容为远端独立恢复验证及本地分支同步。
 

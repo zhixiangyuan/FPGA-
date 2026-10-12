@@ -14,7 +14,7 @@ V1.0 阶段1候选工程已完成团队单VL工程profile的 RTL、真实功能�
 
 Stage E1 已将统一工程候选推送到 GitHub 的 `dev`，并通过独立克隆和源码哈希核验。`dev` 历史包含 V1.0 提交和 GitHub 原始 Initial commit；仓库另保留全部 6 个原有标签。
 
-远端 `main` 仍指向原始 Initial commit。统一工程候选正在通过 `dev` 到 `main` 的 Pull Request 申请发布；合并前仍需队长批准。V1.0 原稳定标签保持不变，统一工作区稳定标签须等正式工作区验证后另行创建。
+远端 `main` 仍指向原始 Initial commit。统一工程候选已通过 [Stage E2 Pull Request #1](https://github.com/zhixiangyuan/FPGA-/pull/1) 申请发布；当前无合并冲突，合并前仍需队长批准。V1.0 原稳定标签保持不变，统一工作区稳定标签须等正式工作区验证后另行创建。
 
 ## 目录
 

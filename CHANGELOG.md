@@ -8,4 +8,4 @@
 - 在隔离候选工程完成315场景RTL Golden回归、候选eLinx GUI综合、真实功能VO导出及ModelSim 0 ns加载检查。
 - 该候选仍是团队单VL功能工程；官方接口兼容、100 Mbps、最坏时延/抖动、Setup/Hold、EQ6原生等价性及物理封装适配均未标记PASS。
 - Stage E1 已将迁移候选提交 `8e31c6414e93b56244f29ce1087ce216daffab04` 和全部 6 个历史标签推送到 GitHub；独立克隆核对了 14 个提交对象、67 个跟踪文件、13 份冻结核心及 8 项 Golden 数据。
-- Stage E2 正在准备 `dev` 到 `main` 的 Pull Request。远端 `main` 仍为初始提交 `a631d0dbaf5515b47077f16cbf02292a6b7be176`；尚未合并。Stage F 正式工作区切换尚未执行。
+- Stage E2 已创建 [`dev` 到 `main` 的 Pull Request #1](https://github.com/zhixiangyuan/FPGA-/pull/1)，GitHub 当前报告可合并；远端 `main` 仍为初始提交 `a631d0dbaf5515b47077f16cbf02292a6b7be176`，等待队长批准合并。Stage E3 和 Stage F 尚未执行。
