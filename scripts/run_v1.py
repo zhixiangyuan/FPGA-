@@ -2,6 +2,8 @@ from pathlib import Path
 import hashlib,json,os,shutil,subprocess,sys
 from datetime import datetime,timezone
 ROOT=Path(__file__).resolve().parents[1]
+BUILD_ROOT=Path(os.environ.get('AFDX_BUILD_ROOT',ROOT/'build'))
+RUN_ROOT=BUILD_ROOT/'logs'
 MS=Path(os.environ.get('MODELSIM_BIN',r'D:\FPGA\Modlesim20.4\ModelSim20.4\win64'))
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
@@ -12,9 +14,10 @@ def main():
   assert sha(local)==x['sha256']
   if Path(x['original']).exists():
    assert sha(Path(x['original']))==x['sha256'];originals_checked+=1
+ RUN_ROOT.mkdir(parents=True,exist_ok=True)
  i=1
- while (ROOT/f'runs/rtl_{i:03d}').exists():i+=1
- run=ROOT/f'runs/rtl_{i:03d}';run.mkdir(parents=True)
+ while (RUN_ROOT/f'rtl_{i:03d}').exists():i+=1
+ run=RUN_ROOT/f'rtl_{i:03d}';run.mkdir()
  sources=[*sorted((ROOT/'vendor/frozen').glob('*.v')),*sorted((ROOT/'rtl').glob('*.v')),ROOT/'sim/tb_v1_echo.sv']
  inputs=sources+[ROOT/'scripts/generate_v1_golden.py',ROOT/'scripts/frozen_frame_reference.py',Path(__file__)]
  for p in inputs:shutil.copy2(p,run/p.name)

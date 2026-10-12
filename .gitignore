@@ -1,10 +1,12 @@
-# 运行输出及完整离线交付归档
-runs/
-delivery/
+# 统一工程的运行缓存、日志和完整离线交付归档
+/build/
+/runs/
+/delivery/
 __pycache__/
 
 # ModelSim和eLinx生成物
 work/
+**/work/
 transcript
 *.wlf
 *.qdb

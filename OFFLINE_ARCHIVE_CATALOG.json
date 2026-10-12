@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "purpose": "Restore points for the isolated unified-workspace migration candidate",
+  "stage_status": "C_AND_D_COMPLETE_PENDING_CAPTAIN_REVIEW",
+  "github_write_performed": false,
+  "workspace_switch_performed": false,
+  "full_stage_workspaces": {
+    "source_root": "D:\\FPGA\\captain_integration",
+    "archive_copy": "D:\\FPGA\\AFDX_archive\\workspaces_20261012\\captain_integration",
+    "manifest": "D:\\FPGA\\AFDX_archive\\workspaces_20261012\\workspace_manifest.json",
+    "manifest_sha256": "a0f2fe4067542298ad3acd33322275c480237ceab7c850551a83c00099a8a64e",
+    "files_verified": 17261,
+    "bytes_verified": 2573320124,
+    "copy_verification": "PASS; all listed relative paths and SHA-256 values matched at archive creation"
+  },
+  "git_bundles": {
+    "directory": "D:\\FPGA\\AFDX_archive\\git_bundles_20261012",
+    "manifest": "git_bundle_manifest.json",
+    "manifest_sha256": "f53fd591681b0c14f0c079faf4ace660d8d07d7e10b47fd211447226091cff5f",
+    "repositories": [
+      {
+        "name": "school_v1_20261011",
+        "file": "school_v1_20261011.bundle",
+        "sha256": "04ca3dfee019e6cc913916f2467755a88a65dbef516d7e72bda43319685240f3",
+        "commits": 4,
+        "tags": [
+          "afdx-v1.0-stage1-candidate-2026-10-12",
+          "afdx-v1.0-stage1-system-verified-2026-10-12"
+        ],
+        "bundle_verify": "PASS",
+        "restore_clone_refs": "PASS"
+      },
+      {
+        "name": "stage5B1_single_vl_20261010",
+        "file": "stage5B1_single_vl_20261010.bundle",
+        "sha256": "a1076f3cc98c9f7041a3ced1da3f33eafa396ac68c3eefe79037aa681a8c65c5",
+        "commits": 1,
+        "tags": ["stage5b1-approved-2026-10-11"],
+        "bundle_verify": "PASS",
+        "restore_clone_refs": "PASS"
+      },
+      {
+        "name": "stage5B2_rx_arch_20261011",
+        "file": "stage5B2_rx_arch_20261011.bundle",
+        "sha256": "e68883bd24ff46bca718754a2ed2803bcc0526394e0c9dcb51a8d75795562e60",
+        "commits": 6,
+        "tags": [
+          "stage5b2-b2-1-2-approved-2026-10-11",
+          "stage5b2-b2-4-approved-2026-10-11"
+        ],
+        "archive_head_commit": "1be857127613ef707674d8a0e6f05eb98a62a0b0",
+        "bundle_verify": "PASS",
+        "restore_clone_refs": "PASS"
+      }
+    ]
+  },
+  "v1_delivery": {
+    "workspace_copy_path": "D:\\FPGA\\AFDX_archive\\workspaces_20261012\\captain_integration\\school_v1_20261011\\delivery",
+    "zip": {
+      "file": "V1.0_complete_20261012.zip",
+      "bytes": 57173744,
+      "sha256": "1015dc36af7c1bffc539a262b7e3ae9c4802fe67c201f7d9cb18242e560b0700"
+    },
+    "git_bundle": {
+      "file": "V1.0_complete_20261012.git.bundle",
+      "bytes": 81841,
+      "sha256": "bfe4b27ca4305cf1029937c383252390555af1a7bbd6ee43ad24ac8982e4b679"
+    },
+    "expanded_evidence_root": "D:\\FPGA\\AFDX_archive\\workspaces_20261012\\captain_integration\\school_v1_20261011\\delivery\\V1.0_complete_20261012\\evidence",
+    "license_note": "Altera simulation models and EDA artifacts stay in the offline archive; do not add them to GitHub without separate redistribution review."
+  },
+  "migration_candidate_evidence": {
+    "archive_root": "D:\\FPGA\\AFDX_archive\\migration_candidate_C_D_20261012",
+    "manifest": "archive_manifest.json",
+    "manifest_sha256": "8b84bf1305bbbc7d0bc25259b7eba19e7a6fe2b6e7c76d320ac6971e6dc97326",
+    "files": 412,
+    "bytes": 106088813,
+    "contents": ["rtl_001", "elinx_001", "eda_export_001", "netlist_load_001", "netlist_observer_001"]
+  },
+  "frozen_baseline": {
+    "stable_commit": "668094d8d4bcb5e4f2a447274b61a88129c991ec",
+    "stable_tag": "afdx-v1.0-stage1-system-verified-2026-10-12",
+    "github_preparation_commit": "5cf6e2e9d511252663e0fa2cf75f41cee53b3901",
+    "github_preparation_commit_preserved_by": "dev ancestry and school_v1_20261011.bundle",
+    "historical_status_records_modified": false,
+    "official_metrics_claimed_pass": false
+  }
+}

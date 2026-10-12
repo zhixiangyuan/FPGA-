@@ -1,11 +1,21 @@
 """Read real GUI smoke artifacts. Never invoke synthesis, fitting or EDA."""
 from pathlib import Path
-import hashlib,json,re
+import argparse
+import hashlib,json,re,os
 ROOT=Path(__file__).resolve().parents[1]
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
- run=ROOT/'runs/elinx_001';p=run/'AFDXV1';s=p/'AFDXV1.runs/synth_1';manifest=json.loads((run/'project_manifest.json').read_text())
- for row in manifest['sources']:assert sha(Path(row['original']))==row['sha256'] and sha(Path(row['snapshot']))==row['snapshot_sha256']
+ ap=argparse.ArgumentParser();ap.add_argument('--project-dir',type=Path);args=ap.parse_args()
+ build=Path(os.environ.get('AFDX_BUILD_ROOT',ROOT/'build'))
+ if args.project_dir:p=args.project_dir.resolve()
+ else:
+  candidates=sorted((build/'elinx').glob('AFDXV1_*'))
+  if not candidates:raise FileNotFoundError('Run scripts/prepare_v1_elinx.py first')
+  p=candidates[-1]
+ run=p;s=p/'AFDXV1.runs/synth_1';manifest=json.loads((p/'project_manifest.json').read_text(encoding='utf-8'))
+ for row in manifest['sources']:
+  assert sha(ROOT/row['canonical_source'])==row['sha256']
+  assert sha(p/row['snapshot'])==row['snapshot_sha256']
  util=(s/'AFDXV1_utilization_synth.rpt').read_text();assert 'Synthesis Status : Successful' in util and 'Top-level Entity Name : AFDX_top' in util
  assert 'device_name="EQ6HL45"' in (s/'AFDXV1_cluster.xml').read_text()
  assert 'set packageName "CSG225"' in (s/'AFDXV1_pack.tcl').read_text()
@@ -27,5 +37,5 @@ def main():
  edc=p/'AFDXV1.srcs/constrs_1/new/clock_125mhz.edc';assert '-period 8.000' in edc.read_text()
  assert b'gmii_clk' in (s/'AFDXV1_clocklist.pb').read_bytes()
  result={'result':'PASS','scope':'real GUI synthesis smoke audit only','resources':resources,'warning_count':len(warnings),'warnings':warnings,'hierarchy':hierarchy,'logical_RAM_bits':96224,'RAM_bank_count':7,'core_optimized_empty':False,'diagnostic_counters_may_be_optimized':'unobserved top-internal counters; protocol/SN/data paths retained','combinational_loop_cells_reported':33,'POST_SYNTH_TIMING':'NOT VERIFIED','EQ6_NATIVE_NETLIST_EQUIVALENCE':'NOT VERIFIED','physical_IO_fit':'NOT VERIFIED','new_V1_functional_VO_test':'NOT RUN; not required by this stage smoke gate','source_integrity':'PASS','Implementation':'NOT RUN','Bitstream':'NOT RUN','synthesis_artifact_hashes':{f.name:sha(f) for f in s.iterdir() if f.is_file()}}
- (run/'synthesis_audit.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({k:v for k,v in result.items() if k in ('result','resources','warning_count','hierarchy','logical_RAM_bits')},indent=2))
+ (p/'synthesis_audit.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({k:v for k,v in result.items() if k in ('result','resources','warning_count','hierarchy','logical_RAM_bits')},indent=2))
 if __name__=='__main__':main()

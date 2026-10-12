@@ -1,33 +1,93 @@
-"""Prepare one independent synthesis smoke project, never run fit/bitstream."""
+"""Generate an ignored eLinx project from the canonical, hash-checked sources."""
 from pathlib import Path
-import json,hashlib,shutil,re
-ROOT=Path(__file__).resolve().parents[1]
-def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
-def main():
- assert json.loads((ROOT/'runs/rtl_002/verification.json').read_text())['result']=='PASS'
- run=ROOT/'runs/elinx_001';prj=run/'AFDXV1';name='AFDXV1';src=prj/f'{name}.srcs/sources_1/new';con=prj/f'{name}.srcs/constrs_1/new';src.mkdir(parents=True);con.mkdir(parents=True)
- files=[*sorted((ROOT/'vendor/frozen').glob('*.v')),*sorted((ROOT/'rtl').glob('*.v'))]
- rows=[]
- for p in files:q=src/p.name;shutil.copy2(p,q);rows.append({'original':str(p),'snapshot':str(q),'sha256':sha(p),'snapshot_sha256':sha(q)})
- constraint=con/'clock_125mhz.edc';constraint.write_text('create_clock -name gmii_clk -period 8.000 -waveform {0.000 4.000} [get_ports clk]\n')
- template=ROOT.parent/'stage5B2_rx_arch_20261011/runs/elinx_002/AFDXB2/AFDXB2.epr'
- # Start from the proven EPR schema; replace sources and preserve synthesis-only flow.
- text=template.read_text().replace('AFDXB2','AFDXV1').replace('afdx_b2_synth_wrap','AFDX_top')
- text=re.sub(r'<FileSet Name="sources_1".*?</FileSet>','<FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">\n'+ '\n'.join(f'<File Path="/AFDXV1.srcs/sources_1/new/{p.name}"/>' for p in files)+'\n</FileSet>',text,flags=re.S)
- (prj/'AFDXV1.epr').write_text(text)
- ports=re.findall(r'\b(input|output)\s+wire\s*(?:\[(\d+):(\d+)\])?\s+(\w+)',(ROOT/'rtl/AFDX_top.v').read_text().split(');')[0]);budget=sum(abs(int(a)-int(b))+1 if a else 1 for _,a,b,n in ports);assert budget==22 and len(ports)==8
- manifest={'status':'PREPARED_NOT_SYNTHESIZED','project':str(prj/'AFDXV1.epr'),'top':'AFDX_top','target':'EQ6HL45/CSG225','ports':22,'sources':rows,'constraint_sha256':sha(constraint),'logical_memory_bits':72688+23536,'application_bank_count':2,'production_modified':False,'Implementation':'NOT RUN','POST_SYNTH_TIMING':'NOT VERIFIED','physical_fit':'NOT VERIFIED'}
- (run/'project_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
- handoff=f'''# V1.0 综合冒烟人工接力（一次）
+import hashlib
+import json
+import os
+import re
+import shutil
 
-工程：`{prj / 'AFDXV1.epr'}`。
+ROOT = Path(__file__).resolve().parents[1]
+BUILD_ROOT = Path(os.environ.get("AFDX_BUILD_ROOT", ROOT / "build"))
+TEMPLATE = ROOT / "elinx" / "AFDXV1"
 
-1. 在eLinx中打开此独立工程，确认Top=AFDX_top，Device=EQ6HL45，Package=CSG225。
-2. Sources应有16个Verilog文件；Constraints选择clock_125mhz.edc（8.000ns）。
-3. 只执行 **Run Synthesis**，等待Synthesis Complete。
-4. 回报Errors/Warnings及LUT、FF、Memory、IO；保留GUI产物，Codex随后读取真实map/EDI/utilization报告审计。
 
-不执行Implementation、Bitstream或下载；不打开冻结生产工程来替换源码。当前RTL八端口22位仅是声明统计，不是物理fit PASS。此前eLinx打开工程对话框自动化焦点不可读，因此本轮采用既定人工接力，不重复自动点击。
-'''
- (run/'GUI综合冒烟接力.md').write_text(handoff,encoding='utf-8');print('V1_SYNTHESIS_PREPARED',prj/'AFDXV1.epr')
-if __name__=='__main__':main()
+def sha(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def main() -> int:
+    template_epr = TEMPLATE / "AFDXV1.epr"
+    template_edc = TEMPLATE / "AFDXV1.srcs" / "constrs_1" / "new" / "clock_125mhz.edc"
+    if not template_epr.is_file() or not template_edc.is_file():
+        raise FileNotFoundError("Tracked eLinx EPR template or 8 ns EDC is missing")
+
+    sources = sorted((ROOT / "vendor" / "frozen").glob("*.v")) + sorted((ROOT / "rtl").glob("*.v"))
+    names = [p.name for p in sources]
+    if len(sources) != 16 or len(set(names)) != len(names):
+        raise RuntimeError(f"Expected 16 uniquely named canonical Verilog sources; found {len(sources)}")
+
+    projects = BUILD_ROOT / "elinx"
+    projects.mkdir(parents=True, exist_ok=True)
+    index = 1
+    while (projects / f"AFDXV1_{index:03d}").exists():
+        index += 1
+    project = projects / f"AFDXV1_{index:03d}"
+    shutil.copytree(TEMPLATE, project)
+
+    source_dir = project / "AFDXV1.srcs" / "sources_1" / "new"
+    source_dir.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for source in sources:
+        snapshot = source_dir / source.name
+        shutil.copy2(source, snapshot)
+        source_hash = sha(source)
+        snapshot_hash = sha(snapshot)
+        if source_hash != snapshot_hash:
+            raise RuntimeError(f"Source copy hash mismatch: {source.name}")
+        rows.append({"canonical_source": source.relative_to(ROOT).as_posix(),
+                     "snapshot": snapshot.relative_to(project).as_posix(),
+                     "sha256": source_hash, "snapshot_sha256": snapshot_hash})
+
+    constraint = project / "AFDXV1.srcs" / "constrs_1" / "new" / "clock_125mhz.edc"
+    shutil.copy2(template_edc, constraint)
+    epr = (project / "AFDXV1.epr").read_text(encoding="utf-8")
+    declared = re.findall(r'<File Path="/AFDXV1\.srcs/sources_1/new/([^"]+)"', epr)
+    if sorted(declared) != sorted(names):
+        raise RuntimeError("EPR source list does not match the canonical RTL set")
+    if "EQ6HL45" not in epr or "CSG225" not in epr or "AFDX_top" not in epr:
+        raise RuntimeError("EPR target or top module differs from the approved V1.0 project")
+    if "-period 8.000" not in constraint.read_text(encoding="utf-8"):
+        raise RuntimeError("The copied EDC does not specify the 8 ns clock")
+
+    header = (ROOT / "rtl" / "AFDX_top.v").read_text(encoding="utf-8").split(");", 1)[0]
+    ports = re.findall(r"\b(input|output)\s+wire\s*(?:\[(\d+):(\d+)\])?\s+(\w+)", header)
+    port_bits = sum(abs(int(a) - int(b)) + 1 if a else 1 for _, a, b, _ in ports)
+    if len(ports) != 8 or port_bits != 22:
+        raise RuntimeError(f"Unexpected candidate interface: {len(ports)} ports, {port_bits} bits")
+
+    manifest = {
+        "status": "PREPARED_NOT_SYNTHESIZED",
+        "project": str(project / "AFDXV1.epr"),
+        "top": "AFDX_top",
+        "device": "EQ6HL45",
+        "package": "CSG225",
+        "clock_constraint_ns": 8,
+        "ports": 8,
+        "io_bits": port_bits,
+        "sources": rows,
+        "constraint_sha256": sha(constraint),
+        "frozen_core_manifest_sha256": sha(ROOT / "FROZEN_CORE_MANIFEST.json"),
+        "production_rtl_modified": False,
+        "Implementation": "NOT RUN",
+        "Bitstream": "NOT RUN",
+        "POST_SYNTH_TIMING": "NOT VERIFIED",
+        "EQ6_NATIVE_NETLIST_EQUIVALENCE": "NOT VERIFIED",
+        "physical_IO_fit": "NOT VERIFIED",
+    }
+    (project / "project_manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps(manifest, ensure_ascii=False, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
