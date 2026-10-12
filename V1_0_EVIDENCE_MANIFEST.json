@@ -1,7 +1,7 @@
 {
   "scope": "stage1 single-VL team GMII echo V1.0 fallback",
   "status": {
-    "generated_local": "2026-10-12T09:16:58.939727+08:00",
+    "generated_local": "2026-10-12T09:18:40.252513+08:00",
     "STAGE1_EXECUTION": "COMPLETE",
     "STAGE1_RESULT": "PENDING_CAPTAIN_REVIEW",
     "V1_RTL_FUNCTIONAL": "PASS",
@@ -63,7 +63,7 @@
     "vendor\\frozen\\mac_gmii_rx.v": "b2c3d4cfd8e7e70251df01bc063ed0ccbb65878c85b4c7a3a8038cbb62466849",
     "vendor\\frozen\\mac_gmii_tx.v": "5dc651da9ce140be4649ea91e129c3de354919f69f8f949c21d84f2ae73b1be8",
     "scripts\\audit_v1_synthesis.py": "d3de674431831cf5ac4752e62bee03a8f355bf2e20fbb9bc8cd8c0d648f079b7",
-    "scripts\\finalize_v1.py": "51698583dd634f6765cdff4b39257c9381edff383b08d33f6bf63d9cf7c91cc2",
+    "scripts\\finalize_v1.py": "86d9b9f2e19ccd5431cdc1e4efd66e42850b37a504e0c4f99c52deda8b6e24eb",
     "scripts\\frozen_frame_reference.py": "8e8d6f57721b21315fe559218865e5be9b5f1f62dce94bc3a5bd8969c04e1236",
     "scripts\\generate_v1_golden.py": "9948eaa625a21c64dc1448dfe2019fc772fe0d004d1c2a10a5133d0daadbc084",
     "scripts\\package_v1.py": "ad5f9aaeada05a33dc8061ba749b65a04bc2a628be21c6d863d0479ff5c3da03",
