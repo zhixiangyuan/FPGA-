@@ -1,0 +1,80 @@
+[
+  {
+    "original": "D:\\FPGA\\captain_integration\\stage3B2_20261008\\rtl\\afdx_byte_fifo.v",
+    "snapshot": "D:\\FPGA\\captain_integration\\school_v1_20261011\\vendor\\frozen\\afdx_byte_fifo.v",
+    "sha256": "d4a68a1e90c4cebf11c8fecf074eec9af25ac655ffa36ec8b94d3530cfeb8748",
+    "owner": "frozen stage3-B2 FIFO"
+  },
+  {
+    "original": "D:\\FPGA\\captain_integration\\stage5B0_selfmac_20261010\\rtl\\mac_crc32_byte.v",
+    "snapshot": "D:\\FPGA\\captain_integration\\school_v1_20261011\\vendor\\frozen\\mac_crc32_byte.v",
+    "sha256": "ace81c3b570adb774ab07221377cd443bcd4a1c1d50470b1fc682872d4ed7e05",
+    "owner": "frozen B0 production RTL"
+  },
+  {
+    "original": "D:\\FPGA\\captain_integration\\stage5B0_selfmac_20261010\\rtl\\mac_frame_store.v",
+    "snapshot": "D:\\FPGA\\captain_integration\\school_v1_20261011\\vendor\\frozen\\mac_frame_store.v",
+    "sha256": "0aafd302a77c9ae219814ccb94e085ec98e00bd5805dfbd00b4b1f9ee4b3e069",
+    "owner": "frozen B0 production RTL"
+  },
+  {
+    "original": "D:\\FPGA\\captain_integration\\stage5B0_selfmac_20261010\\rtl\\mac_gmii_tx.v",
+    "snapshot": "D:\\FPGA\\captain_integration\\school_v1_20261011\\vendor\\frozen\\mac_gmii_tx.v",
+    "sha256": "5dc651da9ce140be4649ea91e129c3de354919f69f8f949c21d84f2ae73b1be8",
+    "owner": "frozen B0 production RTL"
+  },
+  {
+    "original": "D:\\FPGA\\captain_integration\\stage5B0_selfmac_20261010\\rtl\\mac_gmii_rx.v",
+    "snapshot": "D:\\FPGA\\captain_integration\\school_v1_20261011\\vendor\\frozen\\mac_gmii_rx.v",
+    "sha256": "b2c3d4cfd8e7e70251df01bc063ed0ccbb65878c85b4c7a3a8038cbb62466849",
+    "owner": "frozen B0 production RTL"
+  },
+  {
+    "original": "D:\\FPGA\\captain_integration\\stage5B0_selfmac_20261010\\rtl\\mac_gmii_core.v",
+    "snapshot": "D:\\FPGA\\captain_integration\\school_v1_20261011\\vendor\\frozen\\mac_gmii_core.v",
+    "sha256": "fdac547e7180027b7cc8e68ca73e4aa7673f303e1a9ec3b020a7e0dedae6fc7d",
+    "owner": "frozen B0 production RTL"
+  },
+  {
+    "original": "D:\\FPGA\\captain_integration\\stage5B1_single_vl_20261010\\rtl\\afdx_ipv4_checksum.v",
+    "snapshot": "D:\\FPGA\\captain_integration\\school_v1_20261011\\vendor\\frozen\\afdx_ipv4_checksum.v",
+    "sha256": "d0ca0a58ebb7ee03e6058a7ac6a943a7e0d20a9bbf4fd17677379261ef15b1da",
+    "owner": "frozen B1 production RTL"
+  },
+  {
+    "original": "D:\\FPGA\\captain_integration\\stage5B1_single_vl_20261010\\rtl\\afdx_bag_gate.v",
+    "snapshot": "D:\\FPGA\\captain_integration\\school_v1_20261011\\vendor\\frozen\\afdx_bag_gate.v",
+    "sha256": "c3c787e92cf5d9504dbae308eb06c9469b2cc8ac2d033b37956316a8bed0ec2d",
+    "owner": "frozen B1 production RTL"
+  },
+  {
+    "original": "D:\\FPGA\\captain_integration\\stage5B1_single_vl_20261010\\rtl\\afdx_single_vl_tx.v",
+    "snapshot": "D:\\FPGA\\captain_integration\\school_v1_20261011\\vendor\\frozen\\afdx_single_vl_tx.v",
+    "sha256": "dcf165241bebae6c481ead513ebd8c7c72a689d312996a52914c6a36112afd8a",
+    "owner": "frozen B1 production RTL"
+  },
+  {
+    "original": "D:\\FPGA\\captain_integration\\stage5B1_single_vl_20261010\\rtl\\afdx_network_tx_top.v",
+    "snapshot": "D:\\FPGA\\captain_integration\\school_v1_20261011\\vendor\\frozen\\afdx_network_tx_top.v",
+    "sha256": "04fe1b917178e9fe00fa0513f6da04e4885e095453a28488ccc8900d2f5eb6af",
+    "owner": "frozen B1 production RTL"
+  },
+  {
+    "original": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\rtl\\afdx_single_vl_rx_candidate.v",
+    "snapshot": "D:\\FPGA\\captain_integration\\school_v1_20261011\\vendor\\frozen\\afdx_single_vl_rx_candidate.v",
+    "sha256": "d9f70c2aec4a71995eb16a7f4030165c6fe4e2378d128588dd2268cf98573558",
+    "owner": "frozen B2-1 parser"
+  },
+  {
+    "original": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\rtl\\afdx_single_vl_sn_gate.v",
+    "snapshot": "D:\\FPGA\\captain_integration\\school_v1_20261011\\vendor\\frozen\\afdx_single_vl_sn_gate.v",
+    "sha256": "7ff9e5bf97f9f57f85c305435e2f5659ed4025dfad8c4ff864b1c1fedebe7425",
+    "owner": "frozen B2-2 SN gate"
+  },
+  {
+    "original": "D:\\FPGA\\captain_integration\\stage5B2_rx_arch_20261011\\rtl\\afdx_protocol_rx_top.v",
+    "snapshot": "D:\\FPGA\\captain_integration\\school_v1_20261011\\vendor\\frozen\\afdx_protocol_rx_top.v",
+    "sha256": "78bf1bfb675ea40d032cf49667a10c40f8e2a1c0b9fa5648aed8d1b90eddc3d5",
+    "owner": "frozen B2 protocol integration top"
+  }
+]
