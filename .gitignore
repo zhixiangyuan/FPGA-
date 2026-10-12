@@ -1,3 +1,22 @@
+# 运行输出及完整离线交付归档
 runs/
 delivery/
 __pycache__/
+
+# ModelSim和eLinx生成物
+work/
+transcript
+*.wlf
+*.qdb
+*.qpg
+*.qtl
+*.qws
+*.hdb
+*.cdb
+*.rdb
+*.vo
+*.vqm
+*.sof
+*.pof
+*.jic
+*.svf
