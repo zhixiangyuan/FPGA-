@@ -2,7 +2,9 @@
 param(
     [ValidateSet('Plan', 'Switch', 'Rollback')]
     [string]$Action = 'Plan',
-    [switch]$Execute
+    [switch]$Execute,
+    [ValidatePattern('^(_[0-9]{3})?$')]
+    [string]$FailureArchiveSuffix = ''
 )
 
 Set-StrictMode -Version Latest
@@ -11,7 +13,7 @@ $ErrorActionPreference = 'Stop'
 $finalRoot = 'D:\FPGA\captain_integration'
 $archiveRoot = 'D:\FPGA\AFDX_archive\workspaces_20261012'
 $legacyBackup = Join-Path $archiveRoot 'captain_integration_pre_stageF_20261012'
-$failedWorkspace = Join-Path $archiveRoot 'captain_integration_stageF_failed_20261012'
+$failedWorkspace = Join-Path $archiveRoot ('captain_integration_stageF_failed_20261012' + $FailureArchiveSuffix)
 $workspaceManifest = Join-Path $archiveRoot 'workspace_manifest.json'
 $transitionArchive = 'D:\FPGA\AFDX_archive\workspace_transition_20261013'
 $candidateArchive = Join-Path $transitionArchive 'migration_candidate_20261012'
@@ -174,7 +176,7 @@ if ($Action -eq 'Switch') {
         if ($LASTEXITCODE -ne 0) { throw "Creating local dev failed with exit code $LASTEXITCODE." }
 
         $verifyScript = Join-Path $finalRoot 'scripts\verify_unified_workspace.ps1'
-        & (Get-WindowsPowerShellPath) -NoProfile -ExecutionPolicy Bypass -File $verifyScript
+        & (Get-WindowsPowerShellPath) -NoProfile -ExecutionPolicy Bypass -File $verifyScript -WorkspaceRoot $finalRoot
         if ($LASTEXITCODE -ne 0) { throw "Unified workspace checks failed with exit code $LASTEXITCODE." }
 
         $python = Get-Command python -ErrorAction Stop

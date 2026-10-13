@@ -72,7 +72,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $finalRoot '.git'))) { throw 'The fi
 if ((& git -C $finalRoot branch --show-current) -cne 'dev') { throw 'The final unified workspace must be active on dev.' }
 $gitStatus = & git -C $finalRoot status --porcelain=v1
 if ($LASTEXITCODE -ne 0 -or @($gitStatus).Count -ne 0) { throw 'The final unified workspace must be clean before archiving auxiliary workspaces.' }
-& (Get-WindowsPowerShellPath) -NoProfile -ExecutionPolicy Bypass -File (Join-Path $finalRoot 'scripts\verify_unified_workspace.ps1')
+& (Get-WindowsPowerShellPath) -NoProfile -ExecutionPolicy Bypass -File (Join-Path $finalRoot 'scripts\verify_unified_workspace.ps1') -WorkspaceRoot $finalRoot
 if ($LASTEXITCODE -ne 0) { throw 'The final unified workspace verification failed.' }
 
 $activeElnx = @(Get-CimInstance Win32_Process | Where-Object { $_.Name -like 'eLinx*.exe' })

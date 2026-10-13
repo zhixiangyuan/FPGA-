@@ -1,11 +1,15 @@
 [CmdletBinding()]
 param(
-    [string]$WorkspaceRoot = (Split-Path -Parent $PSScriptRoot),
+    [string]$WorkspaceRoot = '',
     [switch]$RunRtl
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+if ([string]::IsNullOrWhiteSpace($WorkspaceRoot)) {
+    $WorkspaceRoot = Split-Path -Parent $PSScriptRoot
+}
 
 $root = [IO.Path]::GetFullPath((Get-Item -LiteralPath $WorkspaceRoot).FullName).TrimEnd([char[]]@('\'))
 
