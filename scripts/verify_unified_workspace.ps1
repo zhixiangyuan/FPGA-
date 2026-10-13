@@ -68,10 +68,11 @@ foreach ($item in $frozenManifest) {
 
 $goldenDir = Join-Path $root 'golden\V1.0_full_vo_315'
 $goldenHashes = Get-Content -LiteralPath (Join-Path $goldenDir 'sha256.json') -Raw | ConvertFrom-Json
-if ($goldenHashes.PSObject.Properties.Count -ne 8) {
-    throw "Expected 8 Golden hash entries, got $($goldenHashes.PSObject.Properties.Count)."
+$goldenEntries = @($goldenHashes.PSObject.Properties)
+if ($goldenEntries.Count -ne 8) {
+    throw "Expected 8 Golden hash entries, got $($goldenEntries.Count)."
 }
-foreach ($entry in $goldenHashes.PSObject.Properties) {
+foreach ($entry in $goldenEntries) {
     $path = Join-Path $goldenDir $entry.Name
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Missing Golden input: '$path'." }
     $actual = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -123,7 +124,7 @@ Write-Output "Origin=$origin"
 Write-Output "Main=$main"
 Write-Output "Dev=$dev"
 Write-Output "FrozenCores=$($frozenManifest.Count)"
-Write-Output "GoldenHashes=$($goldenHashes.PSObject.Properties.Count)"
+Write-Output "GoldenHashes=$($goldenEntries.Count)"
 Write-Output "ELinxProject=$($prepare.project)"
 Write-Output 'ELinxSynthesis=NOT RUN'
 Write-Output "ModelSimRTL=$rtlResult"
