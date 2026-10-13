@@ -92,6 +92,8 @@ GUI综合成功后，已从该真实综合工程导出功能网表 `build/logs/e
 
 ## 6. 后续 Stage E1 状态更新
 
+本节记录 Stage E1 完成时的远端状态；后续 Stage E2/E3 状态见第7节。
+
 本节补记 Stage C/D 报告完成后的 GitHub 同步结果，不改变原 V1.0 验收报告、冻结提交或历史哈希清单。
 
 - GitHub `dev` 已同步至提交`8e31c6414e93b56244f29ce1087ce216daffab04`。候选历史保留 GitHub 初始提交`a631d0dbaf5515b47077f16cbf02292a6b7be176`、V1.0冻结提交`668094d8d4bcb5e4f2a447274b61a88129c991ec`及后续准备提交`5cf6e2e9d511252663e0fa2cf75f41cee53b3901`。
@@ -99,3 +101,12 @@ GUI综合成功后，已从该真实综合工程导出功能网表 `build/logs/e
 - 独立克隆核对通过：14个可达提交与候选仓库一致；67个跟踪文件SHA-256一致；13份冻结核心和8项Golden数据通过清单核验。原V1.0证据清单中的41个源码哈希与冻结提交`668094d8`一致。
 - 在独立克隆目录执行`python scripts/prepare_v1_elinx.py`成功，生成工程副本的16个源文件哈希一致，顶层、器件、封装及8 ns约束核对通过。该步骤只生成综合工程，不代表新目录已运行综合或完整VO回归。
 - 远端`main`仍指向原始 Initial commit；Stage E2 Pull Request [#1](https://github.com/zhixiangyuan/FPGA-/pull/1) 当前无冲突并可合并，但合并尚待队长批准。Stage E3和Stage F均未执行。
+
+## 7. 后续 Stage E2/E3 与 Stage F 准备记录
+
+本节为2026-10-13补充记录，不更改V1.0原始验收报告、冻结提交、历史标签或C/D阶段当时的测试状态。
+
+- Stage E2 的 PR #1 已按普通 Merge Commit 合并，提交`9d5b85dd67bcf356bdc47c4aaf3336d2a863f832`。GitHub main/dev同步点、17个可达提交、6个历史标签及67个跟踪文件核对见[Stage E3报告](reports/STAGE_E3_RECOVERY_REPORT.md)。
+- Stage E3 从独立克隆执行 ModelSim RTL Golden回归：315场景PASS、295 TX帧、22,840线字节、296次应用提交、256帧SN回绕、125,000周期BAG门限、Errors 0/Warnings 0。原始日志与WLF保存在`D:\FPGA\AFDX_E3_dev_clone_20261012\build\logs\rtl_001`。
+- 独立克隆 eLinx EPR 的生成和 GUI 加载通过，GUI核对Top/器件/约束及源码层级；克隆工程GUI综合未运行，完整VO时钟回归也未运行。详细状态和原因见 Stage E3 报告。
+- Stage F只读预检确认旧根目录仍完整、归档清单及bundle哈希通过、D盘可用空间约38.73 GiB。切换及回滚脚本经过语法与只读计划检查；没有移动、重命名或删除任何目录。

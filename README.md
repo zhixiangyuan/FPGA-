@@ -12,9 +12,9 @@ V1.0 阶段1候选工程已完成团队单VL工程profile的 RTL、真实功能�
 
 ## GitHub 发布状态
 
-Stage E1 已将统一工程候选推送到 GitHub 的 `dev`，并通过独立克隆和源码哈希核验。`dev` 历史包含 V1.0 提交和 GitHub 原始 Initial commit；仓库另保留全部 6 个原有标签。
+Stage E2 Pull Request [#1](https://github.com/zhixiangyuan/FPGA-/pull/1) 已于2026-10-12通过普通 Merge Commit 合并。统一工程提交为`9d5b85dd67bcf356bdc47c4aaf3336d2a863f832`；远端`main`与`dev`在E3同步点均指向该提交。远程独立克隆、17个可达提交、6个历史标签、67个跟踪文件及逐文件哈希核验通过。原V1.0稳定标签仍指向冻结提交`668094d8d4bcb5e4f2a447274b61a88129c991ec`。随后E3/F准备报告和校验脚本只更新`dev`，`main`保持上述审核提交。
 
-远端 `main` 仍指向原始 Initial commit。统一工程候选已通过 [Stage E2 Pull Request #1](https://github.com/zhixiangyuan/FPGA-/pull/1) 申请发布；当前无合并冲突，合并前仍需队长批准。V1.0 原稳定标签保持不变，统一工作区稳定标签须等正式工作区验证后另行创建。
+Stage E3 的 ModelSim RTL Golden 回归通过；eLinx克隆工程生成和GUI打开通过，但克隆工程GUI综合为`NOT RUN`。完整候选综合网表时钟回归、POST_SYNTH_TIMING、EQ6原生网表等价、官方八端口兼容、100 Mbps、最坏时延/抖动与物理I/O适配仍未验证。Stage F正式切换尚未执行；等待队长对[切换准备与回滚预案](reports/STAGE_F_CUTOVER_PREPARATION.md)批准。
 
 ## 目录
 
