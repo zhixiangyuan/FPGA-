@@ -1,6 +1,6 @@
 # Stage E3：GitHub 独立恢复与工程验收报告
 
-更新日期：2026-10-13。远端 GitHub 私有仓库：`zhixiangyuan/FPGA-`。本报告记录 Stage E2 合并后的远端恢复、源码哈希、ModelSim RTL 回归与 eLinx 工程恢复检查。
+更新日期：2026-10-14。远端 GitHub 私有仓库：`zhixiangyuan/FPGA-`。本报告记录 Stage E2 合并后的远端恢复、源码哈希、ModelSim RTL 回归与 eLinx 工程恢复检查。
 
 ## 1. GitHub 发布与分支恢复
 
@@ -54,3 +54,10 @@ PR [#1](https://github.com/zhixiangyuan/FPGA-/pull/1) 于 2026-10-12 以普通 M
 - Implementation、Bitstream、硬件下载及 AFDX 阶段2功能开发：NOT RUN。
 
 本报告的 ModelSim PASS 仅适用于已运行的 RTL Golden 回归。eLinx 生成器 PASS 不代表 GUI 综合 PASS；0 ns 网表加载记录也不代表新的完整 VO 时钟回归。
+
+## 6. 2026-10-14 后续远程恢复复核
+
+- E3/F文档与校验脚本按普通提交保存在`dev`；切换脚本的PowerShell路径兼容和Golden清单计数问题已修复。远程`main=9d5b85dd67bcf356bdc47c4aaf3336d2a863f832`，远程`dev=eb85750ced844f14a1bda7f26bda666545b738bd`；`main`未改动，原V1.0稳定标签仍解析至`668094d8d4bcb5e4f2a447274b61a88129c991ec`。
+- 从最新远端`dev`独立克隆到`D:\FPGA\AFDX_E3_dev_clone_20261013`。克隆为20个可达提交、6个标签、72个跟踪文件，包含本地`main`和`dev`，活动分支为`dev`。候选与独立克隆72个跟踪文件的逐文件SHA-256匹配；`verify_unified_workspace.ps1`在候选和克隆中均输出`UNIFIED_WORKSPACE_CHECK=PASS`，核对13份冻结核心、8项Golden输入、远端分支、原V1.0标签及新路径eLinx配置。
+- 此次E3记录和脚本修订没有更改RTL、Testbench、Golden或eLinx模板，因此不重复耗时315场景ModelSim回归。此前ASCII克隆的315场景PASS仍由`rtl_001`原始日志、WLF、CSV和核验文件支持。
+- Stage F切换和辅助克隆归档脚本均通过PowerShell语法检查及只读Plan；正式根目录、候选目录、E3验证克隆、原有归档和bundle均未移动或删除。当前D盘剩余38.74 GiB；最新进程检查未发现eLinx、ModelSim或VS Code进程。

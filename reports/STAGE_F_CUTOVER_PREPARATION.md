@@ -1,12 +1,12 @@
 # Stage F：统一工作区切换准备与回滚预案
 
-更新日期：2026-10-13。状态：**准备工作完成；没有移动、重命名或删除任何旧工作区。正式切换等待队长批准。**
+更新日期：2026-10-14。状态：**准备工作完成；没有移动、重命名或删除任何旧工作区。正式切换等待队长批准。**
 
 ## 1. 当前工作区与历史目录
 
 最终目标 `D:\FPGA\captain_integration` 当前不是 Git 根目录；目录下有 16 个阶段工程目录和 3 个嵌套 Git 仓库。3 个仓库（`school_v1_20261011`、`stage5B1_single_vl_20261010`、`stage5B2_rx_arch_20261011`）当前均干净。没有顶层 `.git`。
 
-独立候选 Git 根目录为 `D:\FPGA\captain_integration_migration_candidate_20261012`。Stage E3 同步点的本地 `main` 和 `dev` 均为 `9d5b85dd67bcf356bdc47c4aaf3336d2a863f832`；两个分支均跟踪相应 `origin` 分支。Stage E3 和 Stage F 准备报告提交后，`dev` 将包含这些后续记录，`main` 保持经批准的统一工程提交。
+独立候选 Git 根目录为 `D:\FPGA\captain_integration_migration_candidate_20261012`。Stage E3同步点的本地`main`和`dev`均为`9d5b85dd67bcf356bdc47c4aaf3336d2a863f832`；两个分支均跟踪相应`origin`分支。后续E3/F报告与校验脚本保存在`dev`，`main`保持经批准的统一工程提交。
 
 ## 2. 归档、Git bundle 和磁盘空间
 
@@ -27,7 +27,7 @@ D 盘总容量约 150 GiB，2026-10-13复核剩余38.74 GiB。切换采用同卷
 ## 3. 工具路径与打开窗口
 
 - ModelSim 未运行。Stage E3 在 `D:\FPGA\AFDX_E3_dev_clone_20261012` 的 ASCII 路径完成 315 场景 RTL Golden 回归，退出码 0、`Errors: 0`、`Warnings: 0`。
-- GUI核验时 eLinx 项目标题确认路径为 ASCII 独立克隆 `D:\FPGA\AFDX_E3_dev_clone_20261012\build\elinx\AFDXV1_001\AFDXV1.epr`，项目 Summary 确认`AFDX_top`与`EQ6HL45/CSG225`。选中综合入口后状态仍为`Not started`，综合未启动；随后窗口自动化检测到最小化/新输入并停止。2026-10-13最新进程检查未发现 eLinx、ModelSim 或 VS Code 进程，也未发现命令行引用待切换根目录/克隆路径的应用进程。详见[Stage E3报告](STAGE_E3_RECOVERY_REPORT.md)。
+- GUI核验时 eLinx 项目标题确认路径为 ASCII 独立克隆 `D:\FPGA\AFDX_E3_dev_clone_20261012\build\elinx\AFDXV1_001\AFDXV1.epr`，项目 Summary 确认`AFDX_top`与`EQ6HL45/CSG225`。选中综合入口后状态仍为`Not started`，综合未启动；随后窗口自动化检测到最小化/新输入并停止。2026-10-14最新进程检查未发现 eLinx、ModelSim 或 VS Code 进程，也未发现命令行引用待切换根目录/克隆路径的应用进程。详见[Stage E3报告](STAGE_E3_RECOVERY_REPORT.md)。
 - Git可执行文件已配置为`E:\git\Git\cmd\git.exe`。切换执行前仍须重新检查 VS Code 是否打开旧根或候选目录。
 - eLinx EPR 使用项目内相对源路径；`prepare_v1_elinx.py` 以自身脚本位置确定工程根目录。`run_v1.py` 从仓库根目录读取 RTL，并支持 `MODELSIM_BIN` 指定本机 ModelSim。`run_history.ps1` 是一次性历史脚本，仍含 `D:\FPGA\captain_integration` 绝对路径；该路径将成为最终根目录，不作为常规开发入口。
 
@@ -52,10 +52,11 @@ D 盘总容量约 150 GiB，2026-10-13复核剩余38.74 GiB。切换采用同卷
 
 ## 6. 唯一长期活动工作区与辅助克隆归档
 
-当前除旧根和候选根外，还存在`D:\FPGA\AFDX_E3_dev_clone_20261012`这一用于ModelSim复现的独立克隆。为在正式切换后实现单一长期开发入口，建议在新根通过Git、ModelSim和eLinx验收后，将迁移候选和E3 ASCII克隆原样移动到新的离线归档子目录：
+当前除旧根和候选根外，还存在两个 E3 验证克隆：`D:\FPGA\AFDX_E3_dev_clone_20261012`保存ModelSim回归证据，`D:\FPGA\AFDX_E3_dev_clone_20261013`用于最新远程dev恢复核验。为在正式切换后实现单一长期开发入口，建议在新根通过Git、ModelSim和eLinx验收后，将迁移候选和两个E3克隆原样移动到新的离线归档子目录：
 
 - `D:\FPGA\captain_integration_migration_candidate_20261012` → `D:\FPGA\AFDX_archive\workspace_transition_20261013\migration_candidate_20261012`
 - `D:\FPGA\AFDX_E3_dev_clone_20261012` → `D:\FPGA\AFDX_archive\workspace_transition_20261013\e3_ascii_clone_20261012`
+- `D:\FPGA\AFDX_E3_dev_clone_20261013` → `D:\FPGA\AFDX_archive\workspace_transition_20261013\e3_latest_dev_clone_20261013`
 
 移动步骤由`scripts/archive_stagef_aux_workspaces.ps1`提供，仅在最终根通过验收并显式传入`-Execute`时执行；脚本会先复核最终根，再对移动前后的文件生成逐项SHA-256清单。若 eLinx 仍加载 E3 克隆中的工程，先在 GUI 确认无未保存修改并关闭 eLinx，再运行归档脚本。已有`D:\FPGA\AFDX_archive\workspaces_20261012`清单不追加或重写，迁移归档使用新的子目录。
 

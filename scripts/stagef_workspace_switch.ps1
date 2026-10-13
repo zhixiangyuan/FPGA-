@@ -16,6 +16,7 @@ $workspaceManifest = Join-Path $archiveRoot 'workspace_manifest.json'
 $transitionArchive = 'D:\FPGA\AFDX_archive\workspace_transition_20261013'
 $candidateArchive = Join-Path $transitionArchive 'migration_candidate_20261012'
 $e3CloneArchive = Join-Path $transitionArchive 'e3_ascii_clone_20261012'
+$latestDevCloneArchive = Join-Path $transitionArchive 'e3_latest_dev_clone_20261013'
 $remote = 'https://github.com/zhixiangyuan/FPGA-.git'
 $approvedMain = '9d5b85dd67bcf356bdc47c4aaf3336d2a863f832'
 $approvedV10 = '668094d8d4bcb5e4f2a447274b61a88129c991ec'
@@ -37,6 +38,7 @@ $workspaceManifest = Assert-FpgaPath $workspaceManifest
 $transitionArchive = Assert-FpgaPath $transitionArchive
 $candidateArchive = Assert-FpgaPath $candidateArchive
 $e3CloneArchive = Assert-FpgaPath $e3CloneArchive
+$latestDevCloneArchive = Assert-FpgaPath $latestDevCloneArchive
 
 function Get-GitOutput {
     param([string]$Repository, [string[]]$GitArgs)
@@ -119,6 +121,7 @@ function Show-Plan {
     Write-Output "WorkspaceManifest=$workspaceManifest"
     Write-Output "AfterSuccessArchiveCandidate=$candidateArchive"
     Write-Output "AfterSuccessArchiveE3Clone=$e3CloneArchive"
+    Write-Output "AfterSuccessArchiveLatestDevClone=$latestDevCloneArchive"
     Write-Output "AuxiliaryArchiveManifest=$(Join-Path $transitionArchive 'archive_manifest.json')"
     Write-Output 'Preflight=GitHub refs, clean dev, two local branches, old-root/archive hashes, and at least 10 GiB free space'
     Write-Output 'PostClone=Unified verification plus full ModelSim RTL Golden verification'
@@ -158,7 +161,7 @@ if ($Action -eq 'Switch') {
     if ((Get-PSDrive -Name D).Free -lt 10GB) { throw 'D: has less than 10 GiB free; stopping before any directory move.' }
     $blockingApps = @(Get-CimInstance Win32_Process | Where-Object { $_.Name -like 'eLinx*.exe' -or $_.Name -in @('vsim.exe', 'vsimk.exe') })
     if ($blockingApps.Count -ne 0) { throw "Close eLinx/ModelSim before the directory move: $((($blockingApps | Select-Object -ExpandProperty Name -Unique) -join ', '))." }
-    $codeWindows = @(Get-CimInstance Win32_Process | Where-Object { $_.Name -eq 'Code.exe' -and $_.CommandLine -match 'captain_integration|AFDX_E3_dev_clone_20261012' })
+    $codeWindows = @(Get-CimInstance Win32_Process | Where-Object { $_.Name -eq 'Code.exe' -and $_.CommandLine -match 'captain_integration|AFDX_E3_dev_clone_2026101[23]' })
     if ($codeWindows.Count -ne 0) { throw 'VS Code command lines still reference the legacy/candidate/verification workspace. Close those workspace windows before moving.' }
 
     Move-Item -LiteralPath $finalRoot -Destination $legacyBackup

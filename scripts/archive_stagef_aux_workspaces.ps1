@@ -14,6 +14,10 @@ $sources = @(
     [pscustomobject]@{
         Path = 'D:\FPGA\AFDX_E3_dev_clone_20261012'
         Destination = Join-Path $archiveRoot 'e3_ascii_clone_20261012'
+    },
+    [pscustomobject]@{
+        Path = 'D:\FPGA\AFDX_E3_dev_clone_20261013'
+        Destination = Join-Path $archiveRoot 'e3_latest_dev_clone_20261013'
     }
 )
 

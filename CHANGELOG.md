@@ -16,3 +16,9 @@
 - GitHub main/dev独立克隆、17个可达提交、67个跟踪文件逐项SHA-256、13份冻结核心和Golden输入核对通过；ASCII路径克隆的315场景ModelSim RTL Golden回归PASS。
 - 独立克隆eLinx工程的配置生成、GUI加载与顶层/器件/8ns约束检查通过；该克隆的GUI综合为NOT RUN。完整VO时钟回归及官方性能/器件指标未据此标记PASS。
 - 完成Stage F只读切换准备及回滚脚本；尚未移动、重命名或删除任何旧工作区，正式切换需队长另行批准。
+
+## 2026-10-14：远程恢复复核与切换脚本修正
+
+- 本次独立克隆核验基线的`dev`提交为`eb85750ced844f14a1bda7f26bda666545b738bd`；`main`保持`9d5b85dd67bcf356bdc47c4aaf3336d2a863f832`。克隆有72个跟踪文件，逐项SHA-256匹配，校验脚本PASS。
+- 修正Windows PowerShell路径解析和Golden清单属性计数；三个Stage F辅助脚本语法检查通过，切换与辅助归档计划均只读演练，没有移动目录。
+- 本次只改文档与校验脚本，没有修改RTL、Testbench、Golden或eLinx模板；故未重复运行315场景ModelSim回归。
