@@ -60,7 +60,7 @@ if ($stableTagCommit -cne '668094d8d4bcb5e4f2a447274b61a88129c991ec') {
 }
 
 $frozenManifestPath = Join-Path $root 'FROZEN_CORE_MANIFEST.json'
-$frozenManifest = @(Get-Content -LiteralPath $frozenManifestPath -Raw | ConvertFrom-Json)
+$frozenManifest = Get-Content -LiteralPath $frozenManifestPath -Raw | ConvertFrom-Json
 if ($frozenManifest.Count -ne 13) { throw "Expected 13 frozen cores, got $($frozenManifest.Count)." }
 foreach ($item in $frozenManifest) {
     $name = Split-Path -Leaf $item.snapshot
