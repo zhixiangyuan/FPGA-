@@ -40,6 +40,14 @@ function Get-Snapshot {
     return @($rows)
 }
 
+function Get-WindowsPowerShellPath {
+    $systemPowerShell = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
+    if (Test-Path -LiteralPath $systemPowerShell -PathType Leaf) { return $systemPowerShell }
+    $command = Get-Command powershell.exe -ErrorAction SilentlyContinue
+    if ($command) { return $command.Source }
+    throw 'Windows PowerShell could not be located.'
+}
+
 foreach ($entry in $sources) {
     $entry.Path = Assert-FpgaPath $entry.Path
     $entry.Destination = Assert-FpgaPath $entry.Destination
@@ -60,7 +68,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $finalRoot '.git'))) { throw 'The fi
 if ((& git -C $finalRoot branch --show-current) -cne 'dev') { throw 'The final unified workspace must be active on dev.' }
 $gitStatus = & git -C $finalRoot status --porcelain=v1
 if ($LASTEXITCODE -ne 0 -or @($gitStatus).Count -ne 0) { throw 'The final unified workspace must be clean before archiving auxiliary workspaces.' }
-& powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $finalRoot 'scripts\verify_unified_workspace.ps1')
+& (Get-WindowsPowerShellPath) -NoProfile -ExecutionPolicy Bypass -File (Join-Path $finalRoot 'scripts\verify_unified_workspace.ps1')
 if ($LASTEXITCODE -ne 0) { throw 'The final unified workspace verification failed.' }
 
 $activeElnx = @(Get-CimInstance Win32_Process | Where-Object { $_.Name -like 'eLinx*.exe' })

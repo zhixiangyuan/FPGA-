@@ -45,6 +45,14 @@ function Get-GitOutput {
     return (($output | Out-String).Trim())
 }
 
+function Get-WindowsPowerShellPath {
+    $systemPowerShell = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
+    if (Test-Path -LiteralPath $systemPowerShell -PathType Leaf) { return $systemPowerShell }
+    $command = Get-Command powershell.exe -ErrorAction SilentlyContinue
+    if ($command) { return $command.Source }
+    throw 'Windows PowerShell could not be located.'
+}
+
 function Assert-WorkspaceMatchesManifest {
     param([string]$Path, [string]$ExpectedRoot)
     if (-not (Test-Path -LiteralPath $Path -PathType Container)) { throw "Workspace is missing: '$Path'." }
@@ -163,7 +171,7 @@ if ($Action -eq 'Switch') {
         if ($LASTEXITCODE -ne 0) { throw "Creating local dev failed with exit code $LASTEXITCODE." }
 
         $verifyScript = Join-Path $finalRoot 'scripts\verify_unified_workspace.ps1'
-        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $verifyScript
+        & (Get-WindowsPowerShellPath) -NoProfile -ExecutionPolicy Bypass -File $verifyScript
         if ($LASTEXITCODE -ne 0) { throw "Unified workspace checks failed with exit code $LASTEXITCODE." }
 
         $python = Get-Command python -ErrorAction Stop
