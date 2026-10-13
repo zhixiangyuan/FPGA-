@@ -21,5 +21,6 @@
 
 - 本次独立克隆核验基线的`dev`提交为`eb85750ced844f14a1bda7f26bda666545b738bd`；`main`保持`9d5b85dd67bcf356bdc47c4aaf3336d2a863f832`。克隆有72个跟踪文件，逐项SHA-256匹配，校验脚本PASS。
 - 随后的文档收尾提交`7a8dceb7a92fd3332f253bcc3ffa81bcdae8f5be`已推送至`dev`，独立克隆快进并再次通过配置自检与逐文件SHA-256比较；`main`保持不变。
+- 报告记录提交`d2c9b947ac89da4701d4ae668aa951ca085c66da`也已由独立克隆快进恢复，自检与72个跟踪文件的SHA-256比较再次通过。
 - 修正Windows PowerShell路径解析和Golden清单属性计数；三个Stage F辅助脚本语法检查通过，切换与辅助归档计划均只读演练，没有移动目录。
 - 本次只改文档与校验脚本，没有修改RTL、Testbench、Golden或eLinx模板；故未重复运行315场景ModelSim回归。

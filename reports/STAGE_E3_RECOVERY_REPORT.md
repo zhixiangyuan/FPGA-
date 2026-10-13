@@ -60,5 +60,6 @@ PR [#1](https://github.com/zhixiangyuan/FPGA-/pull/1) 于 2026-10-12 以普通 M
 - E3/F文档与校验脚本按普通提交保存在`dev`；切换脚本的PowerShell路径兼容和Golden清单计数问题已修复。远程`main=9d5b85dd67bcf356bdc47c4aaf3336d2a863f832`，远程`dev=eb85750ced844f14a1bda7f26bda666545b738bd`；`main`未改动，原V1.0稳定标签仍解析至`668094d8d4bcb5e4f2a447274b61a88129c991ec`。
 - 从最新远端`dev`独立克隆到`D:\FPGA\AFDX_E3_dev_clone_20261013`。克隆为20个可达提交、6个标签、72个跟踪文件，包含本地`main`和`dev`，活动分支为`dev`。候选与独立克隆72个跟踪文件的逐文件SHA-256匹配；`verify_unified_workspace.ps1`在候选和克隆中均输出`UNIFIED_WORKSPACE_CHECK=PASS`，核对13份冻结核心、8项Golden输入、远端分支、原V1.0标签及新路径eLinx配置。
 - 随后E3/F收尾记录以普通提交`7a8dceb7a92fd3332f253bcc3ffa81bcdae8f5be`推送至`dev`；上述独立克隆通过`git pull --ff-only origin dev`快进至该提交，再次运行校验和72文件逐项哈希比较均PASS。此时`main`仍为`9d5b85dd67bcf356bdc47c4aaf3336d2a863f832`。
+- 本报告补充记录提交`d2c9b947ac89da4701d4ae668aa951ca085c66da`推送后，独立克隆再次fast-forward并运行同一自检及72文件SHA-256比较，结果PASS；此提交仅更新本报告和变更记录。
 - 此次E3记录和脚本修订没有更改RTL、Testbench、Golden或eLinx模板，因此不重复耗时315场景ModelSim回归。此前ASCII克隆的315场景PASS仍由`rtl_001`原始日志、WLF、CSV和核验文件支持。
 - Stage F切换和辅助克隆归档脚本均通过PowerShell语法检查及只读Plan；正式根目录、候选目录、E3验证克隆、原有归档和bundle均未移动或删除。当前D盘剩余38.74 GiB；最新进程检查未发现eLinx、ModelSim或VS Code进程。
