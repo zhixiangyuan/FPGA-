@@ -34,6 +34,9 @@
 - 本次只改文档与校验脚本，没有修改RTL、Testbench、Golden或eLinx模板；故未重复运行315场景ModelSim回归。
 # 阶段2开发中
 
+- 16VL共享帧构建器接真实B0 MAC：4097帧独立Golden PASS，保持每VL真实1ms BAG，发送端持续Payload实测188.74 Mbps；系统性能尚未验收。
+- 新增125MHz NTP Q32.32 RTC时基和四时间戳运算，14个独立有理数Golden检查点PASS；网络SNTP仍待集成。
+
 - 核对2026官方指南及FAQ；确认八端口ready可不参与握手，帧边界范围保留工程约定。
 - 正式路径真实VO已导出，315场景完整网表回归运行中，未提前标PASS。
 - 新增16VL独立SN门控及4293帧独立Golden验证；原315场景RTL回归PASS。尚未集成多VL系统。
