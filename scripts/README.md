@@ -16,7 +16,7 @@
 | 独立核验完整 VO 测试 | `python scripts/verify_v1_netlist.py build/logs/netlist_NNN` |
 | 从真实 VO 生成只读探针 | `python scripts/prepare_v1_netlist_observer.py --vo <AFDX_top.vo>` |
 | 正式工作区Git/冻结哈希/Golden/工程配置自检 | `./scripts/verify_unified_workspace.ps1` |
-| 运行管理服务系统集成（16 VL业务回环 + SNMP over 真实MAC） | `python scripts/run_stage2_mgmt.py` |
+| 运行管理服务系统集成（16 VL业务回环 + SNMP/SNTP over 真实MAC） | `python scripts/run_stage2_mgmt.py` |
 | 静态检查顶层多驱动网冲突 | `python scripts/check_top_drivers.py [顶层文件...]` |
 
 `MODELSIM_BIN`、`MGLS_LICENSE_FILE`、`ELINX_HOME`、`AFDX_BUILD_ROOT`、`AFDX_V1_EVIDENCE_ROOT` 可用于指定本机工具、构建和离线证据目录。离线证据默认位置与恢复哈希见仓库根目录的 `OFFLINE_ARCHIVE_CATALOG.json`。

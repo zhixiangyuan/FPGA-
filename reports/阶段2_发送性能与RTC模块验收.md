@@ -20,7 +20,7 @@
 
 ## RTC 时基和同步运算
 
-`afdx_rtc_timebase.v` 实现 NTP Q32.32 UTC、精确有理数分数累计和独立单调周期计数。根据RFC4330计算四时间戳offset和往返delay；合法应答才能步进UTC，单调计数不受步进影响。网络SNTP数据报生成、校验与系统接入尚未完成，不能写RTC端到端PASS。
+`afdx_rtc_timebase.v` 实现 NTP Q32.32 UTC、精确有理数分数累计和独立单调周期计数。根据RFC4330计算四时间戳offset和往返delay；合法应答才能步进UTC，单调计数不受步进影响。SNTP数据报生成与校验由 `afdx_sntp_client.v` 承担并经 `sntp_002` 单元验证；系统接入见 `build/logs/mgmt_016`（《阶段2_管理系统集成验收》），该次交换覆盖一次正常应答，不构成RTC端到端精度或多次交换稳定性证明。
 
 `build/logs/rtc_002` 模块PASS：实际125 MHz、14个Golden检查点、1,375,145周期计时与同步事件，独立Python有理数模型核对UTC、正负offset、delay、非法/超时范围、跨NTP era、reset。量化误差小于1个NTP分数LSB。第一次001观测优化失败保留；002增加Testbench只读可见性后真实通过。
 

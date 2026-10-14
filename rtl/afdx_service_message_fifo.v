@@ -8,9 +8,9 @@ module afdx_service_message_fifo #(
 )(
  input wire clk,reset,
  input wire [7:0] in_data,input wire in_valid,output wire in_ready,
- input wire in_sop,in_eop,input wire [15:0] in_src_port,in_dst_port,
+ input wire in_sop,in_eop,input wire [15:0] in_vlid,in_src_port,in_dst_port,
  output wire msg_valid,input wire msg_ready,output wire [10:0] msg_length,
- output reg [15:0] msg_src_port,msg_dst_port,
+ output reg [15:0] msg_vlid,msg_src_port,msg_dst_port,
  output wire [7:0] out_data,output wire out_valid,input wire out_ready,output wire out_last,
  output reg [31:0] captured_count,overflow_count,sent_count
 );
@@ -46,11 +46,11 @@ module afdx_service_message_fifo #(
  always @(posedge clk)begin
   if(reset)begin
    state<=IDLE;byte_count<=0;rd<=0;hold_length<=0;bad<=0;
-   msg_src_port<=0;msg_dst_port<=0;
+   msg_vlid<=0;msg_src_port<=0;msg_dst_port<=0;
    captured_count<=0;overflow_count<=0;sent_count<=0;
   end else case(state)
    IDLE:if(in_fire)begin
-    msg_src_port<=in_src_port;msg_dst_port<=in_dst_port;bad<=0;byte_count<=11'd1;
+    msg_vlid<=in_vlid;msg_src_port<=in_src_port;msg_dst_port<=in_dst_port;bad<=0;byte_count<=11'd1;
     if(in_eop)begin hold_length<=11'd1;captured_count<=captured_count+1'b1;state<=DESCR;end
     else state<=CAPTURE;
    end

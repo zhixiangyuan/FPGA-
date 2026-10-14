@@ -20,6 +20,20 @@ SNMP_PORT = 161
 OTHER_PORT = 9999
 MGMT_VLID = 0x1244
 BUSINESS_VLID = 0x1234
+SNTP_VLID = 0x1245
+SNTP_DA = bytes.fromhex("030000001245")
+SNTP_SERVER_PORT = 123
+SNTP_CLIENT_PORT = 49152
+# The system test triggers the time exchange before any SNMP traffic and the RTC
+# leaves reset on its documented initial value, so the request origin timestamp
+# is known before the simulation runs.
+SNTP_T1 = 0xE900000000000000
+SNTP_RECEIVE = SNTP_T1 + 0x100000
+# 80 clock cycles at 125 MHz expressed in NTP Q32.32 units.
+SNTP_TRANSMIT = SNTP_RECEIVE + 2748
+SNTP_STRATUM = 2
+SNTP_POLL = 6
+SNTP_PRECISION = 0xE8
 
 
 def afdx_frame(da, sa, src_ip, dst_ip, src_port, dst_port, data, sn):
@@ -31,6 +45,19 @@ def afdx_frame(da, sa, src_ip, dst_ip, src_port, dst_port, data, sn):
     udp = struct.pack("!HHHH", src_port, dst_port, 8 + len(data), 0)
     padding = bytes(max(0, 17 - len(data)))
     return da + sa + b"\x08\x00" + ip + udp + data + padding + bytes((sn,))
+
+
+def sntp_packet(mode, stratum=0, origin=0, receive=0, transmit=0):
+    """RFC4330 unicast packet: LI 0, VN 4, zero root delay and dispersion."""
+    packet = bytearray(48)
+    packet[0] = (4 << 3) | mode
+    packet[1] = stratum
+    packet[2] = SNTP_POLL
+    packet[3] = SNTP_PRECISION
+    packet[24:32] = origin.to_bytes(8, "big")
+    packet[32:40] = receive.to_bytes(8, "big")
+    packet[40:48] = transmit.to_bytes(8, "big")
+    return bytes(packet)
 
 
 def generate(out):
@@ -60,6 +87,26 @@ def generate(out):
             entry["tx_length"] = len(wire_for(frame))
         cases.append(entry)
         return entry
+
+    # Time-service exchange: the client emits its request as soon as the system
+    # test triggers it, before any SNMP traffic, so the request is the first frame
+    # the shared builder puts on the wire. The server reply arrives through the
+    # GMII receive port exactly like a management-station answer.
+    request_wire = wire_for(afdx_frame(SNTP_DA, ES_MAC, ES_IP, MANAGER_IP, SNTP_CLIENT_PORT, SNTP_SERVER_PORT,
+                                       sntp_packet(3, transmit=SNTP_T1), 1))
+    cases.append({"id": len(cases), "name": "sntp_request", "kind": "sntp_request", "sn": 1,
+                  "dst_port": SNTP_SERVER_PORT, "rx_offset": len(rx), "rx_length": 0, "payload_length": 48,
+                  "expect_tx": True, "tx_offset": len(tx), "tx_length": len(request_wire),
+                  "note": "client request on the time-service VL", "uptime_ticks": 12345})
+    tx.extend(request_wire)
+    reply_wire = wire_for(afdx_frame(SNTP_DA, MANAGER_MAC, MANAGER_IP, ES_IP, SNTP_SERVER_PORT, SNTP_CLIENT_PORT,
+                                     sntp_packet(4, stratum=SNTP_STRATUM, origin=SNTP_T1, receive=SNTP_RECEIVE,
+                                                 transmit=SNTP_TRANSMIT), 1))
+    cases.append({"id": len(cases), "name": "sntp_exchange", "kind": "sntp_response", "sn": 1,
+                  "dst_port": SNTP_CLIENT_PORT, "rx_offset": len(rx), "rx_length": len(reply_wire),
+                  "payload_length": 48, "expect_tx": False, "tx_offset": len(tx), "tx_length": 0,
+                  "note": "server reply injected through the GMII port", "uptime_ticks": 12345})
+    rx.extend(reply_wire)
 
     for case in snmp_cases:
         if case["trap"]:
@@ -119,7 +166,9 @@ def generate(out):
             hashes["snmp/" + p.name] = hashlib.sha256(p.read_bytes()).hexdigest()
     (out / "sha256.json").write_text(json.dumps(hashes, indent=2) + "\n", encoding="utf-8")
     manifest = {"frames": len(cases), "rx_wire_bytes": len(rx), "expected_tx_frames": sum(1 for c in cases if c["expect_tx"]),
-                "expected_tx_bytes": len(tx), "snmp_cases": len(snmp_cases), "snmp_golden": hashes["snmp/cases.json"]}
+                "expected_tx_bytes": len(tx), "snmp_cases": len(snmp_cases), "snmp_golden": hashes["snmp/cases.json"],
+                "sntp_t1": f"{SNTP_T1:016x}", "sntp_receive": f"{SNTP_RECEIVE:016x}",
+                "sntp_transmit": f"{SNTP_TRANSMIT:016x}"}
     print("STAGE2_MGMT_GOLDEN = " + json.dumps(manifest))
     return manifest
 

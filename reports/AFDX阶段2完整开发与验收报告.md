@@ -14,12 +14,13 @@
 | 16VL真实收发闭环 | RTL PASS：已测profile | `multi_vl_system_005`，4404场景、4243回送帧，实际应用及外部字节独立Golden |
 | 持续吞吐及GMII时延 | 实测profile PASS | 下面的负载和统计定义；非所有负载最坏情况证明 |
 | 16VL eLinx综合及资源 | GUI综合及审计PASS | `AFDXS2_004`，0Errors/29Warnings；时序等价独立保留 |
+| 管理族eLinx综合 | NOT RUN | 含SNMP/SNTP/RTC的管理顶层尚未做GUI综合与VO复验 |
 | 16VL真实VO导出 | PASS：导出 | `eda_stage2_export_001`，完整VO功能回归NOT RUN |
-| SNMP网络管理 | 独立模块PASS，系统集成PASS | `snmp_004` 52个BER/MIB/Trap场景；`build/logs/mgmt_012` 真实MAC系统集成，见《阶段2_管理系统集成验收》 |
-| RTC/SNTP | 独立模块PASS，系统集成NOT RUN | `rtc_002`、`sntp_002`；真实1秒超时测试，非完整系统同步误差证明 |
+| SNMP网络管理 | 独立模块PASS，系统集成PASS | `snmp_004` 52个BER/MIB/Trap场景；`build/logs/mgmt_016` 真实MAC系统集成，见《阶段2_管理系统集成验收》 |
+| RTC/SNTP | 独立模块PASS，系统集成PASS | `rtc_002`、`sntp_002`；`build/logs/mgmt_016` 一次真实链路交换；系统级超时与多次交换仍仅在单元级，非系统时间精度证明 |
 | 615A | NOT RUN | 规范资料及TFTP/DLP实现仍在推进；TFTP不能代替完整615A验收 |
 | 多VL压力/接收隔离/冗余 | 部分未完成 | 当前接收Parser仍为共享双bank；需要压力与公平性强化，不能声称4096RX或双网冗余 |
-| 原315场景回归 | PASS | `rtl_007`，原时钟/BAG/Golden/断言不变 |
+| 原315场景回归 | PASS | `rtl_008`，原时钟/BAG/Golden/断言不变 |
 | GitHub最终独立恢复 | NOT RUN | 模块进度已正常提交dev，阶段末完整恢复仍待执行 |
 
 ## 正式路径完整VO网表回归
@@ -32,9 +33,9 @@
 
 ## 管理服务系统集成
 
-`build/logs/mgmt_012` PASS：16 VL 业务回环与专用管理 VL（SNMPv1）共用真实冻结 MAC 与共享帧构建器，55 个 GMII 输入帧（6791 线字节）产生 46 个输出帧（6381 线字节），逐字节匹配独立 Golden；管理 VL BAG 最小 139969 周期、业务 VL 145747 周期（要求 125000），GMII 输入首字节至输出首字节 2.880 至 48.256 µs。
+`build/logs/mgmt_016` PASS：16 VL 业务回环、SNMPv1 管理 VL（`0x1244`）与 SNTP 时务 VL（`0x1245`）共用真实冻结 MAC 与共享帧构建器，57 个 Golden 用例中 56 个 GMII 输入帧（6894 线字节）产生 47 个输出帧（6484 线字节），逐字节匹配独立 Golden；管理 VL BAG 最小 139969 周期、业务 VL 145747 周期（要求 125000），GMII 输入首字节至输出首字节 2.880 至 48.256 µs。时务交换的请求起点、服务器时间戳与接受/拒绝/超时计数由独立脚本重做 NTP 模运算核对，RTC `synchronized=1`、`error_count=0`，实测往返延迟 8250392 NTP 单位（约 1.921 ms，限值 1 秒）。
 
-集成过程修复三个真实缺陷：服务消息 FIFO 在捕获状态停止接收字节，造成首字节后死锁并背压整条接收链（55 帧中 49 帧被 MAC 丢弃）；管理 BAG 原设 100 µs 属非法 AFDX BAG，被共享构建器按设计拒绝；集成顶层 `biz_vlid` 被接收解析器与回环队列双重驱动产生未知值，使 `desc_legal` 为未知、业务描述符被静默丢弃。详见《阶段2_管理系统集成验收》。
+集成过程修复五个真实缺陷：服务消息 FIFO 在捕获状态停止接收字节，造成首字节后死锁并背压整条接收链（55 帧中 49 帧被 MAC 丢弃）；管理 BAG 原设 100 µs 属非法 AFDX BAG，被共享构建器按设计拒绝；集成顶层 `biz_vlid` 被接收解析器与回环队列双重驱动产生未知值，使 `desc_legal` 为未知、业务描述符被静默丢弃；时务客户端的接收时刻取自寄存输出，比应答首字节晚一拍致 T4 恒为 0、RTC 拒绝同步；共享构建器 17 个 VL 槽位容纳不下时务 VL。详见《阶段2_管理系统集成验收》。
 
 ## 实测吞吐和延时
 
@@ -58,7 +59,7 @@ RAM双端口Warning276027不能忽略：RTL两端口使用同一clk，但同址�
 
 SNMPv1根据RFC1157/1213实现真实BER处理、sysDescr.0/sysUpTime.0/sysName.0查询、GETNEXT、私有community下sysName写入、错误Response及coldStart Trap。单varbind能力上限明确，超限返回tooBig；Trap enterprise0.0是未分配工程身份，不冒用第三方企业号。该开发profile不表示完整SNMPv1通用实现或SNMPv3安全能力。
 
-SNTPv4根据RFC4330实现真实48字节请求和应答字段校验，拒绝错误origin、LI/VN/mode/stratum/root-distance、错误来源IP/端口和截断；错误后合法应答恢复，1秒真实125MHz超时及reset通过。UTC Q32.32有理数时基和四时间戳偏移运算独立核验。请求时间戳当前定义为入队时刻，正式同步误差必须计入TX排队及网络延迟，不能凭模块通过宣称系统时间精度达标。
+SNTPv4根据RFC4330实现真实48字节请求和应答字段校验，拒绝错误origin、LI/VN/mode/stratum/root-distance、错误来源IP/端口和截断；错误后合法应答恢复，1秒真实125MHz超时及reset通过。UTC Q32.32有理数时基和四时间戳偏移运算独立核验。`build/logs/mgmt_016` 已把时务客户端与时基接在真实管理链路上：请求经共享构建器发出、应答经真实GMII接收端口注入，偏移与往返延迟由独立脚本重算核对。请求时间戳定义为入队时刻，正式同步误差必须计入TX排队及网络延迟，不能凭模块通过或单次系统交换宣称系统时间精度达标。
 
 ## 回归与保护
 
