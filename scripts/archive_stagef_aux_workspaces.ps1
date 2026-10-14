@@ -105,7 +105,9 @@ $manifest | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $manifestPath -En
 
 try {
     foreach ($entry in $entries) {
-        Move-Item -LiteralPath $entry.source -Destination $entry.archived_path
+        # Same-volume atomic rename preserves hidden .git directories without
+        # the PowerShell provider's recursive partial-move behavior.
+        [IO.Directory]::Move($entry.source, $entry.archived_path)
         $actualRows = Get-Snapshot $entry.archived_path
         if ($actualRows.Count -ne $entry.file_count) { throw "Post-move file count mismatch: '$($entry.archived_path)'." }
         $expectedByPath = @{}

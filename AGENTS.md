@@ -1,0 +1,14 @@
+# AFDX 统一开发工作区
+
+- 正式工作区为 `D:\FPGA\captain_integration`；日常开发默认使用 `dev`。
+- 开始修改前核对 Git 根目录、当前分支和 `git status`。工作区有用户修改时先审计并保留，不覆盖或丢弃。
+- `main` 仅保存队长批准的稳定版本。每个已验证的小任务形成普通提交并同步 `dev`；阶段完整验收、报告和队长批准后才通过 PR 普通 Merge Commit 发布 `main`。
+- 未取得队长明确批准，不创建代表正式验收的新稳定标签。禁止强制推送、历史重写、硬重置和危险清理。
+- 活动生产源码只来自 `rtl/` 与 `vendor/frozen/`。13 份冻结 B0/B1/B2 核心、原 V1.0 冻结报告、原始哈希清单和历史标签保持原样；修改冻结核心须获得新增授权。
+- 常规阶段在本工程修改和提交，不复制日期命名的完整工程。`prepare_v1_elinx.py` 生成的工具源快照属于构建产物，不是第二套生产源码。
+- Testbench 在 `sim/`，Golden 在 `golden/`，自动化入口在 `scripts/`，eLinx 配置在 `elinx/`。
+- 临时日志、WLF、VO 和 EDA 数据库写入被忽略的 `build/`；重要原始验收证据另存 `D:\FPGA\AFDX_archive` 并记录 SHA-256。
+- 代码或配置有实际影响时运行相应验证；阶段报告区分 PASS、FAIL、BLOCKED、NOT RUN 和 NOT VERIFIED，禁止降低 BAG、SN、Golden 或断言要求。
+- 更新 README/CHANGELOG 反映当前状态；原始冻结报告和历史清单不回写新状态。
+- 目录切换、历史归档和回滚脚本仅用于经批准的维护，不是日常开发入口。
+- 当前阶段仅完成配置管理；未经新任务授权不开始 AFDX 阶段2、不执行 Implementation、Bitstream 或硬件下载。

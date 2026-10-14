@@ -1,6 +1,6 @@
 # Git版本管理约定
 
-统一工程仍在隔离候选目录，Stage F切换尚未获批。Stage E2 PR [#1](https://github.com/zhixiangyuan/FPGA-/pull/1) 已按普通 Merge Commit 合并，`main`在统一工程发布点为`9d5b85dd67bcf356bdc47c4aaf3336d2a863f832`。E3已将候选本地`main`与`dev`安全快进至发布点，并正常推送`dev`；6个历史标签不变。后续E3和Stage F准备记录提交到`dev`，不自动合并`main`。V1.0冻结提交`668094d8d4bcb5e4f2a447274b61a88129c991ec`仍由原标签保护；原GitHub Initial commit`a631d0dbaf5515b47077f16cbf02292a6b7be176`可达。
+Stage F已完成，唯一长期活动工程和Git根目录为`D:\FPGA\captain_integration`，默认活动分支为`dev`。Stage E2 PR [#1](https://github.com/zhixiangyuan/FPGA-/pull/1) 的普通Merge Commit `9d5b85dd67bcf356bdc47c4aaf3336d2a863f832`仍是main。本次配置修复、最终报告和后续开发记录只进入dev，未经队长批准不合并main。6个历史标签不变；V1.0冻结提交`668094d8d4bcb5e4f2a447274b61a88129c991ec`仍由原标签保护，GitHub Initial commit和后续准备提交均可达。完整目录恢复说明见[Stage F最终报告](reports/Stage%20F统一工作区最终验收报告.md)。
 
 ## 分支和阶段版本
 

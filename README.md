@@ -2,6 +2,8 @@
 
 基于以太网 MAC 总线实现 AFDX
 
+正式开发工作区：`D:\FPGA\captain_integration`。日常开发使用`dev`；`main`仅接受队长批准的稳定版本。源码、测试、Golden和配置在同一工程持续维护，常规阶段不复制日期命名的完整工程。
+
 ## 当前稳定版本
 
 V1.0 阶段1候选工程已完成团队单VL工程profile的 RTL、真实功能网表、独立Golden和历史回归验收。真实VO网表测试为315个Golden场景、295个外部TX帧、22840个字节、296次实际应用bank提交和308条PSN决策，125 MHz、125000周期BAG与256帧SN回绕均已验证。
@@ -14,7 +16,7 @@ V1.0 阶段1候选工程已完成团队单VL工程profile的 RTL、真实功能�
 
 Stage E2 Pull Request [#1](https://github.com/zhixiangyuan/FPGA-/pull/1) 已于2026-10-12通过普通 Merge Commit 合并。统一工程提交为`9d5b85dd67bcf356bdc47c4aaf3336d2a863f832`；远端`main`与`dev`在E3同步点均指向该提交。远程独立克隆、17个可达提交、6个历史标签、67个跟踪文件及逐文件哈希核验通过。原V1.0稳定标签仍指向冻结提交`668094d8d4bcb5e4f2a447274b61a88129c991ec`。随后E3/F准备报告和校验脚本只更新`dev`，`main`保持上述审核提交。
 
-Stage E3 的 ModelSim RTL Golden 回归通过；eLinx克隆工程生成和GUI打开通过，但克隆工程GUI综合为`NOT RUN`。完整候选综合网表时钟回归、POST_SYNTH_TIMING、EQ6原生网表等价、官方八端口兼容、100 Mbps、最坏时延/抖动与物理I/O适配仍未验证。Stage F正式切换尚未执行；等待队长对[切换准备与回滚预案](reports/STAGE_F_CUTOVER_PREPARATION.md)批准。
+Stage F已按队长批准完成正式路径切换、315场景ModelSim RTL/Golden回归、实际eLinx GUI综合和VS Code Git识别。旧工作区、候选仓库和E3克隆已离线归档并验哈希；结果见[Stage F最终验收报告](reports/Stage%20F统一工作区最终验收报告.md)。本轮未更新main或创建新稳定标签。新路径完整VO时钟回归为NOT RUN；POST_SYNTH_TIMING、EQ6原生网表等价、官方八端口兼容、100 Mbps、最坏时延/抖动与物理I/O适配仍未验证。
 
 ## 目录
 

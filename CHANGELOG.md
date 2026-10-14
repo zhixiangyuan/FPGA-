@@ -1,5 +1,13 @@
 # 变更记录
 
+## 2026-10-14：Stage F正式工作区启用
+
+- 正式根目录切换为`D:\FPGA\captain_integration`，dev为日常开发分支，main保持`9d5b85dd`。
+- 正式路径完整315场景RTL Golden回归、13份冻结核心/8项Golden哈希、新路径16份eLinx源配置、真实GUI综合及VS Code Git识别PASS。GUI综合为2784 LUT/1069 FF/28 Memory/22 IO，0 Errors、25 Warnings。
+- 原工作区17,261文件移动后哈希匹配；候选和两个E3克隆离线归档，逐项文件哈希与Git历史保护通过。
+- 保留首次切换失败及自动回滚记录，修复Windows PowerShell 5.1路径/JSON数组兼容；修复隐藏目录导致的部分归档，以合集验哈希及原子重命名完成闭环。
+- 增加AGENTS长期开发约定和Stage F最终报告。没有修改冻结RTL，没有更新main或创建新稳定标签；完整新VO时钟回归NOT RUN，官方接口和性能、时序、EQ6原生等价与物理fit仍NOT VERIFIED。
+
 ## 2026-10-12：统一工作区迁移与 GitHub 发布准备（Stage C/D、E1）
 
 - 保留V1.0稳定恢复点及完整旧 Git 历史；把 eLinx 源文件改为从 `rtl/` 和 `vendor/frozen/` 生成，避免维护两份活动 RTL。
