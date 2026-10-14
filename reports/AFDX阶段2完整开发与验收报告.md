@@ -14,7 +14,7 @@
 | 16VL真实收发闭环 | RTL PASS：已测profile | `multi_vl_system_005`，4404场景、4243回送帧，实际应用及外部字节独立Golden |
 | 持续吞吐及GMII时延 | 实测profile PASS | 下面的负载和统计定义；非所有负载最坏情况证明 |
 | 16VL eLinx综合及资源 | GUI综合及审计PASS | `AFDXS2_004`，0Errors/29Warnings；时序等价独立保留 |
-| 管理族eLinx综合 | NOT RUN | 含SNMP/SNTP/RTC的管理顶层尚未做GUI综合与VO复验 |
+| 管理族eLinx综合 | 前端PASS、后端FAIL | `AFDXS2M_002` 前端0 Errors/72 Warnings；官方后端DRC失败，未产生综合利用率报告与VO，不得标记综合PASS |
 | 16VL真实VO导出 | PASS：导出 | `eda_stage2_export_001`，完整VO功能回归NOT RUN |
 | SNMP网络管理 | 独立模块PASS，系统集成PASS | `snmp_004` 52个BER/MIB/Trap场景；`build/logs/mgmt_016` 真实MAC系统集成，见《阶段2_管理系统集成验收》 |
 | RTC/SNTP | 独立模块PASS，系统集成PASS | `rtc_002`、`sntp_002`；`build/logs/mgmt_016` 一次真实链路交换；系统级超时与多次交换仍仅在单元级，非系统时间精度证明 |
@@ -32,6 +32,10 @@
 等价性证据：新导出VO与归档V1.0 VO唯一差异是工具`// DATE`横幅行，规范化后SHA-256均为`ce01643f7e9afd19a9f7c418f5509d781fc05d17f0b72c11142291dece4a7610`；两次运行的五份外部行为CSV与Golden清单SHA-256完全相同（`actual_tx.csv` `dd9a59c7…`）。因此正式路径回归复现了V1.0功能网表行为，但仍是团队单VL工程profile，`POST_SYNTH_TIMING`与`EQ6_NATIVE_NETLIST_EQUIVALENCE`保持NOT VERIFIED。原始证据已归档`D:\FPGA\AFDX_archive\stage2_evidence_20261014`（36个文件及SHA-256清单）。
 
 ## 管理服务系统集成
+
+管理族独立综合工程 `AFDXS2M_002` 包含 24 份源码、56 位 IO，时钟约束为 8 ns。捆绑的 `quartus_map.exe` 完成前端分析与综合：0 Errors、72 Warnings。前端报告统计 75,804 个逻辑单元、18,466 个寄存器、472,800 个存储位和 152 个 RAM 段。其中，SNMP agent 约占 42,484 个逻辑单元，两份服务消息 FIFO 各约占 7,500 个逻辑单元。这些是兼容前端的统计值，不能用作 EQ6 后端资源利用率结论。真实数据库 VQM 已导出。
+
+首次后端打包因派生的 PSF 文件仍引用旧工程约束路径而失败，原始日志已保留。修正路径后，后端读取了 8 ns 时钟约束及 EQ6HL45 配置，并成功解析 VQM；随后报告 `drc fail`，没有生成 `*_utilization_synth.rpt` 或 `*_netlist.pb`。工具进程退出码为 0，但验收脚本依据缺失的必需产物判为 FAIL。DRC 失败原因尚未定位，管理族综合及 VO 验收不能标记 PASS。原始及修复后的证据均位于 `build/elinx/AFDXS2M_002`。
 
 `build/logs/mgmt_016` PASS：16 VL 业务回环、SNMPv1 管理 VL（`0x1244`）与 SNTP 时务 VL（`0x1245`）共用真实冻结 MAC 与共享帧构建器，57 个 Golden 用例中 56 个 GMII 输入帧（6894 线字节）产生 47 个输出帧（6484 线字节），逐字节匹配独立 Golden；管理 VL BAG 最小 139969 周期、业务 VL 145747 周期（要求 125000），GMII 输入首字节至输出首字节 2.880 至 48.256 µs。时务交换的请求起点、服务器时间戳与接受/拒绝/超时计数由独立脚本重做 NTP 模运算核对，RTC `synchronized=1`、`error_count=0`，实测往返延迟 8250392 NTP 单位（约 1.921 ms，限值 1 秒）。
 

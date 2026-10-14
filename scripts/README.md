@@ -18,6 +18,7 @@
 | 正式工作区Git/冻结哈希/Golden/工程配置自检 | `./scripts/verify_unified_workspace.ps1` |
 | 运行管理服务系统集成（16 VL业务回环 + SNMP/SNTP over 真实MAC） | `python scripts/run_stage2_mgmt.py` |
 | 生成管理族 eLinx 综合工程副本（含SNMP/SNTP/RTC的顶层） | `python scripts/prepare_stage2_mgmt_elinx.py` |
+| 运行管理族真实综合与数据库映射打包 | `python scripts/run_stage2_synthesis.py --project-dir build/elinx/AFDXS2M_NNN --settings-reference build/elinx/AFDXS2_005` |
 | 静态检查顶层多驱动网冲突 | `python scripts/check_top_drivers.py [顶层文件...]` |
 
 `MODELSIM_BIN`、`MGLS_LICENSE_FILE`、`ELINX_HOME`、`AFDX_BUILD_ROOT`、`AFDX_V1_EVIDENCE_ROOT` 可用于指定本机工具、构建和离线证据目录。离线证据默认位置与恢复哈希见仓库根目录的 `OFFLINE_ARCHIVE_CATALOG.json`。
