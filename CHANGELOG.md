@@ -1,5 +1,12 @@
 # 变更记录
 
+## 2026-10-14：正式路径完整VO网表回归闭环
+
+- 正式路径真实GUI综合数据库导出的功能VO完成315场景完整网表回归：`build/logs/netlist_001` 退出码0、Errors 0、Warnings 0，295个外部TX帧/22840字节、296次应用bank提交、308条PSN决策、289个BAG间隔（最小最大均125003周期）和256帧SN回绕全部由独立脚本从冻结Golden重建比对。
+- 新导出VO（`b9710b64…`）与归档V1.0 VO（`7c0a4e00…`）仅`// DATE`横幅不同，规范化SHA-256一致；两次运行的五份外部行为CSV与Golden清单哈希完全相同。
+- `scripts/verify_v1_netlist.py` 扩展支持当前runner schema，新增导出链、输入快照、Golden清单、归档参考运行哈希校验及行为等价交叉检查。
+- 原始证据归档`D:\FPGA\AFDX_archive\stage2_evidence_20261014`（36个文件及SHA-256清单）。未修改冻结核心，未更新main或创建稳定标签，`POST_SYNTH_TIMING`与`EQ6_NATIVE_NETLIST_EQUIVALENCE`保持NOT VERIFIED。
+
 ## 2026-10-14：Stage F正式工作区启用
 
 - 正式根目录切换为`D:\FPGA\captain_integration`，dev为日常开发分支，main保持`9d5b85dd`。

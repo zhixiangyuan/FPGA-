@@ -34,7 +34,7 @@ V1.0 RTL 315 场景、13核心和8Golden已有真实PASS；正式路径GUI综合
 
 33组合环报告项仍需检查具体层级及RAM旁路/反馈依赖。综合功能PASS不能推出Setup/Hold通过；不得删除报告项或降低时钟以掩盖风险。`POST_SYNTH_TIMING=NOT VERIFIED`、`EQ6_NATIVE_NETLIST_EQUIVALENCE=NOT VERIFIED`、物理fit仍未验证。
 
-本轮已从正式路径真实综合数据库导出 `build/logs/eda_export_001/AFDX_top.vo`；SHA-256 `b9710b645a1c1ee385d7d60ab187db58f886f60fc6143f65567f45955d9bb39f`。完整真实网表测试 `build/logs/netlist_001` 正在运行，仅一份，保持125 MHz、125000周期BAG、256回绕、315Golden。运行结束后必须独立核验，当前不能标PASS。
+本轮已从正式路径真实综合数据库导出 `build/logs/eda_export_001/AFDX_top.vo`；SHA-256 `b9710b645a1c1ee385d7d60ab187db58f886f60fc6143f65567f45955d9bb39f`。完整真实网表测试 `build/logs/netlist_001` 已于2026-10-14 03:58:24Z结束并通过 `scripts/verify_v1_netlist.py` 独立核验，保持125 MHz、125000周期BAG、256回绕、315Golden，未启动第二次重复验收。
 
 ## 实施次序
 
