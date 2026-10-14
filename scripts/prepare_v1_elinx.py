@@ -21,7 +21,11 @@ def main() -> int:
     if not template_epr.is_file() or not template_edc.is_file():
         raise FileNotFoundError("Tracked eLinx EPR template or 8 ns EDC is missing")
 
-    sources = sorted((ROOT / "vendor" / "frozen").glob("*.v")) + sorted((ROOT / "rtl").glob("*.v"))
+    # V1 is a sealed integration profile. Development modules in rtl/ must
+    # not silently enter its source set or invalidate the 16-source template.
+    sources = sorted((ROOT / "vendor" / "frozen").glob("*.v")) + [
+        ROOT / "rtl" / name for name in
+        ("AFDX_top.v", "afdx_app_echo_queue.v", "afdx_gmii_candidate_boundary.v")]
     names = [p.name for p in sources]
     if len(sources) != 16 or len(set(names)) != len(names):
         raise RuntimeError(f"Expected 16 uniquely named canonical Verilog sources; found {len(sources)}")

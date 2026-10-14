@@ -11,4 +11,4 @@
 - 代码或配置有实际影响时运行相应验证；阶段报告区分 PASS、FAIL、BLOCKED、NOT RUN 和 NOT VERIFIED，禁止降低 BAG、SN、Golden 或断言要求。
 - 更新 README/CHANGELOG 反映当前状态；原始冻结报告和历史清单不回写新状态。
 - 目录切换、历史归档和回滚脚本仅用于经批准的维护，不是日常开发入口。
-- 当前阶段仅完成配置管理；未经新任务授权不开始 AFDX 阶段2、不执行 Implementation、Bitstream 或硬件下载。
+- 阶段2已获完整开发授权；在dev自主开发、验证及正常推送。必要核心发展版本放在rtl，vendor/frozen保持不变。main发布和正式稳定标签仍须队长批准；不执行Implementation、Bitstream或硬件下载。
