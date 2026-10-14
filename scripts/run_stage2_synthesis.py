@@ -1,0 +1,62 @@
+"""Run the bundled synthesis front end and official eHiWay synthesis packing.
+
+Reuse GUI-generated project settings in a fresh ignored build. No fitting,
+implementation, programming, or vendor-model substitution is invoked.
+"""
+from pathlib import Path
+from datetime import datetime,timezone
+import argparse,json,hashlib,re,subprocess,sys
+ROOT=Path(__file__).resolve().parents[1]
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def main():
+ parser=argparse.ArgumentParser();parser.add_argument('--project-dir',type=Path,required=True);parser.add_argument('--settings-reference',type=Path,required=True)
+ args=parser.parse_args();project=args.project_dir.resolve();reference=args.settings_reference.resolve()
+ manifest=json.loads((project/'project_manifest.json').read_text())
+ assert manifest['device']=='EQ6HL45' and manifest['package']=='CSG225' and manifest['clock_constraint_ns']==8
+ for r in manifest['sources']:
+  assert sha(ROOT/r['canonical_source'])==r['sha256']==sha(project/r['snapshot'])
+ for name in ('AFDXS2.qsf','AFDXS2.qpf'):
+  target=project/name
+  text=(reference/name).read_text().replace(reference.as_posix(),project.as_posix())
+  if name.endswith('.qsf'):
+   constraint=project/'AFDXS2.srcs/constrs_1/new/clock_125mhz.edc'
+   text+='\nset_global_assignment -name SDC_FILE "'+constraint.as_posix()+'"\n'
+   assert 'TOP_LEVEL_ENTITY afdx_stage2_top' in text
+   paths=re.findall(r'VERILOG_FILE "([^"]+)"',text)
+   assert set(paths)=={(project/r['snapshot']).as_posix() for r in manifest['sources']}
+  if target.exists():
+   if target.read_text()!=text:raise RuntimeError(f'Existing settings differ: {target}')
+  else:target.write_text(text,encoding='utf-8')
+ out=project/'AFDXS2.runs/synth_1';out.mkdir(parents=True,exist_ok=True)
+ psf=(reference/'AFDXS2.runs/synth_1/AFDXS2.run.psf').read_bytes()
+ (out/'AFDXS2.run.psf').write_bytes(psf)
+ # GUI branding says ehiway_map; the installed executable is quartus_map.
+ # Record the actual tool rather than inventing an absent binary.
+ tool=Path(r'D:\FPGA\eLinx3.0\bin\Passkey\bin\quartus_map.exe')
+ command=[str(tool),'--read_settings_files=on','--write_settings_files=off','AFDXS2']
+ proof={'result':'RUNNING','command':command,'started_utc':datetime.now(timezone.utc).isoformat(),
+        'driver_sha256':sha(tool),'settings_reference':str(reference),'settings_reference_sha256':sha(reference/'AFDXS2.qsf'),
+        'GUI_invocation':False,'bundled_frontend_executable':'quartus_map.exe','device_GUI_profile':'EQ6HL45/CSG225',
+        'functional_model_backend':'EP1S80F1508C6 / Stratix compatibility','Implementation':'NOT RUN','Bitstream':'NOT RUN',
+        'POST_SYNTH_TIMING':'NOT VERIFIED','EQ6_NATIVE_NETLIST_EQUIVALENCE':'NOT VERIFIED'}
+ (project/'synthesis_runner.json').write_text(json.dumps(proof,indent=2)+'\n')
+ with (project/'synthesis_console.log').open('wb') as log:
+  process=subprocess.Popen(command,cwd=project,stdout=log,stderr=subprocess.STDOUT)
+  proof['pid']=process.pid;(project/'synthesis_runner.json').write_text(json.dumps(proof,indent=2)+'\n')
+  print(f'STAGE2_OFFICIAL_SYNTHESIS {project} PID {process.pid}',flush=True);code=process.wait(timeout=1800)
+ report=out/'AFDXS2.map.rpt';text=report.read_text(errors='replace') if report.exists() else ''
+ passed=code==0 and 'Analysis & Synthesis was successful' in text and 'Error (' not in text
+ backend_code=None
+ if passed:
+  mapping_command=[sys.executable,str(ROOT/'scripts/complete_stage2_database_mapping.py'),'--project-dir',str(project)]
+  proof['database_mapping_command']=mapping_command
+  with (project/'mapping_closure.log').open('wb') as log:
+   backend_code=subprocess.run(mapping_command,cwd=ROOT,stdout=log,stderr=subprocess.STDOUT,timeout=900).returncode
+  mapping=json.loads((project/'database_mapping_provenance.json').read_text())
+  passed=backend_code==0 and mapping['result']=='PASS'
+ proof.update(result='PASS' if passed else 'FAIL',exit_code=code,completed_utc=datetime.now(timezone.utc).isoformat(),
+              artifacts={p.name:sha(p) for p in out.iterdir() if p.is_file()},
+              backend_exit_code=backend_code,eHiWay_backend_artifacts_present=(out/'AFDXS2_netlist.pb').exists())
+ (project/'synthesis_runner.json').write_text(json.dumps(proof,indent=2)+'\n');print(text[-1600:]);print(json.dumps(proof,indent=2))
+ return 0 if passed else 1
+if __name__=='__main__':raise SystemExit(main())

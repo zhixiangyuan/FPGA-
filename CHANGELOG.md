@@ -34,6 +34,11 @@
 - 本次只改文档与校验脚本，没有修改RTL、Testbench、Golden或eLinx模板；故未重复运行315场景ModelSim回归。
 # 阶段2开发中
 
+- 16VL完整GMII收发RTL闭环及独立Golden通过；已测负载Payload183.91Mbps，GMII首入至末出60.44us，未推广为任意负载最坏情况。
+- 真实GUI综合0Errors/29Warnings：14677LUT、4354FF、112Memory、22IO；VO已导出，完整新VO回归尚未执行。
+- SNMPv1单varbind MIB模块52场景PASS，SNTPv4客户端19场景及真实1秒超时PASS；网络系统集成继续开发。
+- V1 RTL回归源码清单固定为实际16份基线输入，防止未使用的发展模块在长期测试期间造成provenance混淆；006完整315回归和独立核验PASS。
+
 - 16VL共享帧构建器接真实B0 MAC：4097帧独立Golden PASS，保持每VL真实1ms BAG，发送端持续Payload实测188.74 Mbps；系统性能尚未验收。
 - 新增125MHz NTP Q32.32 RTC时基和四时间戳运算，14个独立有理数Golden检查点PASS；网络SNTP仍待集成。
 
