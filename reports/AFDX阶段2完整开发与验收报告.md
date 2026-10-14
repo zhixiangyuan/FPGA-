@@ -15,11 +15,11 @@
 | 持续吞吐及GMII时延 | 实测profile PASS | 下面的负载和统计定义；非所有负载最坏情况证明 |
 | 16VL eLinx综合及资源 | GUI综合及审计PASS | `AFDXS2_004`，0Errors/29Warnings；时序等价独立保留 |
 | 16VL真实VO导出 | PASS：导出 | `eda_stage2_export_001`，完整VO功能回归NOT RUN |
-| SNMP网络管理 | 独立模块PASS，网络集成NOT RUN | `snmp_004`，52个BER/MIB/Trap场景；限定SNMPv1 MIB profile |
+| SNMP网络管理 | 独立模块PASS，系统集成PASS | `snmp_004` 52个BER/MIB/Trap场景；`build/logs/mgmt_012` 真实MAC系统集成，见《阶段2_管理系统集成验收》 |
 | RTC/SNTP | 独立模块PASS，系统集成NOT RUN | `rtc_002`、`sntp_002`；真实1秒超时测试，非完整系统同步误差证明 |
 | 615A | NOT RUN | 规范资料及TFTP/DLP实现仍在推进；TFTP不能代替完整615A验收 |
 | 多VL压力/接收隔离/冗余 | 部分未完成 | 当前接收Parser仍为共享双bank；需要压力与公平性强化，不能声称4096RX或双网冗余 |
-| 原315场景回归 | PASS | `rtl_006/verification.json`，原时钟/BAG/Golden/断言不变 |
+| 原315场景回归 | PASS | `rtl_007`，原时钟/BAG/Golden/断言不变 |
 | GitHub最终独立恢复 | NOT RUN | 模块进度已正常提交dev，阶段末完整恢复仍待执行 |
 
 ## 正式路径完整VO网表回归
@@ -29,6 +29,12 @@
 `scripts/verify_v1_netlist.py` 独立核验PASS：不复用仿真器记分板，直接从冻结Golden重建295个外部TX帧的逐字节与逐周期序列、296次应用bank提交和308条PSN决策，并核对输入快照、Golden清单、导出链和归档参考运行哈希。计数为外部TX 295帧/22840字节、应用提交296次、PSN决策308条、BAG间隔289个（最小与最大均125003周期）、故意FCS错误1个、压力保留6帧/容量丢弃1帧/reset取消1帧、部分reset 1次。
 
 等价性证据：新导出VO与归档V1.0 VO唯一差异是工具`// DATE`横幅行，规范化后SHA-256均为`ce01643f7e9afd19a9f7c418f5509d781fc05d17f0b72c11142291dece4a7610`；两次运行的五份外部行为CSV与Golden清单SHA-256完全相同（`actual_tx.csv` `dd9a59c7…`）。因此正式路径回归复现了V1.0功能网表行为，但仍是团队单VL工程profile，`POST_SYNTH_TIMING`与`EQ6_NATIVE_NETLIST_EQUIVALENCE`保持NOT VERIFIED。原始证据已归档`D:\FPGA\AFDX_archive\stage2_evidence_20261014`（36个文件及SHA-256清单）。
+
+## 管理服务系统集成
+
+`build/logs/mgmt_012` PASS：16 VL 业务回环与专用管理 VL（SNMPv1）共用真实冻结 MAC 与共享帧构建器，55 个 GMII 输入帧（6791 线字节）产生 46 个输出帧（6381 线字节），逐字节匹配独立 Golden；管理 VL BAG 最小 139969 周期、业务 VL 145747 周期（要求 125000），GMII 输入首字节至输出首字节 2.880 至 48.256 µs。
+
+集成过程修复三个真实缺陷：服务消息 FIFO 在捕获状态停止接收字节，造成首字节后死锁并背压整条接收链（55 帧中 49 帧被 MAC 丢弃）；管理 BAG 原设 100 µs 属非法 AFDX BAG，被共享构建器按设计拒绝；集成顶层 `biz_vlid` 被接收解析器与回环队列双重驱动产生未知值，使 `desc_legal` 为未知、业务描述符被静默丢弃。详见《阶段2_管理系统集成验收》。
 
 ## 实测吞吐和延时
 

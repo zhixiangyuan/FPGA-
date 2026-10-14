@@ -1,5 +1,13 @@
 # 变更记录
 
+## 2026-10-14：管理服务系统集成闭环（SNMP over 真实MAC）
+
+- `build/logs/mgmt_012` PASS：16 VL业务回环与专用管理VL共用真实冻结MAC及共享帧构建器，46个输出帧、6381线字节逐字节匹配独立Golden；管理VL BAG最小139969周期、业务VL 145747周期（要求125000）；GMII输入首字节至输出首字节2.880至48.256 µs。
+- 新增 `rtl/afdx_service_message_fifo.v`、`rtl/afdx_service_tx_arbiter.v`、`rtl/afdx_management_rx_demux.v`、`rtl/afdx_stage2_mgmt_top.v`，以及对应的独立Golden生成器、运行与校验脚本。
+- 集成中修复三个真实缺陷：服务FIFO仅在空闲状态接受字节，首字节后死锁并背压整条接收链（55帧中49帧被MAC丢弃）；管理BAG原设100 µs属非法AFDX BAG被构建器拒绝，改用最小合法1 ms；集成顶层 `biz_vlid` 被接收解析器与回环队列双重驱动产生未知值，使构建器 `desc_legal` 未知、业务描述符被静默丢弃。
+- 校验脚本修正两处期望：线帧VLID改为取DA低两字节；解析器拒绝计数按Golden推导（共享MAC上两个解析器均观察全部线帧）。
+- 原315场景RTL回归 `build/logs/rtl_007` PASS；13份冻结核心、main及原稳定标签未改动。
+
 ## 2026-10-14：正式路径完整VO网表回归闭环
 
 - 正式路径真实GUI综合数据库导出的功能VO完成315场景完整网表回归：`build/logs/netlist_001` 退出码0、Errors 0、Warnings 0，295个外部TX帧/22840字节、296次应用bank提交、308条PSN决策、289个BAG间隔（最小最大均125003周期）和256帧SN回绕全部由独立脚本从冻结Golden重建比对。
