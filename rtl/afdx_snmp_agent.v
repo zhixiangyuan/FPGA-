@@ -18,9 +18,13 @@ module afdx_snmp_agent #(
  output reg [5:0] sys_name_length
 );
  localparam RX_IDLE=0,RX_BODY=1,ROOT=2,VERSION=3,COMMUNITY=4,PDU=5,RID=6,
-   ERROR_FIELD=7,INDEX_FIELD=8,VBL=9,VB=10,OID=11,VALUE=12,RESOLVE=13,SEND=14,DROP=15;
- reg [3:0] state;
+   ERROR_FIELD=7,INDEX_FIELD=8,VBL=9,VB=10,OID=11,VALUE=12,RESOLVE=13,SEND=14,DROP=15,SET_COPY=16,OID_COPY=17,
+   OID_COPY_PRIME=18,SET_COPY_PRIME=19,REPLY_COPY_PRIME=20;
+ reg [4:0] state;
  reg [7:0] packet[0:483],sys_name[0:31];
+ reg [7:0] packet_oid_ram[0:511],packet_set_ram[0:511],packet_reply_ram[0:511];
+ reg [7:0] oid_read_data,set_read_data,reply_read_data;
+ reg [7:0] oid_cache[0:7];
  reg [9:0] received_length,rx_index,cursor,message_end,pdu_end,vbl_end,vb_end;
  reg bad_frame,private_access,copy_response,trap_mode;
  reg [3:0] community_length,object_id;
@@ -30,6 +34,8 @@ module afdx_snmp_agent #(
  reg [31:0] uptime_snapshot;
  reg [15:0] response_port;
  reg [9:0] tx_index,tx_size;
+ reg [5:0] copy_index;
+ reg [3:0] oid_copy_index;
  // BER definite lengths through 0x82 are parsed with bounds checked first.
  // Return {valid, value-start[9:0], length[9:0], end[9:0]}.
  function [30:0] tlv;
@@ -69,8 +75,8 @@ module afdx_snmp_agent #(
    for(j=0;j<8;j=j+1)begin
     if(!found)begin
      if(j>=oid_length)begin compare_oid=-1;found=1;end
-     else if(packet[oid_start+j]<oid_byte(j,id))begin compare_oid=-1;found=1;end
-     else if(packet[oid_start+j]>oid_byte(j,id))begin compare_oid=1;found=1;end
+     else if(oid_cache[j]<oid_byte(j,id))begin compare_oid=-1;found=1;end
+     else if(oid_cache[j]>oid_byte(j,id))begin compare_oid=1;found=1;end
     end
    end
    if(!found&&oid_length>8)compare_oid=1;
@@ -90,6 +96,16 @@ module afdx_snmp_agent #(
    else unsigned_length=5;
   end endfunction
  wire [2:0] rid_length=signed_length(request_id),tick_length=unsigned_length(uptime_snapshot);
+ wire packet_store_write=!reset&&in_valid&&in_ready&&(state==RX_IDLE||rx_index<484);
+ wire [8:0] packet_store_address=state==RX_IDLE?9'd0:rx_index[8:0];
+ wire oid_read_enable=state==OID_COPY_PRIME||
+                      (state==OID_COPY&&oid_copy_index<7&&oid_copy_index+1'b1<oid_length);
+ wire [8:0] oid_read_address=state==OID_COPY_PRIME?oid_start[8:0]:oid_start[8:0]+oid_copy_index+1'b1;
+ wire set_read_enable=state==SET_COPY_PRIME||(state==SET_COPY&&copy_index+1'b1<value_length);
+ wire [8:0] set_read_address=state==SET_COPY_PRIME?value_start[8:0]:value_start[8:0]+copy_index+1'b1;
+ wire reply_read_enable=state==REPLY_COPY_PRIME||
+                        (state==SEND&&copy_response&&out_valid&&out_ready&&!out_eop);
+ wire [8:0] reply_read_address=state==REPLY_COPY_PRIME?9'd0:tx_index[8:0]+1'b1;
  wire [5:0] response_value_length=object_id==1?6'd22:object_id==3?{3'd0,tick_length}:sys_name_length;
  wire [7:0] response_value_tag=object_id==3?8'h43:8'h04;
  wire [9:0] pdu_start=7+community_length;
@@ -124,7 +140,7 @@ module afdx_snmp_agent #(
      end
     endcase
    end else if(copy_response)begin
-    response_byte=packet[position];
+    response_byte=reply_read_data;
     if(position==pdu_tag_index)response_byte=8'ha2;
     if(position==error_index)response_byte=error_status;
     if(position==index_index)response_byte=error_binding;
@@ -169,13 +185,23 @@ module afdx_snmp_agent #(
  assign out_sop=out_valid&&tx_index==0;assign out_eop=out_valid&&tx_index+1==tx_size;
  assign out_length=tx_size;assign out_src_port=161;assign out_dst_port=trap_mode?16'd162:response_port;
  integer j;reg [3:0] selected;
+ // Mirrored synchronous-read memories serve the mutually exclusive OID,
+ // SET-copy, and error-response phases without wide variable-index muxes.
+ // Keep each memory's write and registered read in separate processes for
+ // Quartus RAM inference.
+ always @(posedge clk)if(packet_store_write)packet_oid_ram[packet_store_address^9'h155]<=in_data;
+ always @(posedge clk)if(packet_store_write)packet_set_ram[packet_store_address^9'h0aa]<=in_data;
+ always @(posedge clk)if(packet_store_write)packet_reply_ram[packet_store_address^9'h1ff]<=in_data;
+ always @(posedge clk)if(!reset&&oid_read_enable)oid_read_data<=packet_oid_ram[oid_read_address^9'h155];
+ always @(posedge clk)if(!reset&&set_read_enable)set_read_data<=packet_set_ram[set_read_address^9'h0aa];
+ always @(posedge clk)if(!reset&&reply_read_enable)reply_read_data<=packet_reply_ram[reply_read_address^9'h1ff];
  always @(posedge clk)begin
   if(reset)begin
    state<=RX_IDLE;received_length<=0;rx_index<=0;cursor<=0;bad_frame<=0;
    private_access<=0;copy_response<=0;trap_mode<=0;community_length<=0;object_id<=0;
    community_start<=0;pdu_tag_index<=0;error_index<=0;index_index<=0;oid_start<=0;oid_length<=0;value_start<=0;value_length<=0;
    message_end<=0;pdu_end<=0;vbl_end<=0;vb_end<=0;pdu_tag<=0;value_tag<=0;error_status<=0;error_binding<=0;
-   request_id<=0;uptime_snapshot<=0;response_port<=0;tx_index<=0;tx_size<=0;
+   request_id<=0;uptime_snapshot<=0;response_port<=0;tx_index<=0;tx_size<=0;copy_index<=0;oid_copy_index<=0;
    request_count<=0;response_count<=0;error_count<=0;trap_count<=0;sys_name_length<=7;
    for(j=0;j<32;j=j+1)sys_name[j]<=j==0?"a":j==1?"f":j==2?"d":j==3?"x":j==4?"-":j==5?"s":j==6?"2":0;
   end else begin
@@ -219,7 +245,7 @@ module afdx_snmp_agent #(
     VBL:if(!field_ok||packet[cursor]!=8'h30||field_end!=pdu_end)state<=DROP;
      else begin
       vbl_end<=field_end;cursor<=field_base;
-      if(field_length==0)begin copy_response<=1;tx_size<=received_length;tx_index<=0;request_count<=request_count+1'b1;state<=SEND;end
+      if(field_length==0)begin copy_response<=1;tx_size<=received_length;tx_index<=0;request_count<=request_count+1'b1;state<=REPLY_COPY_PRIME;end
       else state<=VB;
      end
     VB:if(!field_ok||packet[cursor]!=8'h30||field_end>vbl_end)state<=DROP;
@@ -228,7 +254,13 @@ module afdx_snmp_agent #(
       if(field_end!=vbl_end)begin error_status<=1;error_binding<=0;end
      end
     OID:if(!field_ok||packet[cursor]!=6||field_length==0||field_length>64||field_end>vb_end||packet[field_end-1][7])state<=DROP;
-     else begin oid_start<=field_base;oid_length<=field_length;cursor<=field_end;state<=VALUE;end
+     else begin oid_start<=field_base;oid_length<=field_length;cursor<=field_end;oid_copy_index<=0;state<=OID_COPY_PRIME;end
+    OID_COPY_PRIME:state<=OID_COPY;
+    OID_COPY:begin
+     oid_cache[oid_copy_index]<=oid_read_data;
+     if(oid_copy_index+1'b1>=oid_length||oid_copy_index==7)state<=VALUE;
+     else oid_copy_index<=oid_copy_index+1'b1;
+    end
     VALUE:if(!field_ok||field_end!=vb_end)state<=DROP;
      else begin
       value_start<=field_base;value_length<=field_length;value_tag<=packet[cursor];
@@ -241,7 +273,7 @@ module afdx_snmp_agent #(
      end else begin
       if(compare_oid(1)==0)selected=1;else if(compare_oid(3)==0)selected=3;else if(compare_oid(5)==0)selected=5;
      end
-     object_id<=selected;tx_index<=0;
+     object_id<=selected;tx_index<=0;state<=SEND;
      if(error_status!=0||selected==0||(pdu_tag==8'ha3&&(!private_access||selected!=5||value_tag!=4||value_length>32)))begin
       copy_response<=1;tx_size<=received_length;
       if(error_status==0)begin
@@ -251,15 +283,22 @@ module afdx_snmp_agent #(
        else error_status<=3;
       end
       error_count<=error_count+1'b1;
+      state<=REPLY_COPY_PRIME;
      end else begin
       copy_response<=0;
       if(pdu_tag==8'ha3)begin
-       sys_name_length<=value_length;
-       for(j=0;j<32;j=j+1)if(j<value_length)sys_name[j]<=packet[value_start+j];
+       sys_name_length<=value_length;copy_index<=0;
        tx_size<=7+community_length+4+rid_length+6+2+2+10+2+value_length;
+       if(value_length!=0)state<=SET_COPY_PRIME;
       end else tx_size<=7+community_length+4+rid_length+6+2+2+10+2+(selected==1?22:selected==3?unsigned_length(uptime_snapshot):sys_name_length);
      end
-     state<=SEND;
+    end
+    REPLY_COPY_PRIME:state<=SEND;
+    SET_COPY_PRIME:state<=SET_COPY;
+    SET_COPY:begin
+     sys_name[copy_index]<=set_read_data;
+     copy_index<=copy_index+1'b1;
+     if(copy_index+1'b1>=value_length)state<=SEND;
     end
     SEND:if(out_valid&&out_ready)begin
      if(out_eop)begin state<=RX_IDLE;if(trap_mode)trap_count<=trap_count+1'b1;else response_count<=response_count+1'b1;end

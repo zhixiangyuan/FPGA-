@@ -24,6 +24,11 @@ module afdx_service_message_fifo #(
  reg bad;
  wire in_fire=in_valid&&in_ready;
  wire [9:0] next_rd=rd+1'b1;
+ wire write_enable=in_fire&&(state==IDLE||(state==CAPTURE&&byte_count<DEPTH));
+ wire [8:0] write_address=state==IDLE?9'd0:byte_count[8:0];
+ wire read_enable=(state==DESCR&&msg_valid&&msg_ready)||
+                  (state==STREAM&&out_valid&&out_ready&&!out_last);
+ wire [8:0] read_address=state==DESCR?9'd0:next_rd[8:0];
  // Capture never back-pressures the shared MAC receive path: an oversized or
  // malformed message is counted as an overflow and discarded instead of holding
  // the bank owner hostage, which would stall the business VLs behind it.
@@ -35,13 +40,11 @@ module afdx_service_message_fifo #(
  assign out_last=out_valid&&(rd+1'b1==hold_length[9:0]);
  // RAM write port stays independent of reset and control logic.
  always @(posedge clk)begin
-  if(state==IDLE&&in_fire)store[9'd0]<=in_data;
-  else if(state==CAPTURE&&in_fire&&byte_count<DEPTH)store[byte_count[8:0]]<=in_data;
+  if(write_enable)store[write_address]<=in_data;
  end
  // Registered read port keeps the store inferable as RAM.
  always @(posedge clk)begin
-  if(state==DESCR&&msg_valid&&msg_ready)read_byte<=store[9'd0];
-  else if(state==STREAM&&out_valid&&out_ready&&!out_last)read_byte<=store[next_rd[8:0]];
+  if(read_enable)read_byte<=store[read_address];
  end
  always @(posedge clk)begin
   if(reset)begin
