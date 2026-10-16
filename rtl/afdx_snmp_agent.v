@@ -19,7 +19,8 @@ module afdx_snmp_agent #(
 );
  localparam RX_IDLE=0,RX_BODY=1,ROOT=2,VERSION=3,COMMUNITY=4,PDU=5,RID=6,
    ERROR_FIELD=7,INDEX_FIELD=8,VBL=9,VB=10,OID=11,VALUE=12,RESOLVE=13,SEND=14,DROP=15,SET_COPY=16,OID_COPY=17,
-   OID_COPY_PRIME=18,SET_COPY_PRIME=19,REPLY_COPY_PRIME=20,FIELD_REQ=21,FIELD_CAPTURE=22;
+   OID_COPY_PRIME=18,SET_COPY_PRIME=19,REPLY_COPY_PRIME=20,FIELD_REQ=21,FIELD_CAPTURE=22,
+   COMMUNITY_REQ=23,COMMUNITY_CAPTURE=24;
  reg [4:0] state;
  reg [7:0] packet[0:483],sys_name[0:31];
  reg [7:0] packet_oid_ram[0:511],packet_set_ram[0:511],packet_reply_ram[0:511];
@@ -28,11 +29,12 @@ module afdx_snmp_agent #(
  reg [7:0] field_header[0:3],packet_read_data;
  reg [4:0] field_return_state;
  reg [1:0] field_index;
- reg field_valid;
+ reg field_valid,community_match;
+ reg [3:0] community_index;
  reg [9:0] received_length,rx_index,cursor,message_end,pdu_end,vbl_end,vb_end;
  reg bad_frame,private_access,copy_response,trap_mode;
  reg [3:0] community_length,object_id;
- reg [9:0] community_start,pdu_tag_index,error_index,index_index,oid_start,oid_length,value_start,value_length;
+ reg [9:0] pdu_tag_index,error_index,index_index,oid_start,oid_length,value_start,value_length;
  reg [7:0] pdu_tag,value_tag,error_status,error_binding;
  reg signed [31:0] request_id;
  reg [31:0] uptime_snapshot;
@@ -62,8 +64,11 @@ module afdx_snmp_agent #(
  wire field_ok=field[30];wire [9:0] field_base=field[29:20],field_length=field[19:10],field_end=field[9:0];
  wire field_state=(state==ROOT)||(state==VERSION)||(state==COMMUNITY)||(state==PDU)||(state==RID)||
                   (state==ERROR_FIELD)||(state==INDEX_FIELD)||(state==VBL)||(state==VB)||(state==OID)||(state==VALUE);
- wire packet_read_enable=(state==FIELD_REQ)||(state==FIELD_CAPTURE&&field_index<3);
- wire [9:0] packet_read_address=state==FIELD_REQ?cursor:cursor+field_index+1'b1;
+ wire packet_read_enable=(state==FIELD_REQ)||(state==FIELD_CAPTURE&&field_index<3)||
+                         (state==COMMUNITY_REQ)||(state==COMMUNITY_CAPTURE&&community_index+1'b1<community_length);
+ wire [9:0] packet_read_address=state==FIELD_REQ?cursor:
+                                state==FIELD_CAPTURE?cursor+field_index+1'b1:
+                                state==COMMUNITY_REQ?field_base+community_index:field_base+community_index+1'b1;
  function signed [31:0] integer_value;
   input [9:0] start,length;integer j;reg signed [31:0] value;
   begin
@@ -77,6 +82,21 @@ module afdx_snmp_agent #(
    0:oid_byte=8'h2b;1:oid_byte=6;2:oid_byte=1;3:oid_byte=2;
    4:oid_byte=1;5:oid_byte=1;6:oid_byte=id;default:oid_byte=0;
   endcase end endfunction
+ function [7:0] community_byte;input [3:0] length;input [9:0] position;
+  begin
+   community_byte=0;
+   if(length==6)case(position)
+    0:community_byte="p";1:community_byte="u";2:community_byte="b";
+    3:community_byte="l";4:community_byte="i";5:community_byte="c";
+    default:community_byte=0;
+   endcase
+   else if(length==7)case(position)
+    0:community_byte="p";1:community_byte="r";2:community_byte="i";
+    3:community_byte="v";4:community_byte="a";5:community_byte="t";
+    6:community_byte="e";default:community_byte=0;
+   endcase
+  end
+ endfunction
  function integer compare_oid;input [3:0] id;integer j;reg found;
   begin
    compare_oid=0;found=0;
@@ -160,7 +180,7 @@ module afdx_snmp_agent #(
     else if(position==4)response_byte=0;
     else if(position==5)response_byte=4;
     else if(position==6)response_byte=community_length;
-    else if(position<pdu_start)response_byte=packet[community_start+position-7];
+    else if(position<pdu_start)response_byte=community_byte(community_length,position-7);
     else if(position==pdu_start)response_byte=8'ha2;
     else if(position==pdu_start+1)response_byte=result_end-pdu_start-2;
     else if(position==pdu_start+2)response_byte=2;
@@ -210,10 +230,10 @@ module afdx_snmp_agent #(
   if(reset)begin
    state<=RX_IDLE;received_length<=0;rx_index<=0;cursor<=0;bad_frame<=0;
    private_access<=0;copy_response<=0;trap_mode<=0;community_length<=0;object_id<=0;
-   community_start<=0;pdu_tag_index<=0;error_index<=0;index_index<=0;oid_start<=0;oid_length<=0;value_start<=0;value_length<=0;
+   pdu_tag_index<=0;error_index<=0;index_index<=0;oid_start<=0;oid_length<=0;value_start<=0;value_length<=0;
    message_end<=0;pdu_end<=0;vbl_end<=0;vb_end<=0;pdu_tag<=0;value_tag<=0;error_status<=0;error_binding<=0;
    request_id<=0;uptime_snapshot<=0;response_port<=0;tx_index<=0;tx_size<=0;copy_index<=0;oid_copy_index<=0;
-   field_return_state<=ROOT;field_index<=0;field_valid<=0;
+   field_return_state<=ROOT;field_index<=0;community_index<=0;field_valid<=0;community_match<=0;
    for(j=0;j<4;j=j+1)field_header[j]<=0;
    request_count<=0;response_count<=0;error_count<=0;trap_count<=0;sys_name_length<=7;
    for(j=0;j<32;j=j+1)sys_name[j]<=j==0?"a":j==1?"f":j==2?"d":j==3?"x":j==4?"-":j==5?"s":j==6?"2":0;
@@ -245,6 +265,15 @@ module afdx_snmp_agent #(
      if(field_index==3)begin field_valid<=1;state<=field_return_state;end
      else field_index<=field_index+1'b1;
     end
+    COMMUNITY_REQ:state<=COMMUNITY_CAPTURE;
+    COMMUNITY_CAPTURE:begin
+     community_match<=community_match&&(packet_read_data==community_byte(community_length,community_index));
+     if(community_index+1'b1>=community_length)begin
+      if(community_match&&(packet_read_data==community_byte(community_length,community_index)))begin
+       private_access<=community_length==7;cursor<=field_end;state<=PDU;
+      end else state<=DROP;
+     end else community_index<=community_index+1'b1;
+    end
     ROOT:begin
      if(!field_ok||field_header[0]!=8'h30||field_end!=received_length)state<=DROP;
      else begin cursor<=field_base;message_end<=field_end;state<=VERSION;uptime_snapshot<=uptime_ticks;end
@@ -252,10 +281,8 @@ module afdx_snmp_agent #(
     VERSION:if(!field_ok||field_header[0]!=2||field_length!=1||field_header[2]!=0)state<=DROP;
      else begin cursor<=field_end;state<=COMMUNITY;end
     COMMUNITY:begin
-     if(!field_ok||field_header[0]!=4||
-       !((field_length==6&&{packet[field_base],packet[field_base+1],packet[field_base+2],packet[field_base+3],packet[field_base+4],packet[field_base+5]}=="public")||
-         (field_length==7&&{packet[field_base],packet[field_base+1],packet[field_base+2],packet[field_base+3],packet[field_base+4],packet[field_base+5],packet[field_base+6]}=="private")))state<=DROP;
-     else begin community_start<=field_base;community_length<=field_length;private_access<=field_length==7;cursor<=field_end;state<=PDU;end
+     if(!field_ok||field_header[0]!=4||(field_length!=6&&field_length!=7))state<=DROP;
+     else begin community_length<=field_length;community_index<=0;community_match<=1;state<=COMMUNITY_REQ;end
     end
     PDU:if(!field_ok||field_end!=message_end||(field_header[0]!=8'ha0&&field_header[0]!=8'ha1&&field_header[0]!=8'ha3))state<=DROP;
      else begin pdu_tag_index<=cursor;pdu_tag<=field_header[0];pdu_end<=field_end;cursor<=field_base;state<=RID;end
