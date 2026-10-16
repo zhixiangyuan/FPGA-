@@ -95,7 +95,8 @@ def main():
     for path in sources:
         known.update(module_signatures(strip_comments(path.read_text(encoding="utf-8", errors="replace"))))
     tops = [Path(a) if Path(a).is_absolute() else ROOT / a for a in sys.argv[1:]] or [
-        ROOT / "rtl/afdx_stage2_top.v", ROOT / "rtl/afdx_stage2_mgmt_top.v", ROOT / "rtl/AFDX_top.v"]
+        ROOT / "rtl/afdx_stage2_top.v", ROOT / "rtl/afdx_stage2_mgmt_top.v", ROOT / "rtl/AFDX_top.v",
+        ROOT / "rtl/submission/AFDX_top.v"]
     failed = 0
     for top in tops:
         count, conflicts = collect(strip_comments(top.read_text(encoding="utf-8", errors="replace")), known)

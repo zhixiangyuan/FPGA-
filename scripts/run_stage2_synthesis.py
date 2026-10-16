@@ -13,7 +13,7 @@ def main():
  args=parser.parse_args();project=args.project_dir.resolve();reference=args.settings_reference.resolve()
  manifest=json.loads((project/'project_manifest.json').read_text())
  family=project.name.split('_',1)[0];top=manifest['top']
- assert family in ('AFDXS2','AFDXS2M') and top in ('afdx_stage2_top','afdx_stage2_mgmt_top')
+ assert (family,top) in (('AFDXS2','afdx_stage2_top'),('AFDXS2M','afdx_stage2_mgmt_top'),('AFDXSUB','AFDX_top'))
  assert manifest['device']=='EQ6HL45' and manifest['package']=='CSG225' and manifest['clock_constraint_ns']==8
  for r in manifest['sources']:
   assert sha(ROOT/r['canonical_source'])==r['sha256']==sha(project/r['snapshot'])

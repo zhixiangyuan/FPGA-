@@ -51,7 +51,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--project-dir',type=Path,required=True)
     args=parser.parse_args();project=args.project_dir.resolve();family=project.name.split('_',1)[0]
-    assert family in ('AFDXS2M','AFDXS2')
+    assert family in ('AFDXS2M','AFDXS2','AFDXSUB')
     manifest=json.loads((project/'project_manifest.json').read_text())
     assert manifest['device']=='EQ6HL45' and manifest['package']=='CSG225'
     mapping=json.loads((project/'database_mapping_provenance.json').read_text())

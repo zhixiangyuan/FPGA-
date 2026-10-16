@@ -24,6 +24,11 @@
 | 运行管理族真实综合与数据库映射打包 | `python scripts/run_stage2_synthesis.py --project-dir build/elinx/AFDXS2M_NNN --settings-reference build/elinx/AFDXS2_005` |
 | 运行 EQ6 原生综合时序分析并核对 100 MHz 与工程时钟裕量（不运行布局布线） | `python scripts/run_stage2_native_timing.py --project-dir build/elinx/AFDXS2M_NNN` |
 | 静态检查顶层多驱动网冲突 | `python scripts/check_top_drivers.py [顶层文件...]` |
+| 运行正式八端口生产顶层定向 RTL/Golden 验证 | `python scripts/run_submission.py` |
+| 生成正式八端口生产顶层 EQ6 工程 | `python scripts/prepare_submission_elinx.py` |
+| 综合生产顶层并打包 EQ6 数据库 | `python scripts/run_stage2_synthesis.py --project-dir build/elinx/AFDXSUB_NNN --settings-reference build/elinx/AFDXS2_005` |
+
+正式生产入口为 `rtl/submission/AFDX_top.v`，历史 V1.0 入口为 `rtl/AFDX_top.v`。两者均定义 `AFDX_top`，必须使用各自的显式源码清单，不能递归收集全部 RTL 后同时编译。生产入口使用真实 sysUpTime，复位后自动发起 SNTP，默认每 16 秒再次轮询，原 1 秒超时和 1 ms BAG 保持不变。生产顶层新增 615A 前，完整 VO 留到功能集成后的固定候选执行。
 
 混合负载默认每 VL 256 帧、1471 字节负载，覆盖 SN 回绕。`--interval` 指一轮内不同 VL 的注入间隔；相邻轮次至少间隔 128000 周期，输入和输出仍独立检查每 VL 至少 125000 周期 BAG。吞吐窗口从首个业务输入到最后业务输出，包含空闲、启动和服务竞争；同时保存输出窗口口径和三种 GMII 时延。50 µs 时延极差是工程检查目标，不能当作官方已确认的抖动统计口径。SNTP 的 T1 是入队时间，T4 是路由后首负载字节时间，测试报告会量化它们与 GMII 首字节的差值。
 

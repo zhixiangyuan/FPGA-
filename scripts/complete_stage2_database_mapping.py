@@ -7,7 +7,7 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--project-dir',type=Path,required=True)
  project=parser.parse_args().project_dir.resolve();family=project.name.split('_',1)[0]
- assert family in ('AFDXS2','AFDXS2M')
+ assert family in ('AFDXS2','AFDXS2M','AFDXSUB')
  out=project/f'{family}.runs/synth_1'
  manifest=json.loads((project/'project_manifest.json').read_text())
  for row in manifest['sources']:assert sha(project/row['snapshot'])==row['sha256']==sha(ROOT/row['canonical_source'])
