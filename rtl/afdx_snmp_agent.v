@@ -19,12 +19,16 @@ module afdx_snmp_agent #(
 );
  localparam RX_IDLE=0,RX_BODY=1,ROOT=2,VERSION=3,COMMUNITY=4,PDU=5,RID=6,
    ERROR_FIELD=7,INDEX_FIELD=8,VBL=9,VB=10,OID=11,VALUE=12,RESOLVE=13,SEND=14,DROP=15,SET_COPY=16,OID_COPY=17,
-   OID_COPY_PRIME=18,SET_COPY_PRIME=19,REPLY_COPY_PRIME=20;
+   OID_COPY_PRIME=18,SET_COPY_PRIME=19,REPLY_COPY_PRIME=20,FIELD_REQ=21,FIELD_CAPTURE=22;
  reg [4:0] state;
  reg [7:0] packet[0:483],sys_name[0:31];
  reg [7:0] packet_oid_ram[0:511],packet_set_ram[0:511],packet_reply_ram[0:511];
  reg [7:0] oid_read_data,set_read_data,reply_read_data;
  reg [7:0] oid_cache[0:7];
+ reg [7:0] field_header[0:3],packet_read_data;
+ reg [4:0] field_return_state;
+ reg [1:0] field_index;
+ reg field_valid;
  reg [9:0] received_length,rx_index,cursor,message_end,pdu_end,vbl_end,vb_end;
  reg bad_frame,private_access,copy_response,trap_mode;
  reg [3:0] community_length,object_id;
@@ -54,8 +58,12 @@ module afdx_snmp_agent #(
    end
   end
  endfunction
- wire [30:0] field=tlv(cursor,received_length,packet[cursor+1],packet[cursor+2],packet[cursor+3]);
+ wire [30:0] field=tlv(cursor,received_length,field_header[1],field_header[2],field_header[3]);
  wire field_ok=field[30];wire [9:0] field_base=field[29:20],field_length=field[19:10],field_end=field[9:0];
+ wire field_state=(state==ROOT)||(state==VERSION)||(state==COMMUNITY)||(state==PDU)||(state==RID)||
+                  (state==ERROR_FIELD)||(state==INDEX_FIELD)||(state==VBL)||(state==VB)||(state==OID)||(state==VALUE);
+ wire packet_read_enable=(state==FIELD_REQ)||(state==FIELD_CAPTURE&&field_index<3);
+ wire [9:0] packet_read_address=state==FIELD_REQ?cursor:cursor+field_index+1'b1;
  function signed [31:0] integer_value;
   input [9:0] start,length;integer j;reg signed [31:0] value;
   begin
@@ -195,6 +203,9 @@ module afdx_snmp_agent #(
  always @(posedge clk)if(!reset&&oid_read_enable)oid_read_data<=packet_oid_ram[oid_read_address^9'h155];
  always @(posedge clk)if(!reset&&set_read_enable)set_read_data<=packet_set_ram[set_read_address^9'h0aa];
  always @(posedge clk)if(!reset&&reply_read_enable)reply_read_data<=packet_reply_ram[reply_read_address^9'h1ff];
+ // Fetch a BER TLV header serially. Keeping one registered read path avoids
+ // three parallel variable-index reads from the packet register array.
+ always @(posedge clk)if(packet_read_enable)packet_read_data<=packet[packet_read_address];
  always @(posedge clk)begin
   if(reset)begin
    state<=RX_IDLE;received_length<=0;rx_index<=0;cursor<=0;bad_frame<=0;
@@ -202,6 +213,8 @@ module afdx_snmp_agent #(
    community_start<=0;pdu_tag_index<=0;error_index<=0;index_index<=0;oid_start<=0;oid_length<=0;value_start<=0;value_length<=0;
    message_end<=0;pdu_end<=0;vbl_end<=0;vb_end<=0;pdu_tag<=0;value_tag<=0;error_status<=0;error_binding<=0;
    request_id<=0;uptime_snapshot<=0;response_port<=0;tx_index<=0;tx_size<=0;copy_index<=0;oid_copy_index<=0;
+   field_return_state<=ROOT;field_index<=0;field_valid<=0;
+   for(j=0;j<4;j=j+1)field_header[j]<=0;
    request_count<=0;response_count<=0;error_count<=0;trap_count<=0;sys_name_length<=7;
    for(j=0;j<32;j=j+1)sys_name[j]<=j==0?"a":j==1?"f":j==2?"d":j==3?"x":j==4?"-":j==5?"s":j==6?"2":0;
   end else begin
@@ -221,39 +234,49 @@ module afdx_snmp_agent #(
       cursor<=0;state<=bad_frame||rx_index+1!=received_length?DROP:ROOT;
      end
     end
-   end else case(state)
+   end else if(field_state&&!field_valid)begin
+    field_return_state<=state;field_index<=0;state<=FIELD_REQ;
+   end else begin
+    if(field_state&&field_valid)field_valid<=0;
+    case(state)
+    FIELD_REQ:begin field_index<=0;state<=FIELD_CAPTURE;end
+    FIELD_CAPTURE:begin
+     field_header[field_index]<=packet_read_data;
+     if(field_index==3)begin field_valid<=1;state<=field_return_state;end
+     else field_index<=field_index+1'b1;
+    end
     ROOT:begin
-     if(!field_ok||packet[0]!=8'h30||field_end!=received_length)state<=DROP;
+     if(!field_ok||field_header[0]!=8'h30||field_end!=received_length)state<=DROP;
      else begin cursor<=field_base;message_end<=field_end;state<=VERSION;uptime_snapshot<=uptime_ticks;end
     end
-    VERSION:if(!field_ok||packet[cursor]!=2||field_length!=1||packet[field_base]!=0)state<=DROP;
+    VERSION:if(!field_ok||field_header[0]!=2||field_length!=1||field_header[2]!=0)state<=DROP;
      else begin cursor<=field_end;state<=COMMUNITY;end
     COMMUNITY:begin
-     if(!field_ok||packet[cursor]!=4||
+     if(!field_ok||field_header[0]!=4||
        !((field_length==6&&{packet[field_base],packet[field_base+1],packet[field_base+2],packet[field_base+3],packet[field_base+4],packet[field_base+5]}=="public")||
          (field_length==7&&{packet[field_base],packet[field_base+1],packet[field_base+2],packet[field_base+3],packet[field_base+4],packet[field_base+5],packet[field_base+6]}=="private")))state<=DROP;
      else begin community_start<=field_base;community_length<=field_length;private_access<=field_length==7;cursor<=field_end;state<=PDU;end
     end
-    PDU:if(!field_ok||field_end!=message_end||(packet[cursor]!=8'ha0&&packet[cursor]!=8'ha1&&packet[cursor]!=8'ha3))state<=DROP;
-     else begin pdu_tag_index<=cursor;pdu_tag<=packet[cursor];pdu_end<=field_end;cursor<=field_base;state<=RID;end
-    RID:if(!field_ok||packet[cursor]!=2||field_length==0||field_length>4)state<=DROP;
+    PDU:if(!field_ok||field_end!=message_end||(field_header[0]!=8'ha0&&field_header[0]!=8'ha1&&field_header[0]!=8'ha3))state<=DROP;
+     else begin pdu_tag_index<=cursor;pdu_tag<=field_header[0];pdu_end<=field_end;cursor<=field_base;state<=RID;end
+    RID:if(!field_ok||field_header[0]!=2||field_length==0||field_length>4)state<=DROP;
      else begin request_id<=integer_value(field_base,field_length);cursor<=field_end;state<=ERROR_FIELD;end
-    ERROR_FIELD:if(!field_ok||packet[cursor]!=2||field_length!=1)state<=DROP;
+    ERROR_FIELD:if(!field_ok||field_header[0]!=2||field_length!=1)state<=DROP;
      else begin error_index<=field_base;cursor<=field_end;state<=INDEX_FIELD;end
-    INDEX_FIELD:if(!field_ok||packet[cursor]!=2||field_length!=1)state<=DROP;
+    INDEX_FIELD:if(!field_ok||field_header[0]!=2||field_length!=1)state<=DROP;
      else begin index_index<=field_base;cursor<=field_end;state<=VBL;end
-    VBL:if(!field_ok||packet[cursor]!=8'h30||field_end!=pdu_end)state<=DROP;
+    VBL:if(!field_ok||field_header[0]!=8'h30||field_end!=pdu_end)state<=DROP;
      else begin
       vbl_end<=field_end;cursor<=field_base;
       if(field_length==0)begin copy_response<=1;tx_size<=received_length;tx_index<=0;request_count<=request_count+1'b1;state<=REPLY_COPY_PRIME;end
       else state<=VB;
      end
-    VB:if(!field_ok||packet[cursor]!=8'h30||field_end>vbl_end)state<=DROP;
+    VB:if(!field_ok||field_header[0]!=8'h30||field_end>vbl_end)state<=DROP;
      else begin
       vb_end<=field_end;cursor<=field_base;state<=OID;
       if(field_end!=vbl_end)begin error_status<=1;error_binding<=0;end
      end
-    OID:if(!field_ok||packet[cursor]!=6||field_length==0||field_length>64||field_end>vb_end||packet[field_end-1][7])state<=DROP;
+    OID:if(!field_ok||field_header[0]!=6||field_length==0||field_length>64||field_end>vb_end||packet[field_end-1][7])state<=DROP;
      else begin oid_start<=field_base;oid_length<=field_length;cursor<=field_end;oid_copy_index<=0;state<=OID_COPY_PRIME;end
     OID_COPY_PRIME:state<=OID_COPY;
     OID_COPY:begin
@@ -263,7 +286,7 @@ module afdx_snmp_agent #(
     end
     VALUE:if(!field_ok||field_end!=vb_end)state<=DROP;
      else begin
-      value_start<=field_base;value_length<=field_length;value_tag<=packet[cursor];
+      value_start<=field_base;value_length<=field_length;value_tag<=field_header[0];
       if(vb_end<vbl_end)begin cursor<=vb_end;state<=VB;end else state<=RESOLVE;
      end
     RESOLVE:begin
@@ -306,7 +329,8 @@ module afdx_snmp_agent #(
     end
     DROP:begin error_count<=error_count+1'b1;state<=RX_IDLE;end
     default:begin end
-   endcase
+    endcase
+   end
   end
  end
 endmodule
