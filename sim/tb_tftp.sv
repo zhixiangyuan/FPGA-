@@ -21,7 +21,7 @@ module tb_tftp;
  reg stall_output=0;
  wire out_ready=!stall_output&&(cycle%5)!=1&&(cycle%13)!=2;
  wire file_write_ready=(cycle%3)!=1;
- afdx_tftp_engine #(.TIMEOUT_CYCLES(5000),.MAX_RETRIES(3)) dut(.*,.port_match(),
+ afdx_tftp_engine #(.TIMEOUT_CYCLES(5000),.MAX_RETRIES(3)) dut(.*,.port_match(),.peer_error(),
   .file_open_ready(1'b1),.file_read_length(active_length),.file_finish_ready(1'b1));
  `include "golden/constants.vh"
  reg [7:0] rx_bytes[0:RX_BYTES-1],expected[0:EXPECTED_BYTES-1];

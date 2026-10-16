@@ -1,18 +1,20 @@
 // RFC1350 octet transport, one bounded transfer at a time, client and server.
 // The validated UDP peer IP is selected upstream; both UDP TIDs are checked here.
 // File policy and atomic visibility belong to the file backend, not this layer.
-// Filename profile: 1..32 bytes. No netascii or option negotiation is provided.
+// Filename profile: 1..32 bytes. No netascii or option negotiation is provided;
+// well-formed unsupported option pairs fall back to the 512-byte base protocol.
 module afdx_tftp_engine #(
  parameter integer TIMEOUT_CYCLES=12500000,
  parameter integer MAX_RETRIES=3,
  parameter integer MAX_FILE_BYTES=4096,
  parameter [15:0] TID_SEED=16'hc159,
- parameter [2:0] TID_PREFIX=3'b110
+ parameter [2:0] TID_PREFIX=3'b110,
+ parameter [15:0] SERVER_PORT=16'd69
 )(
  input wire clk,reset,cancel,
  input wire start,input wire start_write,input wire [255:0] start_name,input wire [5:0] start_name_length,
  output wire start_ready,output wire busy,output wire port_match,
- output reg done,failed,aborted,output reg [15:0] failure_code,
+ output reg done,failed,aborted,peer_error,output reg [15:0] failure_code,
  input wire [7:0] in_data,input wire in_valid,output wire in_ready,
  input wire in_sop,in_eop,input wire [10:0] in_length,
  input wire [15:0] in_src_port,in_dst_port,
@@ -56,6 +58,7 @@ module afdx_tftp_engine #(
  wire [31:0] dally_limit=(|dally_period[63:32])?32'hffffffff:dally_period[31:0];
  reg [5:0] mode_index;
  reg parse_mode,parse_bad,parse_duplicate;
+ reg parse_options,option_value,option_character;
  reg [5:0] parse_count;
  reg small_tx;
  reg [15:0] small_src,small_dst,small_code,small_block;
@@ -76,7 +79,7 @@ module afdx_tftp_engine #(
  assign port_match=!reset&&((local_tid!=0&&in_dst_port==local_tid)||(dally_valid&&in_dst_port==dally_local));
  wire tx_fire=out_valid&&out_ready;
  wire wait_state=state==WAIT_PACKET||state==IDLE;
- assign start_ready=!reset&&!cancel&&!cancel_pending&&state==IDLE&&!rx_full&&!rx_collect;
+ assign start_ready=!reset&&!cancel&&!cancel_pending&&state==IDLE&&!rx_full&&!rx_collect&&!in_valid;
  assign busy=state!=IDLE;
  assign in_ready=!reset&&!cancel&&!cancel_pending&&!rx_full&&wait_state;
  assign file_open_valid=!reset&&!cancel&&!cancel_pending&&state==OPEN_FILE;
@@ -175,17 +178,18 @@ module afdx_tftp_engine #(
  endtask
  always @(posedge clk)begin
   if(reset)begin
-   state<=IDLE;done<=0;failed<=0;aborted<=0;failure_code<=0;cancel_pending<=0;
+   state<=IDLE;done<=0;failed<=0;aborted<=0;peer_error<=0;failure_code<=0;cancel_pending<=0;
    local_tid<=0;peer_tid<=0;peer_locked<=0;receiving<=0;tid_lfsr<=TID_SEED;
    file_name<=0;file_name_length<=0;file_write<=0;file_client<=0;
    block_no<=0;file_offset<=0;read_length<=0;payload_length<=0;tx_final<=0;
    timer<=0;retries<=0;retry_count<=0;duplicate_count<=0;reject_count<=0;completed_count<=0;
    tx_index<=0;build_index<=0;tx_length<=0;build_opcode<=0;build_block<=0;after_tx<=AFTER_WAIT;
    rx_index<=0;mode_index<=0;parse_mode<=0;parse_bad<=0;parse_duplicate<=0;parse_count<=0;
+   parse_options<=0;option_value<=0;option_character<=0;
    small_tx<=0;small_src<=0;small_dst<=0;small_code<=0;small_block<=0;small_ack<=0;
    dally_valid<=0;dally_timer<=0;dally_local<=0;dally_peer<=0;dally_block<=0;
   end else begin
-   done<=0;failed<=0;aborted<=0;
+   done<=0;failed<=0;aborted<=0;peer_error<=0;
    if(cancel)cancel_pending<=1;
    if(dally_valid)begin
     if(dally_timer+1>=dally_limit)dally_valid<=0;
@@ -202,7 +206,7 @@ module afdx_tftp_engine #(
       if(start_name_length==0||start_name_length>32)begin failed<=1;failure_code<=4;end
       else begin
        local_tid<=new_tid;tid_lfsr<={tid_lfsr[14:0],tid_lfsr[15]^tid_lfsr[13]^tid_lfsr[12]^tid_lfsr[10]};
-       peer_tid<=69;peer_locked<=0;file_client<=1;file_write<=!start_write;receiving<=!start_write;
+       peer_tid<=SERVER_PORT;peer_locked<=0;file_client<=1;file_write<=!start_write;receiving<=!start_write;
        file_name<=start_name;file_name_length<=start_name_length;file_offset<=0;block_no<=0;state<=OPEN_FILE;
       end
      end
@@ -221,20 +225,22 @@ module afdx_tftp_engine #(
      if(rx_bad)reject_count<=reject_count+1'b1;
      else if(dally_valid&&rx_dst==dally_local&&rx_src==dally_peer&&rx_opcode==3&&rx_block==dally_block&&rx_size>=4)begin
       duplicate_count<=duplicate_count+1'b1;transient(1,dally_block,dally_local,dally_peer);
-     end else if(rx_dst==69&&(rx_opcode==1||rx_opcode==2)&&rx_size<10)begin
-      reject_count<=reject_count+1'b1;transient(0,4,69,rx_src);
-     end else if(busy_session&&!file_client&&rx_dst==69&&rx_src==peer_tid&&
+     end else if(rx_dst==SERVER_PORT&&(rx_opcode==1||rx_opcode==2)&&(rx_size<10||rx_size>512))begin
+      reject_count<=reject_count+1'b1;transient(0,4,SERVER_PORT,rx_src);
+     end else if(busy_session&&!file_client&&rx_dst==SERVER_PORT&&rx_src==peer_tid&&
                  rx_opcode==(receiving?16'd2:16'd1)&&block_no==(receiving?16'd0:16'd1))begin
       parse_duplicate<=1;parse_mode<=0;parse_bad<=0;mode_index<=0;parse_count<=0;
+      parse_options<=0;option_value<=0;option_character<=0;
       rx_index<=2;state<=PARSE_ISSUE;
-     end else if(!busy_session&&rx_dst==69&&(rx_opcode==1||rx_opcode==2))begin
+     end else if(!busy_session&&rx_dst==SERVER_PORT&&(rx_opcode==1||rx_opcode==2))begin
       local_tid<=new_tid;tid_lfsr<={tid_lfsr[14:0],tid_lfsr[15]^tid_lfsr[13]^tid_lfsr[12]^tid_lfsr[10]};
       peer_tid<=rx_src;peer_locked<=1;receiving<=rx_opcode==2;file_write<=rx_opcode==2;file_client<=0;
       file_name<=0;file_name_length<=0;parse_mode<=0;parse_bad<=0;mode_index<=0;parse_duplicate<=0;parse_count<=0;
+      parse_options<=0;option_value<=0;option_character<=0;
       file_offset<=0;block_no<=0;rx_index<=2;state<=PARSE_ISSUE;
      end else if(rx_dst!=local_tid||(peer_locked&&rx_src!=peer_tid)||!busy_session)begin
       reject_count<=reject_count+1'b1;transient(0,5,rx_dst,rx_src);
-     end else if(rx_opcode==5&&rx_size>=5)begin abort_transfer(rx_block);state<=IDLE;end
+     end else if(rx_opcode==5&&rx_size>=5)begin peer_error<=1;abort_transfer(rx_block);state<=IDLE;end
      else if(receiving&&rx_opcode==3&&rx_size>=4&&rx_size<=516)begin
       if(rx_block==block_no+1'b1)begin
        if(!peer_locked)begin peer_tid<=rx_src;peer_locked<=1;end
@@ -272,14 +278,19 @@ module afdx_tftp_engine #(
        else begin file_name[parse_count*8+:8]<=rx_q;file_name_length<=parse_count+1'b1;end
        parse_count<=parse_count+1'b1;
       end else parse_bad<=1;
-     end else begin
+     end else if(!parse_options)begin
       if(mode_index<5)begin
        if((rx_q|8'h20)!=octet_character(mode_index))parse_bad<=1;
-      end else if(mode_index!=5||rx_q!=0)parse_bad<=1;
-      if(mode_index<63)mode_index<=mode_index+1'b1;
-     end
+       mode_index<=mode_index+1'b1;
+      end else if(mode_index==5&&rx_q==0)parse_options<=1;
+      else parse_bad<=1;
+     end else if(rx_q==0)begin
+      if(!option_character)parse_bad<=1;
+      option_value<=!option_value;option_character<=0;
+     end else option_character<=1;
      if(rx_index+1'b1==rx_size)begin
-      if(parse_bad||!parse_mode||mode_index!=5||rx_q!=0)begin
+      if(parse_bad||!parse_mode||rx_q!=0||
+         !(parse_options?(option_value&&option_character):(mode_index==5)))begin
        if(parse_duplicate)transient(0,4,local_tid,peer_tid);
        else prepare(5,4,5,AFTER_IDLE);
       end else if(parse_duplicate)begin
@@ -347,7 +358,7 @@ module afdx_tftp_engine #(
   if(reset)busy_session<=0;
   else if((cancel||cancel_pending)&&state!=TX_STREAM&&state!=TX_PRIME)busy_session<=0;
   else if((state==IDLE&&start&&start_ready&&start_name_length!=0&&start_name_length<=32)||
-          (state==HANDLE_PACKET&&!rx_bad&&!busy_session&&rx_size>=10&&rx_dst==69&&(rx_opcode==1||rx_opcode==2)))busy_session<=1;
+          (state==HANDLE_PACKET&&!rx_bad&&!busy_session&&rx_size>=10&&rx_dst==SERVER_PORT&&(rx_opcode==1||rx_opcode==2)))busy_session<=1;
   else if(done||failed||aborted||state==IDLE)busy_session<=0;
  end
  function [7:0] octet_character;

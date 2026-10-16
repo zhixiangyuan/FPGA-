@@ -26,7 +26,7 @@ module afdx_tftp_file_endpoint #(
  assign file_open_ready=file_open_error!=0||!file_write||begin_ready;
  afdx_tftp_engine #(.TIMEOUT_CYCLES(TIMEOUT_CYCLES),.MAX_RETRIES(MAX_RETRIES)) transport(
   .clk(clk),.reset(reset),.cancel(1'b0),.start(start),.start_write(start_write),.start_name(256'h6e69622e6769666e6f63),.start_name_length(6'd10),
-  .start_ready(start_ready),.busy(busy),.port_match(),.done(done),.failed(failed),.aborted(aborted),.failure_code(failure_code),
+  .start_ready(start_ready),.busy(busy),.port_match(),.peer_error(),.done(done),.failed(failed),.aborted(aborted),.failure_code(failure_code),
   .in_data(in_data),.in_valid(in_valid),.in_ready(in_ready),.in_sop(in_sop),.in_eop(in_eop),.in_length(in_length),
   .in_src_port(in_src_port),.in_dst_port(in_dst_port),.out_data(out_data),.out_valid(out_valid),.out_ready(out_ready),
   .out_sop(out_sop),.out_eop(out_eop),.out_length(out_length),.out_src_port(out_src_port),.out_dst_port(out_dst_port),

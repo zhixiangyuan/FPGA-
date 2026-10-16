@@ -3,6 +3,7 @@ from pathlib import Path
 from datetime import datetime,timezone
 import argparse,csv,json,os,shutil,subprocess
 from run_stage2_mgmt import ROOT,MS,sha
+from modelsim_support import prepare_ini
 from generate_tftp_golden import generate_endpoint
 
 
@@ -22,12 +23,12 @@ def main():
     sources=[ROOT/'rtl'/n for n in ('afdx_tftp_engine.v','afdx_atomic_file_store.v','afdx_tftp_file_endpoint.v')]
     if args.vo:sources=[ROOT/'build/logs/netlist_001'/n for n in ('altera_primitives.v','220model.v','stratix_atoms.v')]+[args.vo.resolve()]
     sources += [ROOT/'sim/tb_tftp_endpoint.sv']
-    inputs=sources+[Path(__file__),ROOT/'scripts/generate_tftp_golden.py',ROOT/'scripts/run_stage2_mgmt.py']
+    inputs=sources+[Path(__file__),ROOT/'scripts/generate_tftp_golden.py',ROOT/'scripts/run_stage2_mgmt.py',ROOT/'scripts/modelsim_support.py']
     if args.vo:inputs+=[args.provenance]
     for p in inputs:shutil.copy2(p,run/p.name)
     golden=generate_endpoint(run/'golden')
-    shutil.copy2(MS.parent/'modelsim.ini',run/'modelsim.ini');os.chmod(run/'modelsim.ini',0o666)
-    commands=['onerror {quit -code 2 -force}','vlib work','vmap work work']+[f'vlog {"-sv " if p.suffix==".sv" else ""}{p.name}' for p in sources]
+    prepare_ini(run,MS)
+    commands=['onerror {quit -code 2 -force}','vlib work']+[f'vlog {"-sv " if p.suffix==".sv" else ""}{p.name}' for p in sources]
     commands += ['vopt -O5 work.tb_tftp_endpoint -o endpoint_opt','vsim -t 1ps work.endpoint_opt','run -all','quit -code 0 -force']
     (run/'run.do').write_text('\n'.join(commands)+'\n')
     env=os.environ.copy();env.setdefault('MGLS_LICENSE_FILE',str(MS.parent/'LICENSE.TXT'))

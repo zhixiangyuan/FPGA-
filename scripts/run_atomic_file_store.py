@@ -7,6 +7,7 @@ import subprocess
 from pathlib import Path
 from datetime import datetime,timezone
 from run_stage2_mgmt import ROOT,MS,sha
+from modelsim_support import prepare_ini
 
 
 def main():
@@ -31,10 +32,10 @@ def main():
     begin(a);write(0,len(a));actions.append('finish_file(0);');read(0,a,2)
     (g/'vectors.mem').write_text(''.join(f'{v:02x}\n' for v in vectors));(g/'constants.vh').write_text(f'localparam VECTOR_BYTES={len(vectors)};\n')
     (g/'stimulus.vh').write_text('\n'.join(actions)+'\n');(g/'expected.mem').write_text(''.join(f'{v:02x}\n' for v in readback))
-    sources=[ROOT/'rtl/afdx_atomic_file_store.v',ROOT/'sim/tb_atomic_file_store.sv'];inputs=sources+[Path(__file__),ROOT/'scripts/run_stage2_mgmt.py']
+    sources=[ROOT/'rtl/afdx_atomic_file_store.v',ROOT/'sim/tb_atomic_file_store.sv'];inputs=sources+[Path(__file__),ROOT/'scripts/run_stage2_mgmt.py',ROOT/'scripts/modelsim_support.py']
     for p in inputs:shutil.copy2(p,run/p.name)
-    shutil.copy2(MS.parent/'modelsim.ini',run/'modelsim.ini');os.chmod(run/'modelsim.ini',0o666)
-    commands=['onerror {quit -code 2 -force}','vlib work','vmap work work','vlog afdx_atomic_file_store.v','vlog -sv tb_atomic_file_store.sv',
+    prepare_ini(run,MS)
+    commands=['onerror {quit -code 2 -force}','vlib work','vlog afdx_atomic_file_store.v','vlog -sv tb_atomic_file_store.sv',
               'vopt -O5 work.tb_atomic_file_store -o store_opt','vsim -t 1ps work.store_opt','run -all','quit -code 0 -force']
     (run/'run.do').write_text('\n'.join(commands)+'\n')
     env=os.environ.copy();env.setdefault('MGLS_LICENSE_FILE',str(MS.parent/'LICENSE.TXT'))

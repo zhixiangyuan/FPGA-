@@ -6,7 +6,9 @@
 
 ## 当前开发状态
 
-TFTP 传输与原子 RAM 基础已完成模块验证：`tftp_009` 覆盖 16 组客户端/服务端、有限指数退避、重复包、错误 TID 和中止场景；`atomic_store_002` 覆盖 CRC16、长度、溢出、读锁和复位；`tftp_endpoint_003` 的 55 包、5424 字节及 10 次元数据检查通过。`AFDXTFTP_005` EQ6 模块综合及打包 PASS：2722 LUT、879 FF、20 Memory、73792 存储位；原生 Fmax 170.823 MHz、8 ns setup +2146 ps，预布线 hold 仍有 −68 ps。其综合数据库导出的兼容功能 VO 已通过 `tftp_endpoint_vo_002` 同一套完整模块时钟测试，未编译 RTL DUT、未使用 force。这是 4 KiB octet 文件传输基础的验收，615A 控制流程及正式顶层接入仍在开发，不能据此标记 615A 完整验收通过。
+TFTP 与配置型 615A-2（A3、UDP 59）端点已完成模块验证。当前支持一个 665-2 LSAP、一个 0～4096 字节偶数长度的 `config.bin`，包括 LUI/LUR/LUS 上传、LND/LNR/LNS 媒体定义下载、独立状态会话、WAIT/ABORT、有限重试以及双 bank 原子提交。`a615a_007` 的 30 个 RTL/独立 Golden 用例、684 个输出包通过；坏数据 CRC、坏总 Load CRC、头部错误、中止及复位不会错误提交。`AFDX615_002` EQ6 综合及打包 PASS：7678 LUT、2602 FF、968 CLB、24 Memory；原生 Fmax 152.114 MHz、8 ns setup +1426 ps，预布线 hold −68 ps、32 个端点。该数据库导出的真实兼容功能 VO 在 `a615a_vo_001` 完成 7 个模块场景、85 包的完整时钟与独立 Golden 核验，无 RTL DUT 或 force。原生 EQ6 网表等价性、完整保持时序及 I/O 时序仍未签核。
+
+底层 `tftp_013` 的 19 组定向用例、64 包、1898 字节通过；`atomic_store_002` 的 10 组原子 RAM 用例通过。原始文件端点 `tftp_endpoint_vo_002` 是上一检查点的真实 RAM 功能 VO 证据，不替代当前 615A 或正式八端口集成验收。正式 GMII 集成正在验证，尚不能标记整机 615A 完成。该配置不包含通用多文件/支持文件、FIND/INFORMATION、操作员定义下载或非易失存储，也尚未与外部装载器互操作。
 
 正式八端口生产入口已新增：`rtl/submission/AFDX_top.v`。内部使用真实 sysUpTime，复位后自动发起 SNTP，默认每 16 秒轮询，无外部测试控制输入。`submission_002` 定向 RTL 验证通过：9 帧、956 字节匹配独立 Golden，覆盖自动同步、业务回送、SET/GET、真实 10 ms 计时、重复 SN、错误 community 和复位恢复。`AFDXSUB_001` EQ6 综合及后端打包 PASS：16370 LE、16371 LUT、6565 FF、2075 CLB、126 Memory、22 位 I/O、0 Errors、80 Warnings；相较管理测试顶层增加 45 LUT、32 FF，RAM 不变。两条新增 Warning 是轮询定时器的 32 位正整数常量赋给 31 位计数器，默认常量均在范围内。原生 Fmax 127.372 MHz、8 ns setup +149 ps，原有 32 个 hold 端点仍为 −68 ps，I/O 延迟未完整约束。新入口的完整 VO 留至 615A 集成后的固定候选集中验收。历史 V1.0 的 `rtl/AFDX_top.v` 使用独立源码清单，两份同名模块不能同时编译。
 

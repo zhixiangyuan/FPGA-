@@ -8,6 +8,7 @@ import os
 import shutil
 import subprocess
 from run_stage2_mgmt import ROOT,MS,sha
+from modelsim_support import prepare_ini
 from generate_tftp_golden import generate
 
 
@@ -17,11 +18,11 @@ def main():
     while (ROOT/f'build/logs/{prefix}_{index:03d}').exists():index+=1
     run=ROOT/f'build/logs/{prefix}_{index:03d}';run.mkdir(parents=True)
     sources=[ROOT/'rtl/afdx_tftp_engine.v',ROOT/'sim/tb_tftp.sv']
-    inputs=sources+[Path(__file__),ROOT/'scripts/generate_tftp_golden.py',ROOT/'scripts/run_stage2_mgmt.py']
+    inputs=sources+[Path(__file__),ROOT/'scripts/generate_tftp_golden.py',ROOT/'scripts/run_stage2_mgmt.py',ROOT/'scripts/modelsim_support.py']
     for p in inputs:shutil.copy2(p,run/p.name)
     golden=generate(run/'golden')
-    shutil.copy2(MS.parent/'modelsim.ini',run/'modelsim.ini');os.chmod(run/'modelsim.ini',0o666)
-    commands=['onerror {quit -code 2 -force}','vlib work','vmap work work']
+    prepare_ini(run,MS)
+    commands=['onerror {quit -code 2 -force}','vlib work']
     commands += [f'vlog {"-sv " if p.suffix==".sv" else ""}{p.name}' for p in sources]
     commands += ['vopt -O5 work.tb_tftp -o tftp_opt','vsim -t 1ps work.tftp_opt','run -all','quit -code 0 -force']
     (run/'run.do').write_text('\n'.join(commands)+'\n')
