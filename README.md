@@ -6,6 +6,8 @@
 
 ## 当前开发状态
 
+TFTP 传输与原子 RAM 基础已完成模块验证：`tftp_009` 覆盖 16 组客户端/服务端、有限指数退避、重复包、错误 TID 和中止场景；`atomic_store_002` 覆盖 CRC16、长度、溢出、读锁和复位；`tftp_endpoint_003` 的 55 包、5424 字节及 10 次元数据检查通过。`AFDXTFTP_005` EQ6 模块综合及打包 PASS：2722 LUT、879 FF、20 Memory、73792 存储位；原生 Fmax 170.823 MHz、8 ns setup +2146 ps，预布线 hold 仍有 −68 ps。其综合数据库导出的兼容功能 VO 已通过 `tftp_endpoint_vo_002` 同一套完整模块时钟测试，未编译 RTL DUT、未使用 force。这是 4 KiB octet 文件传输基础的验收，615A 控制流程及正式顶层接入仍在开发，不能据此标记 615A 完整验收通过。
+
 正式八端口生产入口已新增：`rtl/submission/AFDX_top.v`。内部使用真实 sysUpTime，复位后自动发起 SNTP，默认每 16 秒轮询，无外部测试控制输入。`submission_002` 定向 RTL 验证通过：9 帧、956 字节匹配独立 Golden，覆盖自动同步、业务回送、SET/GET、真实 10 ms 计时、重复 SN、错误 community 和复位恢复。`AFDXSUB_001` EQ6 综合及后端打包 PASS：16370 LE、16371 LUT、6565 FF、2075 CLB、126 Memory、22 位 I/O、0 Errors、80 Warnings；相较管理测试顶层增加 45 LUT、32 FF，RAM 不变。两条新增 Warning 是轮询定时器的 32 位正整数常量赋给 31 位计数器，默认常量均在范围内。原生 Fmax 127.372 MHz、8 ns setup +149 ps，原有 32 个 hold 端点仍为 −68 ps，I/O 延迟未完整约束。新入口的完整 VO 留至 615A 集成后的固定候选集中验收。历史 V1.0 的 `rtl/AFDX_top.v` 使用独立源码清单，两份同名模块不能同时编译。
 
 阶段2仍在 `dev` 开发。最新同载验证 `mgmt_mixed_010` 在同一有时钟系统仿真中运行 16 个业务 VL、4096 个业务帧、45 个 SNMP/SNTP 服务输出和完整管理向量。4141 个输出帧、6,255,335 字节逐帧匹配独立 Golden；整个业务窗口 Payload 速率为 184.21 Mbps，首字节到末字节的最大延时为 60.448 µs，各业务 VL 的最小 BAG 为 128000 周期。该结果仅覆盖已测负载，不代表任意竞争下的最坏时延。

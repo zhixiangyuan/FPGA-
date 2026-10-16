@@ -7,7 +7,7 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--project-dir',type=Path,required=True)
  project=parser.parse_args().project_dir.resolve();family=project.name.split('_',1)[0]
- assert family in ('AFDXS2','AFDXS2M')
+ assert family in ('AFDXS2','AFDXS2M','AFDXSUB','AFDXTFTP')
  runner_path=project/'synthesis_runner.json';runner=json.loads(runner_path.read_text())
  mapping_path=project/'database_mapping_provenance.json';mapping=json.loads(mapping_path.read_text())
  assert runner['result']=='PASS' and mapping['result']=='PASS'

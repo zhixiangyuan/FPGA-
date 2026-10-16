@@ -36,6 +36,8 @@
 
 ## 历史归档脚本
 
+当前协议模块定向入口：`python scripts/run_tftp.py` 验证 TFTP 传输与异常恢复；`python scripts/run_atomic_file_store.py` 验证原子 RAM；`python scripts/run_tftp_endpoint.py` 验证真实 RAM 端点。模块功能 VO 使用 `run_tftp_endpoint.py --vo <真实VO> --provenance <导出记录>`；它不编译 RTL DUT。`prepare_tftp_elinx.py` 生成对应模块综合工程，使用原 8 ns 约束和生产超时参数。上述模块验证不等于 615A 或完整系统验收。
+
 Stage F已完成。`stagef_workspace_switch.ps1`和`archive_stagef_aux_workspaces.ps1`保留用于审计和获批故障恢复，不作为日常入口；不要重复执行已完成的切换或归档。后续工作始终在正式根目录dev中开发。
 
 `archive_v1_system.py`、`finish_v1_system.py`、`finalize_v1.py`、`package_v1.py`、`complete_v1_on_exit.py` 和 `run_history.ps1` 是原阶段目录的一次性收尾或跨阶段历史回归工具。它们保留在提交历史中用于追溯，不作为统一工程的日常入口；其原始输入、日志和结果保存在离线工作区归档中。不要在统一工程中用这些脚本覆盖已冻结的 V1.0 交付证据。
