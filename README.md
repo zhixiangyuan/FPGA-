@@ -71,6 +71,8 @@ python scripts/run_stage2_mixed.py --load-core --interval 4000 --service-interva
 
 原非检查点运行 `submission_615a_vo_002` 已获用户批准停止，原始输出和取消说明保留，未计为验收通过。当前检查点控制器已在真实候选上完成两段 10 μs 保存/冷恢复，五份 CSV 与连续 20 μs 输出一致；这只验证续跑机制，不代表整机验收完成。
 
+两路短段试验 `submission_vo_parallel_001` 使用相同 VO、Testbench、Golden 和原断言，各测 200 μs 的两个真实状态区间：串行合计 213.203 秒，并行 165.906 秒，加速 1.285 倍、节省 22.2%；对应五份 CSV 哈希一致，收发帧通过 RTL 逐 VL 字节前缀、FCS 和 BAG 检查。生成第二个真实前置状态另耗时 1450.547 秒，不包含在上述采样比值中。两路峰值工作集 1495.35 MiB、私有内存 1651.54 MiB，系统最低可用 1464.00 MiB；试验期间正式 VO 同时运行。入口为 `scripts/benchmark_submission_vo_parallel.py --stop-at <带时区截止时间>`，每次执行会建立新试验，勿作为状态查询命令重复运行。该结果为 `BENCHMARK_MATCH_ONLY`：尚未验证长时间高负载或超过两路的扩展效率，原连续 9 场景尚未拆分。按两路效率不下降的假设，13 小时至 4 小时约需 6 路，18 小时至 3 小时约需 10 路；当前可用内存不足以据此直接扩路，也不能保证完整验收在该时间内结束。
+
 ## eLinx综合工程
 
 先运行`python scripts/prepare_v1_elinx.py`，它会从`rtl/`和`vendor/frozen/`的canonical源码生成`build/elinx/AFDXV1_NNN/AFDXV1.epr`，并逐文件核对哈希。打开生成的工程。目标为EQ6HL45/CSG225，顶层`AFDX_top`，使用`clock_125mhz.edc`中的125 MHz/8 ns约束。阶段1原GUI综合资源为2784 LUT、1069 FF、28 Memory、22 IO，0 Errors、25 Warnings。综合通过不代表时序或物理封装适配通过。
