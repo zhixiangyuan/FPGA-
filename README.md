@@ -65,6 +65,8 @@ python scripts/run_stage2_mixed.py --load-core --interval 4000 --service-interva
 
 生产源码清单由 `scripts/submission_sources.py` 给出；`rtl/AFDX_top.v` 是独立 V1.0 入口，不能与生产入口同时编译。重新综合须先用 `prepare_submission_elinx.py` 生成新编号目录，再通过 `run_stage2_synthesis.py` 指定该目录、已验证的 settings reference 以及 `--optimization-technique SPEED`；默认 BALANCED 结果不能代替当前候选。真实 VO 验收入口 `run_submission_615a.py` 还需指定 `--vo`、`--provenance` 和同源码通过的 `--rtl-reference`。
 
+完整 VO 运行期间可执行 `python scripts/check_live_submission_vo.py --run build/logs/submission_615a_vo_002 --rtl-reference build/logs/submission_615a_013`，只读核对已落盘完整帧的 FCS、BAG、帧长及逐 VL 的 RTL 字节前缀，并校验参考与 Golden 指纹。CSV 未完成末行留待下一次检查；`PREFIX_MATCH_ONLY` 不代表最终 PASS，完整场景、未来帧和最终输入哈希仍由原 runner 验收。该检查不修改活动仿真或其输入。
+
 ## eLinx综合工程
 
 先运行`python scripts/prepare_v1_elinx.py`，它会从`rtl/`和`vendor/frozen/`的canonical源码生成`build/elinx/AFDXV1_NNN/AFDXV1.epr`，并逐文件核对哈希。打开生成的工程。目标为EQ6HL45/CSG225，顶层`AFDX_top`，使用`clock_125mhz.edc`中的125 MHz/8 ns约束。阶段1原GUI综合资源为2784 LUT、1069 FF、28 Memory、22 IO，0 Errors、25 Warnings。综合通过不代表时序或物理封装适配通过。
