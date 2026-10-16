@@ -4,7 +4,12 @@ module tb_stage2_mixed;
  reg reset=1;reg [7:0] rx_data=0;reg rx_valid=0;
  reg rx_ready=0,sntp_start=0;reg [31:0] uptime=12345;
  wire [7:0] tx_data;wire tx_valid,tx_ready;
- afdx_stage2_mgmt_top dut(.clk(clk),.reset(reset),.rx_data(rx_data),.rx_valid(rx_valid),.rx_ready(rx_ready),
+ `ifdef MGMT_LOAD_CORE
+ `define MANAGEMENT_DUT afdx_stage3_mgmt_top
+ `else
+ `define MANAGEMENT_DUT afdx_stage2_mgmt_top
+ `endif
+ `MANAGEMENT_DUT dut(.clk(clk),.reset(reset),.rx_data(rx_data),.rx_valid(rx_valid),.rx_ready(rx_ready),
   .tx_data(tx_data),.tx_valid(tx_valid),.tx_ready(tx_ready),.uptime_override(uptime),
   .uptime_override_en(1'b1),.sntp_request_start(sntp_start));
  `include "golden/constants.vh"
@@ -35,7 +40,12 @@ module tb_stage2_mixed;
   rx_fd=$fopen("rx_events.csv","w");count_fd=$fopen("counters.csv","w");
   $fwrite(tx_fd,"frame,start_cycle,end_cycle,bytes\n");$fwrite(rx_fd,"id,start_cycle,end_cycle,bytes\n");
   repeat(4)@(negedge clk);
-  if(dut.mgmt_gate.cfg_integrity_enable!==2'b11)$fatal(1,"unknown/incomplete service integrity configuration");
+  `ifdef MGMT_LOAD_CORE
+  if(dut.mgmt_gate.cfg_integrity_enable!==3'b111)
+  `else
+  if(dut.mgmt_gate.cfg_integrity_enable!==2'b11)
+  `endif
+   $fatal(1,"unknown/incomplete service integrity configuration");
   reset=0;sntp_start=1;
   @(negedge clk);sntp_start=0;
   for(i=0;i<CASE_COUNT;i=i+1)begin

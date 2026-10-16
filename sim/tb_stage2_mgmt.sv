@@ -6,7 +6,12 @@ module tb_stage2_mgmt;
  reg [31:0] uptime_override=0;
  reg sntp_request_start=0;
  wire [7:0] tx_data;wire tx_valid,tx_ready;
- afdx_stage2_mgmt_top dut(.clk(clk),.reset(reset),.rx_data(gmii_rxd),.rx_valid(gmii_rx_dv),.rx_ready(rx_ready),
+ `ifdef MGMT_LOAD_CORE
+ `define MANAGEMENT_DUT afdx_stage3_mgmt_top
+ `else
+ `define MANAGEMENT_DUT afdx_stage2_mgmt_top
+ `endif
+ `MANAGEMENT_DUT dut(.clk(clk),.reset(reset),.rx_data(gmii_rxd),.rx_valid(gmii_rx_dv),.rx_ready(rx_ready),
   .tx_data(tx_data),.tx_valid(tx_valid),.tx_ready(tx_ready),
   .uptime_override(uptime_override),.uptime_override_en(1'b1),
   .sntp_request_start(sntp_request_start));

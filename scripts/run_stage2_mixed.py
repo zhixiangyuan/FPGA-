@@ -124,27 +124,34 @@ def verify(run, manifest):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--load-core',action='store_true')
     parser.add_argument('--rounds',type=int,default=256)
     parser.add_argument('--interval',type=int,default=8000)
     parser.add_argument('--service-interval',type=int,default=600000)
     args=parser.parse_args()
     assert 1<=args.rounds<=256 and args.interval>=1538 and args.service_interval>=125000
+    prefix='mgmt_load_mixed' if args.load_core else 'mgmt_mixed'
     parent=ROOT/'build/logs';index=1
-    while (parent/f'mgmt_mixed_{index:03d}').exists(): index+=1
-    run=parent/f'mgmt_mixed_{index:03d}';run.mkdir(parents=True)
+    while (parent/f'{prefix}_{index:03d}').exists(): index+=1
+    run=parent/f'{prefix}_{index:03d}';run.mkdir(parents=True)
     sources=sorted((ROOT/'vendor/frozen').glob('*.v'))+[ROOT/'rtl'/n for n in RTL]+[ROOT/'sim/tb_stage2_mixed.sv']
+    if args.load_core:
+        from submission_sources import core_sources
+        sources=core_sources()+[ROOT/'sim/tb_stage2_mixed.sv']
     scripts=[Path(__file__),ROOT/'scripts/generate_stage2_mixed_golden.py',ROOT/'scripts/generate_stage2_mgmt_golden.py',ROOT/'scripts/generate_snmp_golden.py',ROOT/'scripts/frozen_frame_reference.py']
+    if args.load_core:scripts+=[ROOT/'scripts/submission_sources.py',ROOT/'scripts/prepare_stage2_mgmt_elinx.py']
     inputs=sources+scripts
     for p in inputs: shutil.copy2(p,run/p.name)
     manifest=generate(run/'golden',args.rounds,args.interval,args.service_interval)
     shutil.copy2(MS.parent/'modelsim.ini',run/'modelsim.ini');os.chmod(run/'modelsim.ini',0o666)
     commands=['onerror {quit -code 2 -force}','vlib work','vmap work work']
-    commands += [f'vlog {"-sv " if p.suffix==".sv" else ""}+incdir+. {p.name}' for p in sources]
+    define='+define+MGMT_LOAD_CORE ' if args.load_core else ''
+    commands += [f'vlog {define}{"-sv " if p.suffix==".sv" else ""}+incdir+. {p.name}' for p in sources]
     commands += ['vopt -O5 work.tb_stage2_mixed -o mixed_optimized','vsim -t 1ps work.mixed_optimized','run -all','quit -code 0 -force']
     (run/'run.do').write_text('\n'.join(commands)+'\n')
     env=os.environ.copy();env.setdefault('MGLS_LICENSE_FILE',str(MS.parent/'LICENSE.TXT'))
     command=[str(MS/'vsim.exe'),'-batch','-modelsimini','modelsim.ini','-l','transcript.log','-do','do run.do']
-    summary=dict(result='RUNNING',started_utc=datetime.now(timezone.utc).isoformat(),golden=manifest,
+    summary=dict(result='RUNNING',load_core=args.load_core,started_utc=datetime.now(timezone.utc).isoformat(),golden=manifest,
                  inputs={str(p.relative_to(ROOT)):sha(p) for p in inputs},command=command)
     with (run/'console.log').open('wb') as log:
         proc=subprocess.Popen(command,cwd=run,env=env,stdout=log,stderr=subprocess.STDOUT)

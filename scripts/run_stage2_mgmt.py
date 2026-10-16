@@ -2,6 +2,7 @@
 from pathlib import Path
 from datetime import datetime, timezone
 from collections import defaultdict
+import argparse
 import csv
 import hashlib
 import json
@@ -27,22 +28,29 @@ def sha(path):
 
 
 def main():
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--load-core',action='store_true');args=parser.parse_args()
+    prefix='mgmt_load' if args.load_core else 'mgmt'
     parent = ROOT / 'build/logs'
     index = 1
-    while (parent / f'mgmt_{index:03d}').exists():
+    while (parent / f'{prefix}_{index:03d}').exists():
         index += 1
-    run = parent / f'mgmt_{index:03d}'
+    run = parent / f'{prefix}_{index:03d}'
     run.mkdir(parents=True)
     sources = sorted((ROOT / 'vendor/frozen').glob('*.v')) + [ROOT / 'rtl' / n for n in RTL] + [ROOT / 'sim/tb_stage2_mgmt.sv']
+    if args.load_core:
+        from submission_sources import core_sources
+        sources=core_sources()+[ROOT/'sim/tb_stage2_mgmt.sv']
     scripts = [Path(__file__), ROOT / 'scripts/generate_stage2_mgmt_golden.py',
                ROOT / 'scripts/generate_snmp_golden.py', ROOT / 'scripts/frozen_frame_reference.py']
+    if args.load_core:scripts+=[ROOT/'scripts/submission_sources.py',ROOT/'scripts/prepare_stage2_mgmt_elinx.py']
     for path in sources + scripts:
         shutil.copy2(path, run / path.name)
     manifest = generate(run / 'golden')
     shutil.copy2(MS.parent / 'modelsim.ini', run / 'modelsim.ini')
     os.chmod(run / 'modelsim.ini', 0o666)
     commands = ['onerror {quit -code 2 -force}', 'vlib work', 'vmap work work']
-    commands += [f'vlog {"-sv " if path.suffix == ".sv" else ""}+incdir+{run.as_posix()} {path.name}' for path in sources]
+    define='+define+MGMT_LOAD_CORE ' if args.load_core else ''
+    commands += [f'vlog {define}{"-sv " if path.suffix == ".sv" else ""}+incdir+{run.as_posix()} {path.name}' for path in sources]
     commands += ['vopt -O5 +acc=nr+tb_stage2_mgmt work.tb_stage2_mgmt -o mgmt_optimized',
                  'vsim -t 1ps -wlf waves.wlf work.mgmt_optimized',
                  'log /tb_stage2_mgmt/reset /tb_stage2_mgmt/gmii_rxd /tb_stage2_mgmt/gmii_rx_dv /tb_stage2_mgmt/tx_data /tb_stage2_mgmt/tx_valid',
@@ -51,7 +59,7 @@ def main():
     env = os.environ.copy()
     env.setdefault('MGLS_LICENSE_FILE', str(MS.parent / 'LICENSE.TXT'))
     command = [str(MS / 'vsim.exe'), '-batch', '-modelsimini', 'modelsim.ini', '-l', 'transcript.log', '-do', 'do run.do']
-    summary = {'result': 'RUNNING', 'started_utc': datetime.now(timezone.utc).isoformat(), 'golden': manifest,
+    summary = {'result': 'RUNNING', 'load_core':args.load_core, 'started_utc': datetime.now(timezone.utc).isoformat(), 'golden': manifest,
                'scope': 'management-service system: 16-VL business echo plus SNMPv1 over the shared real MAC',
                'inputs': {str(p.relative_to(ROOT)): sha(p) for p in sources + scripts}, 'command': command}
     with (run / 'console.log').open('wb') as log:

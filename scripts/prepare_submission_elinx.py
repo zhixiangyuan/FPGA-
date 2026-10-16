@@ -38,7 +38,7 @@ def main():
     manifest=dict(status='PREPARED_NOT_SYNTHESIZED',project=str(project/f'{family}.epr'),top='AFDX_top',
         device='EQ6HL45',package='CSG225',clock_constraint_ns=8,ports=8,io_bits=22,
         sources=rows,constraint_sha256=sha(constraint),
-        scope='production eight-port 16-VL business plus SNMP and autonomous SNTP; 615A not integrated',
+        scope='production eight-port 16-VL business plus SNMP, autonomous SNTP and configured 615A-2 load target',
         POST_SYNTH_TIMING='NOT VERIFIED',EQ6_NATIVE_NETLIST_EQUIVALENCE='NOT VERIFIED',physical_IO_fit='NOT VERIFIED')
     (project/'project_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     print(json.dumps(dict(project=manifest['project'],sources=len(rows),ports=8,io_bits=22),indent=2))

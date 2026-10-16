@@ -9,6 +9,7 @@ import subprocess
 
 from run_stage2_mgmt import MS, ROOT, sha
 from submission_sources import sources
+from modelsim_support import prepare_ini
 from generate_stage2_mgmt_golden import (
     afdx_frame, sntp_packet, ES_MAC, MANAGER_MAC,
     ES_IP, MANAGER_IP,
@@ -109,13 +110,13 @@ def main():
     while (ROOT/f'build/logs/submission_{i:03d}').exists():i+=1
     run=ROOT/f'build/logs/submission_{i:03d}';run.mkdir(parents=True)
     inputs=sources()+[ROOT/'sim/tb_submission.sv',Path(__file__),ROOT/'scripts/submission_sources.py',
-        ROOT/'scripts/prepare_stage2_mgmt_elinx.py',
+        ROOT/'scripts/prepare_stage2_mgmt_elinx.py',ROOT/'scripts/modelsim_support.py',
         ROOT/'scripts/run_stage2_mgmt.py',ROOT/'scripts/generate_stage2_mgmt_golden.py',
         ROOT/'scripts/generate_snmp_golden.py',ROOT/'scripts/frozen_frame_reference.py']
     for p in inputs:shutil.copy2(p,run/p.name)
     expected=generate(run/'golden')
-    shutil.copy2(MS.parent/'modelsim.ini',run/'modelsim.ini');os.chmod(run/'modelsim.ini',0o666)
-    commands=['onerror {quit -code 2 -force}','vlib work','vmap work work']
+    prepare_ini(run,MS)
+    commands=['onerror {quit -code 2 -force}','vlib work']
     commands += [f'vlog {"-sv " if p.suffix==".sv" else ""}{p.name}' for p in sources()+[ROOT/'sim/tb_submission.sv']]
     commands += ['vopt -O5 work.tb_submission -o submission_opt','vsim -t 1ps work.submission_opt','run -all','quit -code 0 -force']
     (run/'run.do').write_text('\n'.join(commands)+'\n')

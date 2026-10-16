@@ -27,7 +27,7 @@ module AFDX_top #(
  end else begin: no_auto_time
   assign poll_request=1'b0;
  end endgenerate
- afdx_stage2_mgmt_top #(.ES_IP(ES_IP),.ES_MAC(ES_MAC),
+ afdx_stage3_mgmt_top #(.ES_IP(ES_IP),.ES_MAC(ES_MAC),
   .MANAGER_IP(MANAGER_IP),.MANAGER_MAC(MANAGER_MAC),.SNTP_SERVER_IP(MANAGER_IP)) core(
   .clk(clk),.reset(reset),.tx_data(tx_data),.rx_data(rx_data),
   .tx_valid(tx_valid),.rx_valid(rx_valid),.tx_ready(tx_ready),.rx_ready(rx_ready),
