@@ -16,9 +16,12 @@ module afdx_rtc_timebase #(
 );
  localparam [63:0] TICK_BASE=64'h0000000100000000/CLK_HZ;
  localparam [63:0] TICK_REM=64'h0000000100000000%CLK_HZ;
- reg [63:0] remainder;
- wire [63:0] remainder_sum=remainder+TICK_REM;
+ // The remainder is always less than CLK_HZ; 32 bits cover the supported
+ // integer clock range without building a needless 64-bit accumulator.
+ reg [31:0] remainder;
+ wire [32:0] remainder_sum={1'b0,remainder}+{1'b0,TICK_REM[31:0]};
  wire extra_tick=remainder_sum>=CLK_HZ;
+ wire [32:0] remainder_reduced=remainder_sum-CLK_HZ;
  wire [63:0] increment=TICK_BASE+extra_tick;
  // Differences use modular NTP arithmetic, valid within a +/-68 year era.
  wire signed [63:0] network_elapsed=$signed(t4-t1);
@@ -36,7 +39,7 @@ module afdx_rtc_timebase #(
    sync_accepted<=0;sync_rejected<=0;last_offset<=0;last_delay<=0;sync_count<=0;error_count<=0;
   end else begin
    monotonic_cycles<=monotonic_cycles+1'b1;
-   remainder<=extra_tick?remainder_sum-CLK_HZ:remainder_sum;
+   remainder<=extra_tick?remainder_reduced[31:0]:remainder_sum[31:0];
    utc_time<=utc_time+increment;
    sync_accepted<=0;sync_rejected<=0;
    if(sync_valid)begin

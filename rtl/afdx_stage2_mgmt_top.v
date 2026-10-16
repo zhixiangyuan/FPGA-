@@ -119,7 +119,9 @@ module afdx_stage2_mgmt_top #(
   .msg_valid(biz_msg_valid),.msg_ready(biz_msg_ready),.msg_length(biz_msg_length),.msg_vlid(biz_vlid),
   .msg_src_port(biz_msg_src_port),.msg_dst_port(biz_msg_dst_port),
   .payload_data(biz_payload_data),.payload_valid(biz_payload_valid),.payload_ready(biz_payload_ready),.payload_last(biz_payload_last),
-  .msg_done(biz_msg_done),.msg_error(biz_msg_error),.gmii_tx_en(tx_valid),.cfg_bag_cycles(BAG_CYCLES),
+  // Only business wire starts belong to the business queue's per-VL BAG clock.
+  // A service frame otherwise restarts the last/pending business VL's timer.
+  .msg_done(biz_msg_done),.msg_error(biz_msg_error),.gmii_tx_en(tx_valid&&!service_active),.cfg_bag_cycles(BAG_CYCLES),
   .stored_count(stored_count),.sent_count(sent_count),.error_count(queue_error_count),.banks_busy());
  afdx_multi_vl_rx_parser #(.CHECK_PORTS(0)) parser(.clk(clk),.reset(reset),
   .in_data(mac_rx_data),.in_valid(mac_rx_valid),.in_ready(business_in_ready),.in_sop(mac_rx_sop),.in_eop(mac_rx_eop),.in_length(mac_rx_length),
@@ -144,7 +146,7 @@ module afdx_stage2_mgmt_top #(
   .payload_sop(mgmt_sop),.payload_eop(mgmt_eop),.payload_length(mgmt_length),.payload_vlid(mgmt_vlid),.payload_sn_unchecked(mgmt_sn),
   .payload_src_port(mgmt_src_port),.payload_dst_port(mgmt_dst_port),.candidate_accepted(mgmt_candidate_accepted),
   .candidate_rejected(mgmt_candidate_rejected),.reject_reason(mgmt_reject_reason),.accepted_count(mgmt_parser_accepted_count),.rejected_count(mgmt_parser_rejected_count),.banks_busy());
- afdx_multi_vl_sn_gate #(.VL_COUNT(2),.VL_BASE(MGMT_VLID)) mgmt_gate(.clk(clk),.reset(reset),.cfg_integrity_enable(1'b1),
+ afdx_multi_vl_sn_gate #(.VL_COUNT(2),.VL_BASE(MGMT_VLID)) mgmt_gate(.clk(clk),.reset(reset),.cfg_integrity_enable(2'b11),
   .in_data(mgmt_data),.in_valid(mgmt_valid),.in_ready(mgmt_ready),.in_sop(mgmt_sop),.in_eop(mgmt_eop),.in_length(mgmt_length),
   .in_vlid(mgmt_vlid),.in_sn(mgmt_sn),.app_data(mgmt_app_data),.app_valid(mgmt_app_valid),.app_ready(mgmt_app_ready),
   .app_sop(mgmt_app_sop),.app_eop(mgmt_app_eop),.app_length(mgmt_app_length),.app_vlid(mgmt_app_vlid),.app_sn(mgmt_app_sn),

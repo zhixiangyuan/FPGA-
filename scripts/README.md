@@ -17,9 +17,15 @@
 | 从真实 VO 生成只读探针 | `python scripts/prepare_v1_netlist_observer.py --vo <AFDX_top.vo>` |
 | 正式工作区Git/冻结哈希/Golden/工程配置自检 | `./scripts/verify_unified_workspace.ps1` |
 | 运行管理服务系统集成（16 VL业务回环 + SNMP/SNTP over 真实MAC） | `python scripts/run_stage2_mgmt.py` |
+| 运行 16 VL 持续业务与完整管理向量共存测试 | `python scripts/run_stage2_mixed.py` |
+| 运行 VL 突发与更密集管理请求共存测试 | `python scripts/run_stage2_mixed.py --interval 4000 --service-interval 160000` |
+| 运行系统级时务连续交换、重复 SN、真实 1 秒超时及复位恢复 | `python scripts/run_stage2_time_recovery.py` |
 | 生成管理族 eLinx 综合工程副本（含SNMP/SNTP/RTC的顶层） | `python scripts/prepare_stage2_mgmt_elinx.py` |
 | 运行管理族真实综合与数据库映射打包 | `python scripts/run_stage2_synthesis.py --project-dir build/elinx/AFDXS2M_NNN --settings-reference build/elinx/AFDXS2_005` |
+| 运行 EQ6 原生综合时序分析并核对 100 MHz 与工程时钟裕量（不运行布局布线） | `python scripts/run_stage2_native_timing.py --project-dir build/elinx/AFDXS2M_NNN` |
 | 静态检查顶层多驱动网冲突 | `python scripts/check_top_drivers.py [顶层文件...]` |
+
+混合负载默认每 VL 256 帧、1471 字节负载，覆盖 SN 回绕。`--interval` 指一轮内不同 VL 的注入间隔；相邻轮次至少间隔 128000 周期，输入和输出仍独立检查每 VL 至少 125000 周期 BAG。吞吐窗口从首个业务输入到最后业务输出，包含空闲、启动和服务竞争；同时保存输出窗口口径和三种 GMII 时延。50 µs 时延极差是工程检查目标，不能当作官方已确认的抖动统计口径。SNTP 的 T1 是入队时间，T4 是路由后首负载字节时间，测试报告会量化它们与 GMII 首字节的差值。
 
 `MODELSIM_BIN`、`MGLS_LICENSE_FILE`、`ELINX_HOME`、`AFDX_BUILD_ROOT`、`AFDX_V1_EVIDENCE_ROOT` 可用于指定本机工具、构建和离线证据目录。离线证据默认位置与恢复哈希见仓库根目录的 `OFFLINE_ARCHIVE_CATALOG.json`。
 

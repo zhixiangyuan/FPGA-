@@ -33,9 +33,65 @@ module afdx_multi_vl_echo_queue #(
  wire [16:0] incoming_index={1'b0,app_vlid}-{1'b0,VL_BASE};
  wire incoming_legal=app_vlid>=VL_BASE&&incoming_index<VL_COUNT;
  wire [15:0] incoming_vl=incoming_legal?incoming_index[15:0]:16'd0;
- wire [15:0] input_bank=2*incoming_vl+wr_slot[incoming_vl];
- wire [15:0] write_bank=2*write_vl+wr_slot[write_vl];
- wire [15:0] output_bank=2*read_vl+rd_slot[read_vl];
+wire [15:0] input_bank=2*incoming_vl+wr_slot[incoming_vl];
+wire [15:0] write_bank=2*write_vl+wr_slot[write_vl];
+wire [15:0] output_bank=2*read_vl+rd_slot[read_vl];
+wire [VL_COUNT-1:0] scheduler_eligible;
+wire [15:0] scheduler_choice;
+wire scheduler_found;
+genvar eligible_vl_index;
+generate for(eligible_vl_index=0;eligible_vl_index<VL_COUNT;eligible_vl_index=eligible_vl_index+1)begin:eligible_vl
+ wire bank0_committed=committed[2*eligible_vl_index];
+ wire bank1_committed=committed[2*eligible_vl_index+1];
+ wire selected_bank_committed=rd_slot[eligible_vl_index]?bank1_committed:bank0_committed;
+ assign scheduler_eligible[eligible_vl_index]=selected_bank_committed&&
+        (!have_start[eligible_vl_index]||elapsed[eligible_vl_index]>=cfg_bag_cycles);
+end endgenerate
+generate if(VL_COUNT==16)begin:balanced_scheduler
+ wire [31:0] doubled_eligible={scheduler_eligible,scheduler_eligible};
+ wire [15:0] eligible_from_rr=doubled_eligible>>rr[3:0];
+ reg [3:0] selected_offset;
+ wire [3:0] selected_vl=rr[3:0]+selected_offset;
+ always @*begin
+  selected_offset=0;
+  casez(eligible_from_rr)
+   16'b???????????????1:selected_offset=4'd0;
+   16'b??????????????10:selected_offset=4'd1;
+   16'b?????????????100:selected_offset=4'd2;
+   16'b????????????1000:selected_offset=4'd3;
+   16'b???????????10000:selected_offset=4'd4;
+   16'b??????????100000:selected_offset=4'd5;
+   16'b?????????1000000:selected_offset=4'd6;
+   16'b????????10000000:selected_offset=4'd7;
+   16'b???????100000000:selected_offset=4'd8;
+   16'b??????1000000000:selected_offset=4'd9;
+   16'b?????10000000000:selected_offset=4'd10;
+   16'b????100000000000:selected_offset=4'd11;
+   16'b???1000000000000:selected_offset=4'd12;
+   16'b??10000000000000:selected_offset=4'd13;
+   16'b?100000000000000:selected_offset=4'd14;
+   16'b1000000000000000:selected_offset=4'd15;
+   default:selected_offset=4'd0;
+  endcase
+ end
+ assign scheduler_found=|eligible_from_rr;
+ assign scheduler_choice={12'd0,selected_vl};
+end else begin:generic_scheduler
+ integer scan,index;
+ reg found;
+ reg [15:0] choice;
+ always @*begin
+  choice=0;found=0;index=0;
+  for(scan=0;scan<VL_COUNT;scan=scan+1)begin
+   index=rr+scan;if(index>=VL_COUNT)index=index-VL_COUNT;
+   if(!found&&scheduler_eligible[index])begin
+    choice=index;found=1;
+   end
+  end
+ end
+ assign scheduler_found=found;
+ assign scheduler_choice=choice;
+end endgenerate
  assign app_ready=!reset&&(writing||(incoming_legal&&!busy[input_bank]));
  assign banks_busy=busy;
  assign msg_valid=!reset&&state==DESC;
@@ -64,16 +120,6 @@ module afdx_multi_vl_echo_queue #(
  end
  always @(posedge clk)begin
   if(!reset&&prefetch)read_byte<=storage[output_bank*1471+prefetch_offset];
- end
- integer scan,choice,index;reg found;
- always @*begin
-  choice=0;found=0;index=0;
-  for(scan=0;scan<VL_COUNT;scan=scan+1)begin
-   index=rr+scan;if(index>=VL_COUNT)index=index-VL_COUNT;
-   if(!found&&committed[2*index+rd_slot[index]]&&(!have_start[index]||elapsed[index]>=cfg_bag_cycles))begin
-    choice=index;found=1;
-   end
-  end
  end
  integer i;
  always @(posedge clk)begin
@@ -106,7 +152,7 @@ module afdx_multi_vl_echo_queue #(
     end
    end
    case(state)
-    IDLE:if(found)begin read_vl<=choice;rd_index<=0;state<=DESC;end
+    IDLE:if(scheduler_found)begin read_vl<=scheduler_choice;rd_index<=0;state<=DESC;end
     DESC:if(msg_valid&&msg_ready)state<=DATA;
     DATA:if(payload_valid&&payload_ready)begin
      if(payload_last)state<=WAIT_DONE;
