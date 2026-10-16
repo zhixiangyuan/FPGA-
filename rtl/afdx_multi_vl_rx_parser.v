@@ -171,8 +171,14 @@ module afdx_multi_vl_rx_parser #(
                              !udp_checksum_legal ? ERR_UDP :
                              byte_index != sn_index || byte_index + 16'd1 != in_length ? ERR_LENGTH :
                              4'd0;
-    wire frame_commit = in_fire && active && in_eop && final_error == 0;
-    wire frame_reject = in_fire && active && in_eop && final_error != 0;
+    // A legal final beat is the SN byte, after every header/padding byte.
+    // Their errors are already retained in first_error. Avoid routing the
+    // current byte through the header error encoder just to commit the bank.
+    wire frame_commit = in_fire && active && in_eop && first_error == 0 &&
+                        !in_sop && in_length == declared_length && length_legal &&
+                        folded_sum(ip_sum) == 16'hffff && udp_checksum_legal &&
+                        byte_index == sn_index && byte_index + 16'd1 == in_length;
+    wire frame_reject = in_fire && active && in_eop && !frame_commit;
 
     always @(posedge clk) begin
         if (reset) begin
