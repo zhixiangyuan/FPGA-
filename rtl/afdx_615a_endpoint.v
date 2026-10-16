@@ -175,7 +175,10 @@ module afdx_615a_endpoint #(
   .committed(store_committed),.rejected(store_rejected),.staging_active(store_staging),.staging_length(store_stage_length),.staging_crc(store_stage_crc));
  always @(posedge clk)begin
   if(b_read)bulk_rom_q<=initialization_byte(b_read_address,init_denied);
-  if(s_read)status_rom_q<=status_byte(s_read_address);
+  // Status snapshots are 28, 51 or 63 bytes and fit in one TFTP block.
+  // A six-bit ROM address avoids carrying the generic 16-bit file offset
+  // through this bounded decoder. The directed test checks this bound.
+  if(s_read)status_rom_q<=status_byte(s_read_address[5:0]);
  end
  // Control files are checked serially. The configured 665-2 header consists
  // of a fixed identity/layout plus independently validated length and CRCs.
@@ -360,7 +363,7 @@ module afdx_615a_endpoint #(
   begin ratio_byte=code==3&&i==0?8'h31:8'h30;end
  endfunction
  function [7:0] status_byte;
-  input [15:0] i;reg [15:0] file_status;
+  input [5:0] i;reg [15:0] file_status;
   begin
    file_status=status_code_q>=16'h1000 ? 16'h1007:status_code_q;
    status_byte=0;

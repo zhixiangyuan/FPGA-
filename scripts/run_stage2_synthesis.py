@@ -10,6 +10,7 @@ ROOT=Path(__file__).resolve().parents[1]
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--project-dir',type=Path,required=True);parser.add_argument('--settings-reference',type=Path,required=True)
+ parser.add_argument('--optimization-technique',choices=('BALANCED','SPEED'),default='BALANCED')
  args=parser.parse_args();project=args.project_dir.resolve();reference=args.settings_reference.resolve()
  manifest=json.loads((project/'project_manifest.json').read_text())
  family=project.name.split('_',1)[0];top=manifest['top']
@@ -22,6 +23,9 @@ def main():
   text=(reference/('AFDXS2'+suffix)).read_text().replace('AFDXS2',family)
   text=text.replace(reference.as_posix().replace('AFDXS2',family),project.as_posix())
   if name.endswith('.qsf'):
+   text,count=re.subn(r'set_global_assignment -name STRATIX_OPTIMIZATION_TECHNIQUE \w+',
+    'set_global_assignment -name STRATIX_OPTIMIZATION_TECHNIQUE '+args.optimization_technique,text)
+   assert count==1,'expected one explicit synthesis optimization setting'
    constraint=project/f'{family}.srcs/constrs_1/new/clock_125mhz.edc'
    text=re.sub(r'set_global_assignment -name VERILOG_FILE "[^"]+"\n','',text)
    text='\n'.join(line for line in text.splitlines() if not line.startswith('set_global_assignment -name SDC_FILE'))+'\n'
@@ -43,6 +47,8 @@ def main():
  tool=Path(r'D:\FPGA\eLinx3.0\bin\Passkey\bin\quartus_map.exe')
  command=[str(tool),'--read_settings_files=on','--write_settings_files=off',family]
  proof={'result':'RUNNING','command':command,'started_utc':datetime.now(timezone.utc).isoformat(),
+        'optimization_technique':args.optimization_technique,'settings_qsf_sha256':sha(project/f'{family}.qsf'),
+        'source_manifest_sha256':sha(project/'project_manifest.json'),
         'driver_sha256':sha(tool),'settings_reference':str(reference),'settings_reference_sha256':sha(reference/'AFDXS2.qsf'),
         'GUI_invocation':False,'bundled_frontend_executable':'quartus_map.exe','device_GUI_profile':'EQ6HL45/CSG225',
         'functional_model_backend':'EP1S80F1508C6 / Stratix compatibility','Implementation':'NOT RUN','Bitstream':'NOT RUN',

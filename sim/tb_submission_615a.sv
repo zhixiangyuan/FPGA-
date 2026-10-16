@@ -69,7 +69,8 @@ module tb_submission_615a;
    crc=~crc;for(y=0;y<4;y=y+1)rx_wire[x+y]=crc>>(8*y);
    rx_wire_length=x+4;
    if(vl=='h1246)last_load_start=cycle;
-   $fwrite(wire_rf,"%0d,%0d,%0d,",current_case,cycle,rx_wire_length);
+   // RX is driven on this falling edge and sampled on the next rising edge.
+   $fwrite(wire_rf,"%0d,%0d,%0d,",current_case,cycle+1,rx_wire_length);
    for(y=0;y<rx_wire_length;y=y+1)$fwrite(wire_rf,"%02x",rx_wire[y]);$fwrite(wire_rf,"\n");
   end
  endtask

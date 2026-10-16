@@ -44,9 +44,9 @@ def verify(run,golden):
     evidence=verify_payloads(run,golden,check_metadata=False)
     tx=list(csv.DictReader((run/'wire_tx.csv').open()))
     rx=list(csv.DictReader((run/'wire_rx.csv').open()))
-    last={};gaps=[];counts={};background_tx={};background_rx={};tx_tftp=[];rx_tftp=[];sntp_requests=[];sntp_replies=[]
+    last={};gaps=[];rx_gaps=[];rx_bag_gaps=[];counts={};background_tx={};background_rx={};tx_tftp=[];rx_tftp=[];sntp_requests=[];sntp_replies=[]
     for direction,rows in [('tx',tx),('rx',rx)]:
-        sequence={};input_previous={}
+        sequence={};input_previous={};previous_rx_end=None
         for row in rows:
             wire=bytes.fromhex(row['data']);size=int(row['bytes']);cid=int(row['case_id'])
             assert len(wire)==size and size>=72
@@ -64,8 +64,12 @@ def verify(run,golden):
             assert wire==reference,f'{direction} GMII header/checksum/FCS/padding case {cid} VL {vl:04x}'
             if direction=='rx':
                 start=int(row['start_cycle'])
-                if vl in input_previous:assert start-input_previous[vl]>=125000,'illegal offered AFDX BAG'
+                if vl in input_previous:
+                    gap=start-input_previous[vl];assert gap>=125000,'illegal offered AFDX BAG';rx_bag_gaps.append(gap)
                 input_previous[vl]=start
+                if previous_rx_end is not None:
+                    gap=start-previous_rx_end-1;assert gap>=2048,'offered traffic exceeds bounded RX interframe gap';rx_gaps.append(gap)
+                previous_rx_end=start+size-1
             if direction=='tx':
                 start,end=int(row['start_cycle']),int(row['end_cycle']);assert end-start+1==size
                 if vl in last:
@@ -104,7 +108,10 @@ def verify(run,golden):
     first=min(v[0] for v in background_rx.values());last_end=max(v[1] for v in background_tx.values())
     rate=512*1471*1000/(last_end-first+1)
     assert rate>=100,'continuous-load business throughput below 100 Mbps'
-    evidence['continuous_load_business']=dict(frames=512,payload_Mbps=rate,max_first_to_last_ns=max(latency))
+    per_vl_range=[max((background_tx[i][1]-background_rx[i][0])*8 for i in background_tx if i%15==v)-min((background_tx[i][1]-background_rx[i][0])*8 for i in background_tx if i%15==v) for v in range(15)]
+    assert max(per_vl_range)<=50000,'continuous-load per-VL latency range exceeds engineering target'
+    evidence['continuous_load_business']=dict(frames=512,payload_Mbps=rate,max_first_to_last_ns=max(latency),max_per_VL_latency_range_ns=max(per_vl_range),engineering_jitter_target_ns=50000)
+    evidence['minimum_RX_BAG_cycles']=min(rx_bag_gaps);evidence['minimum_RX_interframe_gap_cycles']=min(rx_gaps)
     evidence.pop('whole_system_VO',None)
     evidence.update(scope='official eight-port GMII, real 125 MHz and 1 ms BAG',
                     wire_tx_frames=len(tx),wire_rx_frames=len(rx),wire_tx_bytes=sum(int(r['bytes']) for r in tx),
@@ -114,14 +121,37 @@ def verify(run,golden):
     return evidence
 
 
+def compare_rtl_vo(run,reference):
+    """Compare complete wire bytes in order within each independent AFDX VL."""
+    def streams(path):
+        result={}
+        for row in csv.DictReader(path.open()):
+            wire=bytes.fromhex(row['data']);vl=int.from_bytes(wire[12:14],'big')
+            result.setdefault(vl,[]).append((int(row['case_id']),wire))
+        return result
+    for name in ('wire_tx.csv','wire_rx.csv'):
+        actual=streams(run/name);expected=streams(reference/name)
+        assert actual.keys()==expected.keys(),f'RTL/VO VL set differs: {name}'
+        for vl in expected:
+            assert actual[vl]==expected[vl],f'RTL/VO wire bytes differ: {name}, VL {vl:04x}'
+    return dict(RTL_VO_per_VL_wire_bytes_equal=True,reference_RTL_run=str(reference))
+
+
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--vo',type=Path);parser.add_argument('--provenance',type=Path)
+    parser.add_argument('--rtl-reference',type=Path)
     args=parser.parse_args()
+    reference_hashes={}
     if args.vo:
-        assert args.provenance
+        assert args.provenance and args.rtl_reference
         export=json.loads(args.provenance.read_text());assert export['result']=='PASS' and sha(args.vo)==export['delivered_netlist_sha256']
         project=Path(export['source_project']);manifest=project/'project_manifest.json';assert sha(manifest)==export['source_manifest_sha256']
-        for r in json.loads(manifest.read_text())['sources']:assert sha(ROOT/r['canonical_source'])==r['sha256']==sha(project/r['snapshot'])
+        reference=json.loads((args.rtl_reference/'summary.json').read_text());assert reference['result']=='PASS' and reference['RTL_DUT_compiled']
+        for r in json.loads(manifest.read_text())['sources']:
+            p=ROOT/r['canonical_source'];assert sha(p)==r['sha256']==sha(project/r['snapshot'])==reference['inputs'][str(p)]
+        tb=ROOT/'sim/tb_submission_615a.sv';assert sha(tb)==reference['inputs'][str(tb)]
+        reference_hashes={n:sha(args.rtl_reference/n) for n in ('summary.json','wire_tx.csv','wire_rx.csv')}
+    else:assert args.rtl_reference is None
     prefix='submission_615a_vo' if args.vo else 'submission_615a';index=1
     while (ROOT/f'build/logs/{prefix}_{index:03d}').exists():index+=1
     run=ROOT/f'build/logs/{prefix}_{index:03d}';run.mkdir(parents=True)
@@ -132,6 +162,7 @@ def main():
     if args.vo:inputs+=[args.provenance]
     for p in inputs:shutil.copy2(p,run/p.name)
     golden=generate_wire(run/'golden');prepare_ini(run,MS)
+    if args.vo:assert reference['golden']=={p.name:sha(p) for p in (run/'golden').iterdir()},'RTL/VO Golden inputs differ'
     commands=['onerror {quit -code 2 -force}','vlib work']
     commands += [f'vlog {"-sv " if p.suffix==".sv" else ""}{p.name}' for p in compiled]
     commands += ['vopt -O5 work.tb_submission_615a -o sub615a_opt','vsim -t 1ps work.sub615a_opt','run -all','quit -code 0 -force']
@@ -139,6 +170,7 @@ def main():
     env=os.environ.copy();env.setdefault('MGLS_LICENSE_FILE',str(MS.parent/'LICENSE.TXT'))
     summary=dict(result='RUNNING',started_utc=datetime.now(timezone.utc).isoformat(),RTL_DUT_compiled=not bool(args.vo),force_used=False,
                  model_backend=export['model_backend'] if args.vo else 'RTL',EQ6_NATIVE_NETLIST_EQUIVALENCE='NOT VERIFIED',
+                 rtl_reference_hashes=reference_hashes,
                  clock_ns=8,BAG_cycles=125000,shortened_timers=False,inputs={str(p):sha(p) for p in inputs},golden={p.name:sha(p) for p in (run/'golden').iterdir()})
     proof=run/'summary.json';proof.write_text(json.dumps(summary,indent=2)+'\n')
     timeout_error=None
@@ -156,6 +188,9 @@ def main():
     if passed:
         try:
             evidence=verify(run,golden)
+            if args.vo:
+                for n,h in reference_hashes.items():assert sha(args.rtl_reference/n)==h,f'RTL reference changed: {n}'
+                evidence.update(compare_rtl_vo(run,args.rtl_reference))
             for p in inputs:assert sha(p)==summary['inputs'][str(p)]==sha(run/p.name),f'input changed: {p}'
         except (AssertionError,ValueError,KeyError,IndexError) as exc:passed=False;error=str(exc)
     summary.update(result='PASS' if passed else 'FAIL',exit_code=code,error=error,evidence=evidence,completed_utc=datetime.now(timezone.utc).isoformat(),artifacts={p.name:sha(p) for p in run.iterdir() if p.is_file() and p.name!='summary.json'})

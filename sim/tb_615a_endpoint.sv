@@ -62,6 +62,9 @@ module tb_615a_endpoint;
   end
  end
  always @(posedge clk)begin
+  `ifndef A615A_VO
+  if(!reset&&dut.s_read&&|dut.s_read_address[15:6])$fatal(1,"Status ROM address exceeds configured 63-byte bound");
+  `endif
   cycle<=cycle+1;
   if(reset)begin head=0;tail=0;position=0;stalled<=0;end
   else begin
