@@ -20,7 +20,7 @@ module afdx_snmp_agent #(
  localparam RX_IDLE=0,RX_BODY=1,ROOT=2,VERSION=3,COMMUNITY=4,PDU=5,RID=6,
    ERROR_FIELD=7,INDEX_FIELD=8,VBL=9,VB=10,OID=11,VALUE=12,RESOLVE=13,SEND=14,DROP=15,SET_COPY=16,OID_COPY=17,
    OID_COPY_PRIME=18,SET_COPY_PRIME=19,REPLY_COPY_PRIME=20,FIELD_REQ=21,FIELD_CAPTURE=22,
-   COMMUNITY_REQ=23,COMMUNITY_CAPTURE=24;
+   COMMUNITY_REQ=23,COMMUNITY_CAPTURE=24,RID_REQ=25,RID_CAPTURE=26,OID_END_REQ=27,OID_END_CAPTURE=28;
  reg [4:0] state;
  reg [7:0] packet[0:483],sys_name[0:31];
  reg [7:0] packet_oid_ram[0:511],packet_set_ram[0:511],packet_reply_ram[0:511];
@@ -37,6 +37,9 @@ module afdx_snmp_agent #(
  reg [9:0] pdu_tag_index,error_index,index_index,oid_start,oid_length,value_start,value_length;
  reg [7:0] pdu_tag,value_tag,error_status,error_binding;
  reg signed [31:0] request_id;
+ reg [2:0] rid_index;
+ reg [31:0] rid_accum;
+ reg [9:0] oid_last_address;
  reg [31:0] uptime_snapshot;
  reg [15:0] response_port;
  reg [9:0] tx_index,tx_size;
@@ -65,18 +68,15 @@ module afdx_snmp_agent #(
  wire field_state=(state==ROOT)||(state==VERSION)||(state==COMMUNITY)||(state==PDU)||(state==RID)||
                   (state==ERROR_FIELD)||(state==INDEX_FIELD)||(state==VBL)||(state==VB)||(state==OID)||(state==VALUE);
  wire packet_read_enable=(state==FIELD_REQ)||(state==FIELD_CAPTURE&&field_index<3)||
-                         (state==COMMUNITY_REQ)||(state==COMMUNITY_CAPTURE&&community_index+1'b1<community_length);
+                         (state==COMMUNITY_REQ)||(state==COMMUNITY_CAPTURE&&community_index+1'b1<community_length)||
+                         (state==RID_REQ)||(state==RID_CAPTURE&&rid_index+1'b1<field_length)||(state==OID_END_REQ);
  wire [9:0] packet_read_address=state==FIELD_REQ?cursor:
                                 state==FIELD_CAPTURE?cursor+field_index+1'b1:
-                                state==COMMUNITY_REQ?field_base+community_index:field_base+community_index+1'b1;
- function signed [31:0] integer_value;
-  input [9:0] start,length;integer j;reg signed [31:0] value;
-  begin
-   value=packet[start][7]?-1:0;
-   for(j=0;j<4;j=j+1)if(j<length)value=(value<<8)|packet[start+j];
-   integer_value=value;
-  end
- endfunction
+                                state==COMMUNITY_REQ?field_base+community_index:
+                                state==COMMUNITY_CAPTURE?field_base+community_index+1'b1:
+                                state==RID_REQ?field_base+rid_index:
+                                state==RID_CAPTURE?field_base+rid_index+1'b1:oid_last_address;
+ wire [31:0] rid_append=rid_index==0?{{24{packet_read_data[7]}},packet_read_data}:{rid_accum[23:0],packet_read_data};
  function [7:0] oid_byte;input integer position;input [3:0] id;
   begin case(position)
    0:oid_byte=8'h2b;1:oid_byte=6;2:oid_byte=1;3:oid_byte=2;
@@ -220,6 +220,7 @@ module afdx_snmp_agent #(
  always @(posedge clk)if(packet_store_write)packet_oid_ram[packet_store_address^9'h155]<=in_data;
  always @(posedge clk)if(packet_store_write)packet_set_ram[packet_store_address^9'h0aa]<=in_data;
  always @(posedge clk)if(packet_store_write)packet_reply_ram[packet_store_address^9'h1ff]<=in_data;
+ always @(posedge clk)if(packet_store_write)packet[packet_store_address]<=in_data;
  always @(posedge clk)if(!reset&&oid_read_enable)oid_read_data<=packet_oid_ram[oid_read_address^9'h155];
  always @(posedge clk)if(!reset&&set_read_enable)set_read_data<=packet_set_ram[set_read_address^9'h0aa];
  always @(posedge clk)if(!reset&&reply_read_enable)reply_read_data<=packet_reply_ram[reply_read_address^9'h1ff];
@@ -234,6 +235,7 @@ module afdx_snmp_agent #(
    message_end<=0;pdu_end<=0;vbl_end<=0;vb_end<=0;pdu_tag<=0;value_tag<=0;error_status<=0;error_binding<=0;
    request_id<=0;uptime_snapshot<=0;response_port<=0;tx_index<=0;tx_size<=0;copy_index<=0;oid_copy_index<=0;
    field_return_state<=ROOT;field_index<=0;community_index<=0;field_valid<=0;community_match<=0;
+   rid_index<=0;rid_accum<=0;oid_last_address<=0;
    for(j=0;j<4;j=j+1)field_header[j]<=0;
    request_count<=0;response_count<=0;error_count<=0;trap_count<=0;sys_name_length<=7;
    for(j=0;j<32;j=j+1)sys_name[j]<=j==0?"a":j==1?"f":j==2?"d":j==3?"x":j==4?"-":j==5?"s":j==6?"2":0;
@@ -242,12 +244,11 @@ module afdx_snmp_agent #(
     trap_mode<=1;uptime_snapshot<=uptime_ticks;tx_size<=34+unsigned_length(uptime_ticks);tx_index<=0;state<=SEND;
    end else if(in_valid&&in_ready)begin
     if(state==RX_IDLE)begin
-     packet[0]<=in_data;rx_index<=1;received_length<=in_length;response_port<=in_src_port;
+     rx_index<=1;received_length<=in_length;response_port<=in_src_port;
      bad_frame<=!in_sop||in_length>484||in_length==0||in_eop;
      copy_response<=0;trap_mode<=0;error_status<=0;error_binding<=0;
      state<=in_eop?DROP:RX_BODY;
     end else begin
-     if(rx_index<484)packet[rx_index]<=in_data;
      if(rx_index<1023)rx_index<=rx_index+1'b1;
      if(in_sop||in_length!=received_length)bad_frame<=1;
      if(in_eop)begin
@@ -274,6 +275,14 @@ module afdx_snmp_agent #(
       end else state<=DROP;
      end else community_index<=community_index+1'b1;
     end
+    RID_REQ:state<=RID_CAPTURE;
+    RID_CAPTURE:begin
+     if(rid_index+1'b1>=field_length)begin request_id<=rid_append;cursor<=field_end;state<=ERROR_FIELD;end
+     else begin rid_accum<=rid_append;rid_index<=rid_index+1'b1;end
+    end
+    OID_END_REQ:state<=OID_END_CAPTURE;
+    OID_END_CAPTURE:if(packet_read_data[7])state<=DROP;
+     else begin cursor<=oid_last_address+1'b1;oid_copy_index<=0;state<=OID_COPY_PRIME;end
     ROOT:begin
      if(!field_ok||field_header[0]!=8'h30||field_end!=received_length)state<=DROP;
      else begin cursor<=field_base;message_end<=field_end;state<=VERSION;uptime_snapshot<=uptime_ticks;end
@@ -287,7 +296,7 @@ module afdx_snmp_agent #(
     PDU:if(!field_ok||field_end!=message_end||(field_header[0]!=8'ha0&&field_header[0]!=8'ha1&&field_header[0]!=8'ha3))state<=DROP;
      else begin pdu_tag_index<=cursor;pdu_tag<=field_header[0];pdu_end<=field_end;cursor<=field_base;state<=RID;end
     RID:if(!field_ok||field_header[0]!=2||field_length==0||field_length>4)state<=DROP;
-     else begin request_id<=integer_value(field_base,field_length);cursor<=field_end;state<=ERROR_FIELD;end
+     else begin rid_index<=0;rid_accum<=0;state<=RID_REQ;end
     ERROR_FIELD:if(!field_ok||field_header[0]!=2||field_length!=1)state<=DROP;
      else begin error_index<=field_base;cursor<=field_end;state<=INDEX_FIELD;end
     INDEX_FIELD:if(!field_ok||field_header[0]!=2||field_length!=1)state<=DROP;
@@ -303,8 +312,8 @@ module afdx_snmp_agent #(
       vb_end<=field_end;cursor<=field_base;state<=OID;
       if(field_end!=vbl_end)begin error_status<=1;error_binding<=0;end
      end
-    OID:if(!field_ok||field_header[0]!=6||field_length==0||field_length>64||field_end>vb_end||packet[field_end-1][7])state<=DROP;
-     else begin oid_start<=field_base;oid_length<=field_length;cursor<=field_end;oid_copy_index<=0;state<=OID_COPY_PRIME;end
+    OID:if(!field_ok||field_header[0]!=6||field_length==0||field_length>64||field_end>vb_end)state<=DROP;
+     else begin oid_start<=field_base;oid_length<=field_length;oid_last_address<=field_end-1'b1;state<=OID_END_REQ;end
     OID_COPY_PRIME:state<=OID_COPY;
     OID_COPY:begin
      oid_cache[oid_copy_index]<=oid_read_data;
