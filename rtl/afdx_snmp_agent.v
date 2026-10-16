@@ -37,6 +37,7 @@ module afdx_snmp_agent #(
  reg [9:0] pdu_tag_index,error_index,index_index,oid_start,oid_length,value_start,value_length;
  reg [7:0] pdu_tag,value_tag,error_status,error_binding;
  reg signed [31:0] request_id;
+ reg [2:0] rid_length;
  reg [2:0] rid_index;
  reg [31:0] rid_accum;
  reg [9:0] oid_last_address;
@@ -123,7 +124,7 @@ module afdx_snmp_agent #(
    else if(value<=8388607)unsigned_length=3;else if(value<=2147483647)unsigned_length=4;
    else unsigned_length=5;
   end endfunction
- wire [2:0] rid_length=signed_length(request_id),tick_length=unsigned_length(uptime_snapshot);
+ wire [2:0] tick_length=unsigned_length(uptime_snapshot);
  wire packet_store_write=!reset&&in_valid&&in_ready&&(state==RX_IDLE||rx_index<484);
  wire [8:0] packet_store_address=state==RX_IDLE?9'd0:rx_index[8:0];
  wire oid_read_enable=state==OID_COPY_PRIME||
@@ -233,7 +234,7 @@ module afdx_snmp_agent #(
    private_access<=0;copy_response<=0;trap_mode<=0;community_length<=0;object_id<=0;
    pdu_tag_index<=0;error_index<=0;index_index<=0;oid_start<=0;oid_length<=0;value_start<=0;value_length<=0;
    message_end<=0;pdu_end<=0;vbl_end<=0;vb_end<=0;pdu_tag<=0;value_tag<=0;error_status<=0;error_binding<=0;
-   request_id<=0;uptime_snapshot<=0;response_port<=0;tx_index<=0;tx_size<=0;copy_index<=0;oid_copy_index<=0;
+   request_id<=0;rid_length<=1;uptime_snapshot<=0;response_port<=0;tx_index<=0;tx_size<=0;copy_index<=0;oid_copy_index<=0;
    field_return_state<=ROOT;field_index<=0;community_index<=0;field_valid<=0;community_match<=0;
    rid_index<=0;rid_accum<=0;oid_last_address<=0;
    for(j=0;j<4;j=j+1)field_header[j]<=0;
@@ -277,7 +278,7 @@ module afdx_snmp_agent #(
     end
     RID_REQ:state<=RID_CAPTURE;
     RID_CAPTURE:begin
-     if(rid_index+1'b1>=field_length)begin request_id<=rid_append;cursor<=field_end;state<=ERROR_FIELD;end
+     if(rid_index+1'b1>=field_length)begin request_id<=rid_append;rid_length<=signed_length(rid_append);cursor<=field_end;state<=ERROR_FIELD;end
      else begin rid_accum<=rid_append;rid_index<=rid_index+1'b1;end
     end
     OID_END_REQ:state<=OID_END_CAPTURE;
