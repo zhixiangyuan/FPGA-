@@ -67,6 +67,10 @@ python scripts/run_stage2_mixed.py --load-core --interval 4000 --service-interva
 
 完整 VO 运行期间可执行 `python scripts/check_live_submission_vo.py --run build/logs/submission_615a_vo_002 --rtl-reference build/logs/submission_615a_013`，只读核对已落盘完整帧的 FCS、BAG、帧长及逐 VL 的 RTL 字节前缀，并校验参考与 Golden 指纹。CSV 未完成末行留待下一次检查；`PREFIX_MATCH_ONLY` 不代表最终 PASS，完整场景、未来帧和最终输入哈希仍由原 runner 验收。该检查不修改活动仿真或其输入。
 
+需要关机后接续时，使用 `run_submission_vo_checkpoint.py --run build/logs/submission_615a_vo_checkpoint_002 --session-minutes 100` 在同一目录恢复已保存检查点。该运行从相同真实 VO 的 O5 编译缓存建立，保持 8 ns 时钟、真实 BAG、全部场景和原 Golden 核验；每段按墙钟预算保存完整内核状态并退出。只有 `summary.json` 为 `PAUSED`、检查点及输出哈希核对成功、仿真进程已经退出后才可关机。普通日志、CSV、进程暂停和 `PREFIX_MATCH_ONLY` 均不能代替可冷恢复检查点；恢复须保持工具版本、运行目录、源码、原语、编译库和 Golden 不变。全部场景完成后仍调用原完整验收函数，`PAUSED` 不计为 PASS。
+
+原非检查点运行 `submission_615a_vo_002` 已获用户批准停止，原始输出和取消说明保留，未计为验收通过。当前检查点控制器已在真实候选上完成两段 10 μs 保存/冷恢复，五份 CSV 与连续 20 μs 输出一致；这只验证续跑机制，不代表整机验收完成。
+
 ## eLinx综合工程
 
 先运行`python scripts/prepare_v1_elinx.py`，它会从`rtl/`和`vendor/frozen/`的canonical源码生成`build/elinx/AFDXV1_NNN/AFDXV1.epr`，并逐文件核对哈希。打开生成的工程。目标为EQ6HL45/CSG225，顶层`AFDX_top`，使用`clock_125mhz.edc`中的125 MHz/8 ns约束。阶段1原GUI综合资源为2784 LUT、1069 FF、28 Memory、22 IO，0 Errors、25 Warnings。综合通过不代表时序或物理封装适配通过。
