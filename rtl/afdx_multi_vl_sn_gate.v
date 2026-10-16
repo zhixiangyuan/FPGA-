@@ -18,13 +18,15 @@ module afdx_multi_vl_sn_gate #(
  output reg [31:0] missing_count,delivered_count
 );
  localparam IDLE=0,PASS=1,DRAIN=2;
+ localparam integer INDEX_BITS=VL_COUNT>1?$clog2(VL_COUNT):1;
+ localparam [16:0] VL_LIMIT={1'b0,VL_BASE}+VL_COUNT;
  reg [1:0] state;
  reg [7:0] psn[0:VL_COUNT-1];
  reg [VL_COUNT-1:0] psn_valid;
  wire [16:0] index_wide={1'b0,in_vlid}-{1'b0,VL_BASE};
- wire configured=in_vlid>=VL_BASE && index_wide<VL_COUNT;
+ wire configured=({1'b0,in_vlid}>={1'b0,VL_BASE})&&({1'b0,in_vlid}<VL_LIMIT);
  // The safe index prevents an out-of-range read even for invalid metadata.
- wire [15:0] index=configured?index_wide[15:0]:16'd0;
+ wire [INDEX_BITS-1:0] index=configured?index_wide[INDEX_BITS-1:0]:{INDEX_BITS{1'b0}};
  function [7:0] next_sn;input [7:0] s;
  begin next_sn=(s==255 || s==0)?8'd1:s+8'd1;end endfunction
  function [31:0] inc;input [31:0] v;

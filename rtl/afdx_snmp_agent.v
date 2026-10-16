@@ -30,6 +30,7 @@ module afdx_snmp_agent #(
  reg [4:0] field_return_state;
  reg [1:0] field_index;
  reg field_valid,community_match;
+ reg [30:0] field_q;
  reg [3:0] community_index;
  reg [9:0] received_length,rx_index,cursor,message_end,pdu_end,vbl_end,vb_end;
  reg bad_frame,private_access,copy_response,trap_mode;
@@ -64,8 +65,7 @@ module afdx_snmp_agent #(
    end
   end
  endfunction
- wire [30:0] field=tlv(cursor,received_length,field_header[1],field_header[2],field_header[3]);
- wire field_ok=field[30];wire [9:0] field_base=field[29:20],field_length=field[19:10],field_end=field[9:0];
+ wire field_ok=field_q[30];wire [9:0] field_base=field_q[29:20],field_length=field_q[19:10],field_end=field_q[9:0];
  wire field_state=(state==ROOT)||(state==VERSION)||(state==COMMUNITY)||(state==PDU)||(state==RID)||
                   (state==ERROR_FIELD)||(state==INDEX_FIELD)||(state==VBL)||(state==VB)||(state==OID)||(state==VALUE);
  wire packet_read_enable=(state==FIELD_REQ)||(state==FIELD_CAPTURE&&field_index<3)||
@@ -137,13 +137,15 @@ module afdx_snmp_agent #(
  wire [8:0] reply_read_address=state==REPLY_COPY_PRIME?9'd0:tx_index[8:0]+1'b1;
  wire [5:0] response_value_length=object_id==1?6'd22:object_id==3?{3'd0,tick_length}:sys_name_length;
  wire [7:0] response_value_tag=object_id==3?8'h43:8'h04;
+wire [4:0] response_offset_base={1'b0,community_length}+{2'b0,rid_length};
+wire [5:0] response_tail_length=response_offset_base+response_value_length;
  wire [9:0] pdu_start=7+community_length;
- wire [9:0] err_start=pdu_start+4+rid_length;
- wire [9:0] vbl_start=err_start+6;
- wire [9:0] vb_start=vbl_start+2;
- wire [9:0] object_start=vb_start+2;
- wire [9:0] result_start=object_start+10;
- wire [9:0] result_end=result_start+2+response_value_length;
+wire [9:0] err_start=10'd11+response_offset_base;
+wire [9:0] vbl_start=10'd17+response_offset_base;
+wire [9:0] vb_start=10'd19+response_offset_base;
+wire [9:0] object_start=10'd21+response_offset_base;
+wire [9:0] result_start=10'd31+response_offset_base;
+wire [9:0] result_end=10'd33+response_tail_length;
  function [7:0] response_byte;
   input [9:0] position;
   integer relative;reg [175:0] description;
@@ -225,6 +227,13 @@ module afdx_snmp_agent #(
  always @(posedge clk)if(!reset&&oid_read_enable)oid_read_data<=packet_oid_ram[oid_read_address^9'h155];
  always @(posedge clk)if(!reset&&set_read_enable)set_read_data<=packet_set_ram[set_read_address^9'h0aa];
  always @(posedge clk)if(!reset&&reply_read_enable)reply_read_data<=packet_reply_ram[reply_read_address^9'h1ff];
+ // Decode the complete BER length header when its final byte arrives. The
+ // parser consumes this registered boundary in the following state cycle.
+ always @(posedge clk)begin
+  if(reset)field_q<=0;
+  else if(state==FIELD_CAPTURE&&field_index==3)
+   field_q<=tlv(cursor,received_length,field_header[1],field_header[2],packet_read_data);
+ end
  // Fetch a BER TLV header serially. Keeping one registered read path avoids
  // three parallel variable-index reads from the packet register array.
  always @(posedge clk)if(packet_read_enable)packet_read_data<=packet[packet_read_address];
@@ -334,10 +343,11 @@ module afdx_snmp_agent #(
       if(compare_oid(1)==0)selected=1;else if(compare_oid(3)==0)selected=3;else if(compare_oid(5)==0)selected=5;
      end
      object_id<=selected;tx_index<=0;state<=SEND;
+      error_binding<=(error_status==0)&&(selected==0||
+                     (pdu_tag==8'ha3&&(!private_access||selected!=5||value_tag!=4||value_length>32)));
      if(error_status!=0||selected==0||(pdu_tag==8'ha3&&(!private_access||selected!=5||value_tag!=4||value_length>32)))begin
       copy_response<=1;tx_size<=received_length;
       if(error_status==0)begin
-       error_binding<=1;
        if(selected==0)error_status<=2;
        else if(!private_access||selected!=5)error_status<=4;
        else error_status<=3;
