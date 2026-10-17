@@ -75,6 +75,8 @@ python scripts/run_stage2_mixed.py --load-core --interval 4000 --service-interva
 
 ## eLinx综合工程
 
+2026-10-18 在封存的 10.12 ms 真实 VO 检查点上完成 `vo_resume_optimization_001`：两个相邻 100 μs 区间、默认调度/指定独立物理核心/重复采样/两路并行共 10 个样本，Golden、原断言及真实时钟/BAG 不变。对应五份 CSV 哈希及终点一致，原 67 份根目录产物、检查点、25 份缓存和 5 份 CSV 均未改变。相同 A 区间默认两次纯运行 65.981/54.858 秒，CPU2 绑定两次 65.092/57.803 秒，未证实稳定的单路绑核收益；默认/绑核两路墙钟 97.813/92.328 秒，相对对应串行样本吞吐为 1.455/1.535 倍。区间 B 的真实起点由区间 A 顺序计算取得，不能用这些吞吐比值缩短原连续 9 场景的关键路径。场景共享文件 bank、SN、协议状态与连续背景流，独立完整场景分组尚未建立。续跑采用已有 O5 镜像、默认调度及原检查点控制器，避免并发重复 VO；原数据保留。剩余 109.179368 ms 按默认 A 样本外推约 16.6～20.0 小时，均值约 18.3 小时，仅为短段估计，后续实际活跃度仍会影响耗时；不承诺 5～7 小时完成。短测入口 `benchmark_loaded_vo_resume.py --stop-at <带时区截止时间>` 会启动新试验，不用于查询进度；`LOADED_BENCHMARK_MATCH_ONLY` 不计为完整 VO 通过。
+
 先运行`python scripts/prepare_v1_elinx.py`，它会从`rtl/`和`vendor/frozen/`的canonical源码生成`build/elinx/AFDXV1_NNN/AFDXV1.epr`，并逐文件核对哈希。打开生成的工程。目标为EQ6HL45/CSG225，顶层`AFDX_top`，使用`clock_125mhz.edc`中的125 MHz/8 ns约束。阶段1原GUI综合资源为2784 LUT、1069 FF、28 Memory、22 IO，0 Errors、25 Warnings。综合通过不代表时序或物理封装适配通过。
 
 真实VO及原厂器件模型不在Git源码树中。将V1.0离线交付包解压到本地归档后，设置`AFDX_V1_EVIDENCE_ROOT`指向其`evidence`目录，再按`README_SYSTEM.md`运行真实VO复验脚本。厂商模型仅用于本机已许可的仿真环境。
