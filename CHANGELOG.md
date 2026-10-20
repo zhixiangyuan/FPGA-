@@ -1,5 +1,11 @@
 # 变更记录
 
+## 2026-10-20：正式八端口整机 VO 完整验收
+
+- 同一真实候选 `submission_615a_vo_checkpoint_002` 连续冷恢复至原 Testbench 结束；15 段会话中最终进程退出 0、`SUBMISSION_615A_PASS`、无 Error/Fatal，原完整 Golden 和同候选 RTL 双向逐 VL wire bytes 比较通过。原始摘要、日志、检查点及输入指纹保留在 `build/logs/`。
+- 9 场景、640 TX / 643 RX 帧、795541 TX 字节；512 个完整同载业务帧实测 Payload 163.4956 Mbps、最大 GMII 延时 60448 ns、每 VL 时延极差 0，真实 BAG 和对端 IFG 均满足原断言。独立只读复核与原摘要证据一致。
+- 赛题 V2.1 及答疑要求 eLinx 编译和综合后仿真，无需硬件平台；正式提交材料尚待整理。当前功能范围为 16 业务 VL、单 LSAP/单 `config.bin` 的配置型 615A、SNMP 与自动 SNTP；外部装载器互操作、更大 VL 容量、EQ6 原生等价与完整物理时序未验证。
+
 ## 2026-10-18：断点负载短测与续跑配置选择
 
 - 新增 `benchmark_loaded_vo_resume.py`，在隔离构建副本中冷恢复已封存的 10.12 ms 检查点，测试相邻两段各 100 μs 的默认调度、CPU2/CPU4 绑定、重复运行及两路并行，共 10 样本；保持原 VO、Golden、时钟/BAG、计时器与断言。

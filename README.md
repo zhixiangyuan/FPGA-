@@ -20,15 +20,15 @@
 
 当前固定综合候选为 `AFDXSUB_005`，使用 SPEED 综合目标。真实 EQ6 后端打包 PASS：30733 LUT、9239 FF、3846 CLB、152 Memory、22 位 I/O，0 Errors、104 Warnings。接入前八端口基线为 16371 LUT、6565 FF、126 Memory；新增功能及当前综合目标合计增加 14362 LUT、2674 FF、26 Memory。相同 RTL 的 BALANCED 候选 `_004` 为 24204 LUT、9256 FF、152 Memory，8 ns setup −598 ps；SPEED 增加 6529 LUT，以原生综合估算 Fmax 125.849 MHz、8 ns setup +54 ps、失败端点 0 满足建立约束。当前裕量较小，预布线 hold 仍为 −68 ps、64 个端点，I/O 延迟未完整约束；未运行布局布线，不宣称完整时序签核。
 
-**最终整机功能 VO：尚未完成。** 已从上述候选真实综合数据库导出 `eda_stage2_export_011/AFDX_top.vo`，验收须使用原厂原语、真实时钟/BAG、完整 Golden，并与同候选 RTL 按 VL 比较完整收发帧字节。实际仿真模型为 eLinx 工具导出的 EP1S80/Stratix 兼容模型，EQ6 原生映射等价性仍为 NOT VERIFIED。历史 `a615a_vo_001` 的 7 场景/85 包只适用于其旧模块检查点；未修改的旧管理核心 `mgmt_vo_010` 的 57 用例/47 帧/6484 字节及 V1.0 真实 VO 证据继续保留，均不替代新入口的整机验收。
+**最终整机功能 VO：PASS。** `build/logs/submission_615a_vo_checkpoint_002` 使用 `eda_stage2_export_011/AFDX_top.vo`、原厂原语、真实 8 ns 时钟与 125000 周期 BAG，在同一状态链完成 15 段会话及 9 个场景；最终 ModelSim 进程退出 0、无 Error/Fatal，完整独立 Golden 和同候选 RTL 的双向逐 VL wire bytes 比较通过。共 640 个 TX 帧、643 个 RX 帧、795541 个 TX 字节；512 个完整同载业务帧的 Payload 速率为 163.4956 Mbps，已测 GMII 最大延时 60448 ns，每 VL 时延极差为 0。原始摘要、各段日志、检查点和输入指纹保留在该目录。实际仿真模型为 eLinx 工具导出的 EP1S80/Stratix 兼容模型，EQ6 原生映射等价性仍为 NOT VERIFIED；历史模块 VO 与 V1.0 证据均不替代本次整机结果。
 
-比赛正式提交材料、外部装载器互操作、更大 VL 容量及完整物理时序属于尚未验收的内容；目前不宣称所有比赛指标或完整协议标准已获认可。
+比赛正式提交材料尚未整理。外部装载器互操作、更大 VL 容量及完整物理时序仍未验证；赛题 V2.1 和答疑要求 eLinx 编译及综合后仿真，无需硬件平台或布局布线，不把这些未验证能力冒称赛题验收 PASS，也不宣称完整 ARINC 标准合规。
 
 ## GitHub 发布状态
 
 Stage E2 Pull Request [#1](https://github.com/zhixiangyuan/FPGA-/pull/1) 已于2026-10-12通过普通 Merge Commit 合并。统一工程提交为`9d5b85dd67bcf356bdc47c4aaf3336d2a863f832`；远端`main`与`dev`在E3同步点均指向该提交。远程独立克隆、17个可达提交、6个历史标签、67个跟踪文件及逐文件哈希核验通过。原V1.0稳定标签仍指向冻结提交`668094d8d4bcb5e4f2a447274b61a88129c991ec`。随后E3/F准备报告和校验脚本只更新`dev`，`main`保持上述审核提交。
 
-Stage F已按队长批准完成正式路径切换、315场景ModelSim RTL/Golden回归、实际eLinx GUI综合和VS Code Git识别。旧工作区、候选仓库和E3克隆已离线归档并验哈希；结果见[Stage F最终验收报告](reports/Stage%20F统一工作区最终验收报告.md)。本轮未更新main或创建新稳定标签。新路径完整VO时钟回归为NOT RUN；POST_SYNTH_TIMING、EQ6原生网表等价、官方八端口兼容、100 Mbps、最坏时延/抖动与物理I/O适配仍未验证。
+Stage F已按队长批准完成正式路径切换、315场景ModelSim RTL/Golden回归、实际eLinx GUI综合和VS Code Git识别。旧工作区、候选仓库和E3克隆已离线归档并验哈希；结果见[Stage F最终验收报告](reports/Stage%20F统一工作区最终验收报告.md)。该阶段未更新main或创建新稳定标签；当时新路径完整VO时钟回归为NOT RUN，POST_SYNTH_TIMING、EQ6原生网表等价、官方八端口兼容、100 Mbps、最坏时延/抖动与物理I/O适配均未验证。后续最新结果以本页“当前开发状态”为准。
 
 ## 目录
 
@@ -65,11 +65,11 @@ python scripts/run_stage2_mixed.py --load-core --interval 4000 --service-interva
 
 生产源码清单由 `scripts/submission_sources.py` 给出；`rtl/AFDX_top.v` 是独立 V1.0 入口，不能与生产入口同时编译。重新综合须先用 `prepare_submission_elinx.py` 生成新编号目录，再通过 `run_stage2_synthesis.py` 指定该目录、已验证的 settings reference 以及 `--optimization-technique SPEED`；默认 BALANCED 结果不能代替当前候选。真实 VO 验收入口 `run_submission_615a.py` 还需指定 `--vo`、`--provenance` 和同源码通过的 `--rtl-reference`。
 
-完整 VO 运行期间可执行 `python scripts/check_live_submission_vo.py --run build/logs/submission_615a_vo_002 --rtl-reference build/logs/submission_615a_013`，只读核对已落盘完整帧的 FCS、BAG、帧长及逐 VL 的 RTL 字节前缀，并校验参考与 Golden 指纹。CSV 未完成末行留待下一次检查；`PREFIX_MATCH_ONLY` 不代表最终 PASS，完整场景、未来帧和最终输入哈希仍由原 runner 验收。该检查不修改活动仿真或其输入。
+完整 VO 运行期间可执行 `python scripts/check_live_submission_vo.py --run build/logs/submission_615a_vo_checkpoint_002 --rtl-reference build/logs/submission_615a_013`，只读核对已落盘完整帧的 FCS、BAG、帧长及逐 VL 的 RTL 字节前缀，并校验参考与 Golden 指纹。`PREFIX_MATCH_ONLY` 不代表最终 PASS；本次最终结果以原 runner 的完整验收及 `summary.json` 为准。
 
-需要关机后接续时，使用 `run_submission_vo_checkpoint.py --run build/logs/submission_615a_vo_checkpoint_002 --session-minutes 100` 在同一目录恢复已保存检查点。该运行从相同真实 VO 的 O5 编译缓存建立，保持 8 ns 时钟、真实 BAG、全部场景和原 Golden 核验；每段按墙钟预算保存完整内核状态并退出。只有 `summary.json` 为 `PAUSED`、检查点及输出哈希核对成功、仿真进程已经退出后才可关机。普通日志、CSV、进程暂停和 `PREFIX_MATCH_ONLY` 均不能代替可冷恢复检查点；恢复须保持工具版本、运行目录、源码、原语、编译库和 Golden 不变。全部场景完成后仍调用原完整验收函数，`PAUSED` 不计为 PASS。
+本次断点验收曾使用 `run_submission_vo_checkpoint.py --run build/logs/submission_615a_vo_checkpoint_002 --session-minutes 100` 在同一目录冷恢复，复用相同真实 VO 的 O5 编译缓存，保持 8 ns 时钟、真实 BAG、全部场景和原 Golden 核验。每次恢复前校验输入、Golden、参考、检查点、编译库及已输出 CSV；`PAUSED` 不计为 PASS。该目录现已为 `PASS`，不应再调用续跑命令。
 
-原非检查点运行 `submission_615a_vo_002` 已获用户批准停止，原始输出和取消说明保留，未计为验收通过。当前检查点控制器已在真实候选上完成两段 10 μs 保存/冷恢复，五份 CSV 与连续 20 μs 输出一致；这只验证续跑机制，不代表整机验收完成。
+原非检查点运行 `submission_615a_vo_002` 已获用户批准停止，原始输出和取消说明保留，未计为验收通过。本次整机 PASS 仅来自连续接续的 `submission_615a_vo_checkpoint_002`；原两段 10 μs 冷恢复短测只作为续跑机制证据。
 
 两路短段试验 `submission_vo_parallel_001` 使用相同 VO、Testbench、Golden 和原断言，各测 200 μs 的两个真实状态区间：串行合计 213.203 秒，并行 165.906 秒，加速 1.285 倍、节省 22.2%；对应五份 CSV 哈希一致，收发帧通过 RTL 逐 VL 字节前缀、FCS 和 BAG 检查。生成第二个真实前置状态另耗时 1450.547 秒，不包含在上述采样比值中。两路峰值工作集 1495.35 MiB、私有内存 1651.54 MiB，系统最低可用 1464.00 MiB；试验期间正式 VO 同时运行。入口为 `scripts/benchmark_submission_vo_parallel.py --stop-at <带时区截止时间>`，每次执行会建立新试验，勿作为状态查询命令重复运行。该结果为 `BENCHMARK_MATCH_ONLY`：尚未验证长时间高负载或超过两路的扩展效率，原连续 9 场景尚未拆分。按两路效率不下降的假设，13 小时至 4 小时约需 6 路，18 小时至 3 小时约需 10 路；当前可用内存不足以据此直接扩路，也不能保证完整验收在该时间内结束。
 
