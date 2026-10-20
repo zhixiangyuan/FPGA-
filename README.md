@@ -24,6 +24,12 @@
 
 比赛正式提交材料尚未整理。外部装载器互操作、更大 VL 容量及完整物理时序仍未验证；赛题 V2.1 和答疑要求 eLinx 编译及综合后仿真，无需硬件平台或布局布线，不把这些未验证能力冒称赛题验收 PASS，也不宣称完整 ARINC 标准合规。
 
+## 队友从 GitHub 接手
+
+仓库默认分支为 `main`。队友克隆后先记录 `git rev-parse HEAD`，阅读本页，再从 `rtl/submission/AFDX_top.v` 和 `scripts/submission_sources.py` 确认生产入口与源码清单；`sim/tb_submission_615a.sv`、`scripts/run_submission_615a.py`、`scripts/generate_615a_golden.py` 提供仿真激励、Golden 生成及验收逻辑。完整交接稿位于用户另行打包的 `D:\FPGA\交接内容`，包含设计文档、测试报告和交接手册。
+
+Git 跟踪源码、Testbench、脚本和模板约束，**不跟踪 `build/`**。因此仅有 GitHub 仓库不能直接查看本次完整 VO、15 段原始日志、ModelSim 编译库或厂商仿真模型，也不能据此声称复核了原始 PASS。原始证据在本机 `build/logs/submission_615a_vo_checkpoint_002`，同候选 RTL 参考在 `build/logs/submission_615a_013`；需要复核时由持有者按许可和文件哈希单独交接，不把厂商模型或完整构建目录推送到公开仓库。
+
 ## GitHub 发布状态
 
 Stage E2 Pull Request [#1](https://github.com/zhixiangyuan/FPGA-/pull/1) 已于2026-10-12通过普通 Merge Commit 合并。统一工程提交为`9d5b85dd67bcf356bdc47c4aaf3336d2a863f832`；远端`main`与`dev`在E3同步点均指向该提交。远程独立克隆、17个可达提交、6个历史标签、67个跟踪文件及逐文件哈希核验通过。原V1.0稳定标签仍指向冻结提交`668094d8d4bcb5e4f2a447274b61a88129c991ec`。随后E3/F准备报告和校验脚本只更新`dev`，`main`保持上述审核提交。
