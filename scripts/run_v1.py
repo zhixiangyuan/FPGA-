@@ -18,7 +18,11 @@ def main():
  i=1
  while (RUN_ROOT/f'rtl_{i:03d}').exists():i+=1
  run=RUN_ROOT/f'rtl_{i:03d}';run.mkdir()
- sources=[*sorted((ROOT/'vendor/frozen').glob('*.v')),*sorted((ROOT/'rtl').glob('*.v')),ROOT/'sim/tb_v1_echo.sv']
+ # V1 regression has an explicit sealed profile. Unrelated development RTL
+ # is tested by its own runner and must not become a mutable V1 input.
+ sources=[*sorted((ROOT/'vendor/frozen').glob('*.v')),
+          *[ROOT/'rtl'/n for n in ('AFDX_top.v','afdx_app_echo_queue.v','afdx_gmii_candidate_boundary.v')],
+          ROOT/'sim/tb_v1_echo.sv']
  inputs=sources+[ROOT/'scripts/generate_v1_golden.py',ROOT/'scripts/frozen_frame_reference.py',Path(__file__)]
  for p in inputs:shutil.copy2(p,run/p.name)
  with (run/'golden_generation.log').open('wb') as log:
