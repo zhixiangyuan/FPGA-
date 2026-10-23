@@ -232,7 +232,7 @@ wire [9:0] result_end=10'd33+response_tail_length;
  assign out_data=out_valid?response_byte(tx_index):8'd0;
  assign out_sop=out_valid&&tx_index==0;assign out_eop=out_valid&&tx_index+1==tx_size;
  assign out_length=tx_size;assign out_src_port=161;assign out_dst_port=trap_mode?16'd162:response_port;
- integer j;reg [3:0] selected;
+ integer j;reg [3:0] selected;reg [3:0] oid_probe;integer probe_index;
  integer tx_calc;
  // Mirrored synchronous-read memories serve the mutually exclusive OID,
  // SET-copy, and error-response phases without wide variable-index muxes.
@@ -362,12 +362,12 @@ wire [9:0] result_end=10'd33+response_tail_length;
      end
     RESOLVE:begin
      request_count<=request_count+1'b1;selected=0;
-      if(pdu_tag==8'ha1)begin
-       if(compare_oid(1)<0)selected=1;else if(compare_oid(2)<0)selected=2;else if(compare_oid(3)<0)selected=3;
-       else if(compare_oid(4)<0)selected=4;else if(compare_oid(5)<0)selected=5;else if(compare_oid(6)<0)selected=6;
-      end else begin
-       if(compare_oid(1)==0)selected=1;else if(compare_oid(2)==0)selected=2;else if(compare_oid(3)==0)selected=3;
-       else if(compare_oid(4)==0)selected=4;else if(compare_oid(5)==0)selected=5;else if(compare_oid(6)==0)selected=6;
+      // Pass a variable (not a literal) so the comparison stays a run-time
+      // function for both the Quartus and Yosys front ends.
+      for(probe_index=1;probe_index<=6&&selected==0;probe_index=probe_index+1)begin
+       oid_probe=probe_index[3:0];
+       if(pdu_tag==8'ha1)begin if(compare_oid(oid_probe)<0)selected=oid_probe;end
+       else if(compare_oid(oid_probe)==0)selected=oid_probe;
       end
      object_id<=selected;tx_index<=0;state<=SEND;
       error_binding<=(error_status==0)&&(selected==0||
