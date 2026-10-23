@@ -3,7 +3,10 @@
 // This gate holds ownership of that bank until delivery or draining finishes.
 module afdx_multi_vl_sn_gate #(
  parameter integer VL_COUNT=16,
- parameter [15:0] VL_BASE=16'h1234
+ parameter [15:0] VL_BASE=16'h1234,
+ parameter integer POLICING_ENABLE=0,
+ parameter integer MIN_BAG_CYCLES=0,
+ parameter integer MAX_FRAME_BYTES=1471
 )(
  input wire clk,reset,
  input wire [VL_COUNT-1:0] cfg_integrity_enable,
@@ -19,10 +22,16 @@ module afdx_multi_vl_sn_gate #(
 );
  localparam IDLE=0,PASS=1,DRAIN=2;
  localparam integer INDEX_BITS=VL_COUNT>1?$clog2(VL_COUNT):1;
- localparam [16:0] VL_LIMIT={1'b0,VL_BASE}+VL_COUNT;
+ localparam [31:0] VL_LIMIT_WIDE={1'b0,VL_BASE}+VL_COUNT;
+ localparam [16:0] VL_LIMIT=VL_LIMIT_WIDE[16:0];
  reg [1:0] state;
  reg [7:0] psn[0:VL_COUNT-1];
  reg [VL_COUNT-1:0] psn_valid;
+ reg [VL_COUNT-1:0] seen_vl;
+ reg [31:0] last_seen[0:VL_COUNT-1];
+ reg [31:0] clk_cycles;
+ reg [31:0] bag_violations;
+ reg [31:0] length_violations;
  wire [16:0] index_wide={1'b0,in_vlid}-{1'b0,VL_BASE};
  wire configured=({1'b0,in_vlid}>={1'b0,VL_BASE})&&({1'b0,in_vlid}<VL_LIMIT);
  // The safe index prevents an out-of-range read even for invalid metadata.
@@ -33,6 +42,9 @@ module afdx_multi_vl_sn_gate #(
  begin inc=v==32'hffffffff ? v : v+32'd1;end endfunction
  wire plus_one=in_sn==next_sn(psn[index]);
  wire plus_two=in_sn==next_sn(next_sn(psn[index]));
+ wire length_bad=(in_length==0)||(in_length>MAX_FRAME_BYTES);
+ wire bag_bad=POLICING_ENABLE!=0&&seen_vl[index]&&
+              ((clk_cycles-last_seen[index])<MIN_BAG_CYCLES);
  assign in_ready=!reset&&(state==DRAIN||(state==PASS&&app_ready));
  assign app_valid=!reset&&state==PASS&&in_valid;
  assign app_data=app_valid?in_data:8'd0;
@@ -44,17 +56,25 @@ module afdx_multi_vl_sn_gate #(
  integer i;
  always @(posedge clk)begin
   if(reset)begin
-   state<=IDLE;psn_valid<=0;
+   state<=IDLE;psn_valid<=0;seen_vl<=0;clk_cycles<=0;
+   bag_violations<=0;length_violations<=0;
    for(i=0;i<VL_COUNT;i=i+1)psn[i]<=0;
+   for(i=0;i<VL_COUNT;i=i+1)last_seen[i]<=0;
    accepted<=0;rejected<=0;reset_control<=0;delivered<=0;
    accepted_count<=0;rejected_count<=0;control_count<=0;
    missing_count<=0;delivered_count<=0;
   end else begin
+   clk_cycles<=clk_cycles+1'b1;
    accepted<=0;rejected<=0;reset_control<=0;delivered<=0;
    if(state==IDLE&&in_valid)begin
-    if(!configured||!in_sop||in_length==0||in_length>1471)begin
+    if(!configured||!in_sop||length_bad)begin
+     if(length_bad)length_violations<=inc(length_violations);
+     state<=DRAIN;rejected<=1;rejected_count<=inc(rejected_count);
+    end else if(bag_bad)begin
+     bag_violations<=inc(bag_violations);
      state<=DRAIN;rejected<=1;rejected_count<=inc(rejected_count);
     end else begin
+     seen_vl[index]<=1;last_seen[index]<=clk_cycles;
      psn_valid[index]<=1;psn[index]<=in_sn;
      if(in_sn==0)begin
       state<=DRAIN;reset_control<=1;control_count<=inc(control_count);

@@ -33,9 +33,10 @@ module afdx_multi_vl_echo_queue #(
  wire [16:0] incoming_index={1'b0,app_vlid}-{1'b0,VL_BASE};
  wire incoming_legal=app_vlid>=VL_BASE&&incoming_index<VL_COUNT;
  wire [15:0] incoming_vl=incoming_legal?incoming_index[15:0]:16'd0;
-wire [15:0] input_bank=2*incoming_vl+wr_slot[incoming_vl];
-wire [15:0] write_bank=2*write_vl+wr_slot[write_vl];
-wire [15:0] output_bank=2*read_vl+rd_slot[read_vl];
+// Shifts and zero-extended selects keep every bank index exactly 16 bits wide.
+wire [15:0] input_bank=(incoming_vl<<1)+{{15{1'b0}},wr_slot[incoming_vl]};
+wire [15:0] write_bank=(write_vl<<1)+{{15{1'b0}},wr_slot[write_vl]};
+wire [15:0] output_bank=(read_vl<<1)+{{15{1'b0}},rd_slot[read_vl]};
 wire [VL_COUNT-1:0] scheduler_eligible;
 wire [15:0] scheduler_choice;
 wire scheduler_found;
@@ -49,7 +50,7 @@ generate for(eligible_vl_index=0;eligible_vl_index<VL_COUNT;eligible_vl_index=el
 end endgenerate
 generate if(VL_COUNT==16)begin:balanced_scheduler
  wire [31:0] doubled_eligible={scheduler_eligible,scheduler_eligible};
- wire [15:0] eligible_from_rr=doubled_eligible>>rr[3:0];
+  wire [15:0] eligible_from_rr=doubled_eligible[rr[3:0]+:16];
  reg [3:0] selected_offset;
  wire [3:0] selected_vl=rr[3:0]+selected_offset;
  always @*begin

@@ -26,7 +26,12 @@ module afdx_stage3_mgmt_top #(
  // legal bag (1 ms) with 10 percent jitter, not a sub-millisecond interval.
  parameter [31:0] MGMT_BAG_CYCLES=32'd125000,
  parameter [31:0] MGMT_JITTER_CYCLES=32'd12500,
- parameter [31:0] TICK_DIVIDER=32'd1250000
+ parameter [31:0] TICK_DIVIDER=32'd1250000,
+ // Optional receive-side traffic policing. The production candidate keeps this
+ // disabled until the new profile has its own regression and synthesis result.
+ parameter integer RX_POLICING_ENABLE=0,
+ parameter [31:0] RX_BAG_CYCLES=32'd125000,
+ parameter integer RX_MAX_FRAME_BYTES=1471
 )(
  input wire clk,reset,input wire [7:0] rx_data,input wire rx_valid,rx_ready,
  output wire [7:0] tx_data,output wire tx_valid,tx_ready,
@@ -135,7 +140,8 @@ module afdx_stage3_mgmt_top #(
   .payload_sop(biz_sop),.payload_eop(biz_eop),.payload_length(biz_length),.payload_vlid(biz_rx_vlid),.payload_sn_unchecked(biz_sn),
   .payload_src_port(biz_src_port),.payload_dst_port(biz_dst_port),.candidate_accepted(candidate_accepted),.candidate_rejected(candidate_rejected),
   .reject_reason(reject_reason),.accepted_count(business_parser_accepted_count),.rejected_count(business_parser_rejected_count),.banks_busy());
- afdx_multi_vl_sn_gate gate(.clk(clk),.reset(reset),.cfg_integrity_enable(16'hffff),
+ afdx_multi_vl_sn_gate #(.POLICING_ENABLE(RX_POLICING_ENABLE),.MIN_BAG_CYCLES(RX_BAG_CYCLES),
+  .MAX_FRAME_BYTES(RX_MAX_FRAME_BYTES)) gate(.clk(clk),.reset(reset),.cfg_integrity_enable(16'hffff),
   .in_data(biz_data),.in_valid(biz_valid),.in_ready(biz_ready),.in_sop(biz_sop),.in_eop(biz_eop),.in_length(biz_length),
   .in_vlid(biz_rx_vlid),.in_sn(biz_sn),.app_data(app_data),.app_valid(app_valid),.app_ready(app_ready),.app_sop(app_sop),.app_eop(app_eop),
   .app_length(app_length),.app_vlid(app_vlid),.app_sn(app_sn),.accepted(accepted),.rejected(rejected),.reset_control(reset_control),.delivered(delivered),

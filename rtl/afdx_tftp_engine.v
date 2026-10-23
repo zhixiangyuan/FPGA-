@@ -34,7 +34,7 @@ module afdx_tftp_engine #(
  localparam IDLE=0,WAIT_PACKET=1,PARSE_ISSUE=2,PARSE_BYTE=3,OPEN_FILE=4,
   BUILD=5,READ_ISSUE=6,READ_STORE=7,TX_PRIME=8,TX_STREAM=9,
   RX_ISSUE=10,RX_BYTE=11,FINISH_FILE=12,HANDLE_PACKET=13;
- localparam AFTER_WAIT=0,AFTER_DONE=1,AFTER_IDLE=2;
+ localparam [1:0] AFTER_WAIT=2'd0,AFTER_DONE=2'd1,AFTER_IDLE=2'd2;
  reg [3:0] state;
  reg [1:0] after_tx;
  reg [7:0] rx_mem[0:515],tx_mem[0:515];
@@ -247,7 +247,7 @@ module afdx_tftp_engine #(
        if({1'b0,file_offset}+rx_size-4>MAX_FILE_BYTES)begin
         abort_transfer(3);prepare(5,3,5,AFTER_IDLE);
        end else begin
-        payload_length<=rx_size-4;block_no<=rx_block;rx_index<=4;timer<=0;retries<=0;
+         payload_length<=rx_size-10'd4;block_no<=rx_block;rx_index<=4;timer<=0;retries<=0;
         if(rx_size==4)state<=FINISH_FILE;else state<=RX_ISSUE;
        end
       end else if(rx_block==block_no&&peer_locked)begin

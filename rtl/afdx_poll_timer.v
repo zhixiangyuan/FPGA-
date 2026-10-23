@@ -7,14 +7,16 @@ module afdx_poll_timer #(
  input wire clk,reset,
  output reg request
 );
- localparam integer MAX_CYCLES=START_CYCLES>PERIOD_CYCLES ? START_CYCLES : PERIOD_CYCLES;
- localparam integer WIDTH=MAX_CYCLES>1 ? $clog2(MAX_CYCLES) : 1;
- reg [WIDTH-1:0] remaining;
+ // Both parameters are integer values, so a 32-bit countdown covers every
+ // legal configuration and keeps the literal assignments width-clean.
+ localparam [31:0] START_VALUE=START_CYCLES-1;
+ localparam [31:0] PERIOD_VALUE=PERIOD_CYCLES-1;
+ reg [31:0] remaining;
  always @(posedge clk)begin
-  if(reset)begin remaining<=START_CYCLES-1;request<=0;end
+  if(reset)begin remaining<=START_VALUE;request<=0;end
   else begin
    request<=remaining==0;
-   if(remaining==0)remaining<=PERIOD_CYCLES-1;
+   if(remaining==0)remaining<=PERIOD_VALUE;
    else remaining<=remaining-1'b1;
   end
  end

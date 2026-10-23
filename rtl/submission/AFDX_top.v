@@ -10,7 +10,10 @@ module AFDX_top #(
  parameter [47:0] MANAGER_MAC=48'h02000000000a,
  parameter integer SNTP_AUTO_ENABLE=1,
  parameter integer SNTP_START_CYCLES=16,
- parameter integer SNTP_POLL_CYCLES=2000000000
+ parameter integer SNTP_POLL_CYCLES=2000000000,
+ parameter integer RX_POLICING_ENABLE=0,
+ parameter [31:0] RX_BAG_CYCLES=32'd125000,
+ parameter integer RX_MAX_FRAME_BYTES=1471
 )(
  input wire clk,reset,
  output wire [7:0] tx_data,
@@ -28,7 +31,9 @@ module AFDX_top #(
   assign poll_request=1'b0;
  end endgenerate
  afdx_stage3_mgmt_top #(.ES_IP(ES_IP),.ES_MAC(ES_MAC),
-  .MANAGER_IP(MANAGER_IP),.MANAGER_MAC(MANAGER_MAC),.SNTP_SERVER_IP(MANAGER_IP)) core(
+  .MANAGER_IP(MANAGER_IP),.MANAGER_MAC(MANAGER_MAC),.SNTP_SERVER_IP(MANAGER_IP),
+  .RX_POLICING_ENABLE(RX_POLICING_ENABLE),.RX_BAG_CYCLES(RX_BAG_CYCLES),
+  .RX_MAX_FRAME_BYTES(RX_MAX_FRAME_BYTES)) core(
   .clk(clk),.reset(reset),.tx_data(tx_data),.rx_data(rx_data),
   .tx_valid(tx_valid),.rx_valid(rx_valid),.tx_ready(tx_ready),.rx_ready(rx_ready),
   .uptime_override(32'd0),.uptime_override_en(1'b0),.sntp_request_start(poll_request));

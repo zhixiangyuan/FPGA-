@@ -1,4 +1,7 @@
-// RFC1157 SNMPv1 agent profile: one varbind, GET/GETNEXT/SET, coldStart Trap.
+// RFC1157 SNMPv1 and RFC1901 SNMPv2c agent profile: one varbind,
+// GET/GETNEXT/SET, coldStart Trap. The request version is echoed in replies.
+// MIB-II system group: sysDescr.0, sysObjectID.0, sysUpTime.0, sysContact.0,
+// sysName.0 and sysLocation.0; contact/name/location are writable.
 // MIB-II sysDescr.0, sysUpTime.0, sysName.0; public read, private read/write.
 // Packet boundary/UDP/FCS/SN validation belongs to the upstream network path.
 // Trap enterprise 0.0 is an explicitly unassigned engineering identity.
@@ -22,7 +25,7 @@ module afdx_snmp_agent #(
    OID_COPY_PRIME=18,SET_COPY_PRIME=19,REPLY_COPY_PRIME=20,FIELD_REQ=21,FIELD_CAPTURE=22,
    COMMUNITY_REQ=23,COMMUNITY_CAPTURE=24,RID_REQ=25,RID_CAPTURE=26,OID_END_REQ=27,OID_END_CAPTURE=28;
  reg [4:0] state;
- reg [7:0] packet[0:483],sys_name[0:31];
+ reg [7:0] packet[0:483],sys_name[0:31],contact[0:31],location[0:31];
  reg [7:0] packet_oid_ram[0:511],packet_set_ram[0:511],packet_reply_ram[0:511];
  reg [7:0] oid_read_data,set_read_data,reply_read_data;
  reg [7:0] oid_cache[0:7];
@@ -37,6 +40,12 @@ module afdx_snmp_agent #(
  reg [3:0] community_length,object_id;
  reg [9:0] pdu_tag_index,error_index,index_index,oid_start,oid_length,value_start,value_length;
  reg [7:0] pdu_tag,value_tag,error_status,error_binding;
+ reg [7:0] version_byte;
+ reg [5:0] contact_length,location_length;
+ reg [1:0] set_target;
+ // Default writable strings, indexed least-significant byte first.
+ localparam [255:0] CONTACT_TEXT={"afdx-es-team3",152'd0};
+ localparam [255:0] LOCATION_TEXT={"AFDX lab bench",144'd0};
  reg signed [31:0] request_id;
  reg [2:0] rid_length;
  reg [2:0] rid_index;
@@ -135,11 +144,12 @@ module afdx_snmp_agent #(
  wire reply_read_enable=state==REPLY_COPY_PRIME||
                         (state==SEND&&copy_response&&out_valid&&out_ready&&!out_eop);
  wire [8:0] reply_read_address=state==REPLY_COPY_PRIME?9'd0:tx_index[8:0]+1'b1;
- wire [5:0] response_value_length=object_id==1?6'd22:object_id==3?{3'd0,tick_length}:sys_name_length;
- wire [7:0] response_value_tag=object_id==3?8'h43:8'h04;
+ wire [5:0] response_value_length=object_id==1?6'd22:object_id==2?6'd5:object_id==3?{3'd0,tick_length}:
+  object_id==4?contact_length:object_id==6?location_length:sys_name_length;
+ wire [7:0] response_value_tag=object_id==2?8'h06:object_id==3?8'h43:8'h04;
 wire [4:0] response_offset_base={1'b0,community_length}+{2'b0,rid_length};
 wire [5:0] response_tail_length=response_offset_base+response_value_length;
- wire [9:0] pdu_start=7+community_length;
+ wire [9:0] pdu_start=10'd7+{6'd0,community_length};
 wire [9:0] err_start=10'd11+response_offset_base;
 wire [9:0] vbl_start=10'd17+response_offset_base;
 wire [9:0] vb_start=10'd19+response_offset_base;
@@ -148,17 +158,17 @@ wire [9:0] result_start=10'd31+response_offset_base;
 wire [9:0] result_end=10'd33+response_tail_length;
  function [7:0] response_byte;
   input [9:0] position;
-  integer relative;reg [175:0] description;
+  integer relative;reg [175:0] description;reg [39:0] ticks;
   begin
-   response_byte=0;relative=0;description="AFDX FPGA RTL endpoint";
+   response_byte=0;relative=0;description="AFDX FPGA RTL endpoint";ticks={8'd0,uptime_snapshot};
    if(trap_mode)begin
     case(position)
-     0:response_byte=8'h30;1:response_byte=32+tick_length;
+     0:response_byte=8'h30;1:response_byte=8'd32+tick_length;
      2:response_byte=2;3:response_byte=1;4:response_byte=0;
      5:response_byte=4;6:response_byte=6;
      7:response_byte="p";8:response_byte="u";9:response_byte="b";
      10:response_byte="l";11:response_byte="i";12:response_byte="c";
-     13:response_byte=8'ha4;14:response_byte=19+tick_length;
+     13:response_byte=8'ha4;14:response_byte=8'd19+tick_length;
      15:response_byte=6;16:response_byte=1;17:response_byte=0;
      18:response_byte=8'h40;19:response_byte=4;
      20:response_byte=LOCAL_IP[31:24];21:response_byte=LOCAL_IP[23:16];
@@ -167,7 +177,7 @@ wire [9:0] result_end=10'd33+response_tail_length;
      30:response_byte=8'h43;31:response_byte=tick_length;
      default:begin
       if(position==32+tick_length)response_byte=8'h30;
-      else if(position<32+tick_length)response_byte={8'd0,uptime_snapshot}>>(8*(31+tick_length-position));
+      else if(position<32+tick_length)response_byte=ticks[8*(31+tick_length-position)+:8];
      end
     endcase
    end else if(copy_response)begin
@@ -177,24 +187,24 @@ wire [9:0] result_end=10'd33+response_tail_length;
     if(position==index_index)response_byte=error_binding;
    end else begin
     if(position==0)response_byte=8'h30;
-    else if(position==1)response_byte=result_end-2;
+     else if(position==1)response_byte=result_end[7:0]-8'd2;
     else if(position==2)response_byte=2;
     else if(position==3)response_byte=1;
-    else if(position==4)response_byte=0;
+    else if(position==4)response_byte=version_byte;
     else if(position==5)response_byte=4;
     else if(position==6)response_byte=community_length;
     else if(position<pdu_start)response_byte=community_byte(community_length,position-7);
     else if(position==pdu_start)response_byte=8'ha2;
-    else if(position==pdu_start+1)response_byte=result_end-pdu_start-2;
+     else if(position==pdu_start+1)response_byte=result_end[7:0]-pdu_start[7:0]-8'd2;
     else if(position==pdu_start+2)response_byte=2;
     else if(position==pdu_start+3)response_byte=rid_length;
-    else if(position<err_start)response_byte=request_id>>(8*(err_start-1-position));
+     else if(position<err_start)response_byte=request_id[8*(err_start-1-position)+:8];
     else if(position==err_start||position==err_start+3)response_byte=2;
     else if(position==err_start+1||position==err_start+4)response_byte=1;
     else if(position==err_start+2||position==err_start+5)response_byte=0;
     else if(position==vbl_start||position==vb_start)response_byte=8'h30;
-    else if(position==vbl_start+1)response_byte=result_end-vbl_start-2;
-    else if(position==vb_start+1)response_byte=result_end-vb_start-2;
+     else if(position==vbl_start+1)response_byte=result_end[7:0]-vbl_start[7:0]-8'd2;
+     else if(position==vb_start+1)response_byte=result_end[7:0]-vb_start[7:0]-8'd2;
     else if(position==object_start)response_byte=6;
     else if(position==object_start+1)response_byte=8;
     else if(position<result_start)response_byte=oid_byte(position-object_start-2,object_id);
@@ -202,9 +212,16 @@ wire [9:0] result_end=10'd33+response_tail_length;
     else if(position==result_start+1)response_byte=response_value_length;
     else begin
      relative=position-result_start-2;
-     if(object_id==1)response_byte=description>>(8*(21-relative));
-     else if(object_id==3)response_byte={8'd0,uptime_snapshot}>>(8*(tick_length-1-relative));
-     else response_byte=sys_name[relative];
+       if(object_id==1)response_byte=description[8*(21-relative)+:8];
+       else if(object_id==2)case(relative)
+        0:response_byte=8'h2b;1:response_byte=8'h06;2:response_byte=8'h01;
+        3:response_byte=8'h04;
+        default:response_byte=8'h01;
+       endcase
+       else if(object_id==3)response_byte=ticks[8*(tick_length-1-relative)+:8];
+       else if(object_id==4)response_byte=contact[relative];
+       else if(object_id==6)response_byte=location[relative];
+      else response_byte=sys_name[relative];
     end
    end
   end
@@ -216,6 +233,7 @@ wire [9:0] result_end=10'd33+response_tail_length;
  assign out_sop=out_valid&&tx_index==0;assign out_eop=out_valid&&tx_index+1==tx_size;
  assign out_length=tx_size;assign out_src_port=161;assign out_dst_port=trap_mode?16'd162:response_port;
  integer j;reg [3:0] selected;
+ integer tx_calc;
  // Mirrored synchronous-read memories serve the mutually exclusive OID,
  // SET-copy, and error-response phases without wide variable-index muxes.
  // Keep each memory's write and registered read in separate processes for
@@ -244,17 +262,23 @@ wire [9:0] result_end=10'd33+response_tail_length;
    pdu_tag_index<=0;error_index<=0;index_index<=0;oid_start<=0;oid_length<=0;value_start<=0;value_length<=0;
    message_end<=0;pdu_end<=0;vbl_end<=0;vb_end<=0;pdu_tag<=0;value_tag<=0;error_status<=0;error_binding<=0;
    request_id<=0;rid_length<=1;uptime_snapshot<=0;response_port<=0;tx_index<=0;tx_size<=0;copy_index<=0;oid_copy_index<=0;
+   version_byte<=0;
    field_return_state<=ROOT;field_index<=0;community_index<=0;field_valid<=0;community_match<=0;
    rid_index<=0;rid_accum<=0;oid_last_address<=0;
    for(j=0;j<4;j=j+1)field_header[j]<=0;
-   request_count<=0;response_count<=0;error_count<=0;trap_count<=0;sys_name_length<=7;
-   for(j=0;j<32;j=j+1)sys_name[j]<=j==0?"a":j==1?"f":j==2?"d":j==3?"x":j==4?"-":j==5?"s":j==6?"2":0;
+    request_count<=0;response_count<=0;error_count<=0;trap_count<=0;sys_name_length<=7;
+    contact_length<=13;location_length<=14;set_target<=1;
+     for(j=0;j<32;j=j+1)begin
+      sys_name[j]<=j==0?"a":j==1?"f":j==2?"d":j==3?"x":j==4?"-":j==5?"s":j==6?"2":8'd0;
+      contact[j]<=CONTACT_TEXT[8*(31-j)+:8];
+      location[j]<=LOCATION_TEXT[8*(31-j)+:8];
+     end
   end else begin
    if(trap_start&&trap_ready)begin
-    trap_mode<=1;uptime_snapshot<=uptime_ticks;tx_size<=34+unsigned_length(uptime_ticks);tx_index<=0;state<=SEND;
+     trap_mode<=1;uptime_snapshot<=uptime_ticks;tx_size<=10'd34+{7'd0,unsigned_length(uptime_ticks)};tx_index<=0;state<=SEND;
    end else if(in_valid&&in_ready)begin
     if(state==RX_IDLE)begin
-     rx_index<=1;received_length<=in_length;response_port<=in_src_port;
+      rx_index<=1;received_length<=in_length[9:0];response_port<=in_src_port;
      bad_frame<=!in_sop||in_length>484||in_length==0||in_eop;
      copy_response<=0;trap_mode<=0;error_status<=0;error_binding<=0;
      state<=in_eop?DROP:RX_BODY;
@@ -297,11 +321,12 @@ wire [9:0] result_end=10'd33+response_tail_length;
      if(!field_ok||field_header[0]!=8'h30||field_end!=received_length)state<=DROP;
      else begin cursor<=field_base;message_end<=field_end;state<=VERSION;uptime_snapshot<=uptime_ticks;end
     end
-    VERSION:if(!field_ok||field_header[0]!=2||field_length!=1||field_header[2]!=0)state<=DROP;
-     else begin cursor<=field_end;state<=COMMUNITY;end
+    VERSION:if(!field_ok||field_header[0]!=2||field_length!=1||
+               (field_header[2]!=0&&field_header[2]!=1))state<=DROP;
+     else begin version_byte<=field_header[2];cursor<=field_end;state<=COMMUNITY;end
     COMMUNITY:begin
      if(!field_ok||field_header[0]!=4||(field_length!=6&&field_length!=7))state<=DROP;
-     else begin community_length<=field_length;community_index<=0;community_match<=1;state<=COMMUNITY_REQ;end
+      else begin community_length<=field_length[3:0];community_index<=0;community_match<=1;state<=COMMUNITY_REQ;end
     end
     PDU:if(!field_ok||field_end!=message_end||(field_header[0]!=8'ha0&&field_header[0]!=8'ha1&&field_header[0]!=8'ha3))state<=DROP;
      else begin pdu_tag_index<=cursor;pdu_tag<=field_header[0];pdu_end<=field_end;cursor<=field_base;state<=RID;end
@@ -337,36 +362,52 @@ wire [9:0] result_end=10'd33+response_tail_length;
      end
     RESOLVE:begin
      request_count<=request_count+1'b1;selected=0;
-     if(pdu_tag==8'ha1)begin
-      if(compare_oid(1)<0)selected=1;else if(compare_oid(3)<0)selected=3;else if(compare_oid(5)<0)selected=5;
-     end else begin
-      if(compare_oid(1)==0)selected=1;else if(compare_oid(3)==0)selected=3;else if(compare_oid(5)==0)selected=5;
-     end
+      if(pdu_tag==8'ha1)begin
+       if(compare_oid(1)<0)selected=1;else if(compare_oid(2)<0)selected=2;else if(compare_oid(3)<0)selected=3;
+       else if(compare_oid(4)<0)selected=4;else if(compare_oid(5)<0)selected=5;else if(compare_oid(6)<0)selected=6;
+      end else begin
+       if(compare_oid(1)==0)selected=1;else if(compare_oid(2)==0)selected=2;else if(compare_oid(3)==0)selected=3;
+       else if(compare_oid(4)==0)selected=4;else if(compare_oid(5)==0)selected=5;else if(compare_oid(6)==0)selected=6;
+      end
      object_id<=selected;tx_index<=0;state<=SEND;
       error_binding<=(error_status==0)&&(selected==0||
-                     (pdu_tag==8'ha3&&(!private_access||selected!=5||value_tag!=4||value_length>32)));
-     if(error_status!=0||selected==0||(pdu_tag==8'ha3&&(!private_access||selected!=5||value_tag!=4||value_length>32)))begin
+                     (pdu_tag==8'ha3&&(!private_access||selected<4||selected>6||value_tag!=4||value_length>32)));
+      if(error_status!=0||selected==0||(pdu_tag==8'ha3&&(!private_access||selected<4||selected>6||value_tag!=4||value_length>32)))begin
       copy_response<=1;tx_size<=received_length;
       if(error_status==0)begin
        if(selected==0)error_status<=2;
-       else if(!private_access||selected!=5)error_status<=4;
+        else if(!private_access||selected<4||selected>6)error_status<=4;
        else error_status<=3;
       end
       error_count<=error_count+1'b1;
       state<=REPLY_COPY_PRIME;
      end else begin
       copy_response<=0;
-      if(pdu_tag==8'ha3)begin
-       sys_name_length<=value_length;copy_index<=0;
-       tx_size<=7+community_length+4+rid_length+6+2+2+10+2+value_length;
+       if(pdu_tag==8'ha3)begin
+         set_target<=selected[1:0];
+         if(selected==4)contact_length<=value_length[5:0];
+         else if(selected==6)location_length<=value_length[5:0];
+         else sys_name_length<=value_length[5:0];
+         copy_index<=0;
+         tx_calc=7+community_length+4+rid_length+6+2+2+10+2+value_length;
+         tx_size<=tx_calc[9:0];
        if(value_length!=0)state<=SET_COPY_PRIME;
-      end else tx_size<=7+community_length+4+rid_length+6+2+2+10+2+(selected==1?22:selected==3?unsigned_length(uptime_snapshot):sys_name_length);
+       end else begin
+        tx_calc=7+community_length+4+rid_length+6+2+2+10+2+
+                 (selected==1?22:selected==2?5:selected==3?unsigned_length(uptime_snapshot):
+                  selected==4?contact_length:selected==6?location_length:sys_name_length);
+        tx_size<=tx_calc[9:0];
+       end
      end
     end
     REPLY_COPY_PRIME:state<=SEND;
     SET_COPY_PRIME:state<=SET_COPY;
     SET_COPY:begin
-     sys_name[copy_index]<=set_read_data;
+      case(set_target)
+       2'd0:contact[copy_index]<=set_read_data;
+       2'd2:location[copy_index]<=set_read_data;
+       default:sys_name[copy_index]<=set_read_data;
+      endcase
      copy_index<=copy_index+1'b1;
      if(copy_index+1'b1>=value_length)state<=SEND;
     end
