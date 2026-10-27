@@ -38,7 +38,7 @@ def main():
   'delivered_netlist':str(delivered),'delivered_netlist_sha256':sha(delivered),'export_log_sha256':sha(run/'export.log'),
   'tool_sha256':sha(tool),'source_manifest_sha256':sha(project/'project_manifest.json'),
   'synthesis_runner_sha256':sha(runner_path),'database_mapping_provenance_sha256':sha(mapping_path),
-  'device_GUI':'EQ6HL45/CSG225','model_backend':'EP1S80F1508C6 / Stratix compatibility primitives',
+  'device_GUI':manifest['device']+'/'+manifest['package'],'model_backend':'EP1S80F1508C6 / Stratix compatibility primitives',
   'POST_SYNTH_TIMING':'NOT VERIFIED','EQ6_NATIVE_NETLIST_EQUIVALENCE':'NOT VERIFIED',
   'synthesis_or_implementation_invoked_by_export':False}
  (run/'provenance.json').write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps(proof,indent=2));return 0

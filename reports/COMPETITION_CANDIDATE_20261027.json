@@ -1,0 +1,264 @@
+{
+  "date": "2026-10-27",
+  "audited_utc": "2026-10-27T08:41:11.356190+00:00",
+  "result": "PASS_FOR_DECLARED_SCOPE",
+  "errors": [],
+  "sources": {
+    "vendor\\frozen\\afdx_bag_gate.v": "c3c787e92cf5d9504dbae308eb06c9469b2cc8ac2d033b37956316a8bed0ec2d",
+    "vendor\\frozen\\afdx_byte_fifo.v": "d4a68a1e90c4cebf11c8fecf074eec9af25ac655ffa36ec8b94d3530cfeb8748",
+    "vendor\\frozen\\afdx_ipv4_checksum.v": "d0ca0a58ebb7ee03e6058a7ac6a943a7e0d20a9bbf4fd17677379261ef15b1da",
+    "vendor\\frozen\\afdx_network_tx_top.v": "04fe1b917178e9fe00fa0513f6da04e4885e095453a28488ccc8900d2f5eb6af",
+    "vendor\\frozen\\afdx_protocol_rx_top.v": "78bf1bfb675ea40d032cf49667a10c40f8e2a1c0b9fa5648aed8d1b90eddc3d5",
+    "vendor\\frozen\\afdx_single_vl_rx_candidate.v": "d9f70c2aec4a71995eb16a7f4030165c6fe4e2378d128588dd2268cf98573558",
+    "vendor\\frozen\\afdx_single_vl_sn_gate.v": "7ff9e5bf97f9f57f85c305435e2f5659ed4025dfad8c4ff864b1c1fedebe7425",
+    "vendor\\frozen\\afdx_single_vl_tx.v": "dcf165241bebae6c481ead513ebd8c7c72a689d312996a52914c6a36112afd8a",
+    "vendor\\frozen\\mac_crc32_byte.v": "ace81c3b570adb774ab07221377cd443bcd4a1c1d50470b1fc682872d4ed7e05",
+    "vendor\\frozen\\mac_frame_store.v": "0aafd302a77c9ae219814ccb94e085ec98e00bd5805dfbd00b4b1f9ee4b3e069",
+    "vendor\\frozen\\mac_gmii_core.v": "fdac547e7180027b7cc8e68ca73e4aa7673f303e1a9ec3b020a7e0dedae6fc7d",
+    "vendor\\frozen\\mac_gmii_rx.v": "b2c3d4cfd8e7e70251df01bc063ed0ccbb65878c85b4c7a3a8038cbb62466849",
+    "vendor\\frozen\\mac_gmii_tx.v": "5dc651da9ce140be4649ea91e129c3de354919f69f8f949c21d84f2ae73b1be8",
+    "rtl\\afdx_app_tx_queue.v": "0c90168e715a272436fe93457369bbac75265d93c7845622d1d267e1d74263e4",
+    "rtl\\afdx_redundant_rx.v": "246112d599786d00574db6837d808bb5389d0e8ce8ff87b3e5e03bd91902ac68",
+    "rtl\\afdx_competition_core.v": "fc3335481102580d0a7594d363469dd7ace68817225bae3a8796329fc0a7daed",
+    "rtl\\afdx_mac_rx_buffered.v": "3078a3998efbad48bb0671db9c9ce1305b6ebaa1e347f8dfbdc2f7242e3253af",
+    "rtl\\afdx_multi_vl_tx.v": "a63f1269f3aadd39d9b895f1acde1826919b059f4d1c53fe6f9b5e07a5750a01",
+    "rtl\\afdx_multi_vl_rx_parser.v": "150988bd2a9e6ab094b1301056cc9ebfdeeea64ab758cd6e356954962995c81c",
+    "rtl\\competition\\AFDX_top.v": "294f184c4246fe28bd2c48ffd9a8d27bfc74e19eec915fa28f0447a8501a150b",
+    "rtl\\afdx_management_plane.v": "8f00161781681b348f5d3c0802319007df8cd1af89b46e5b14d5e19f7c51330a",
+    "rtl\\afdx_poll_timer.v": "f86edbbf6d058e6e59ea634077d8d740c8443af6233391b4146d99228a612b66",
+    "rtl\\afdx_snmp_agent.v": "107829f3c0ab0afae896b2e8f1f582a9ccd16400263cedbc2c82260fadc9f6fd",
+    "rtl\\afdx_service_message_fifo.v": "3c13319ad0ccc36eb8f1e86fffd82188ed22ffbf3233edc39f6a79f7f6407e22",
+    "rtl\\afdx_sntp_client.v": "4be49c1222cf5f66f524bdec0ecfccc66f6f6fc98f05303ca4e7c2bed536bbbb",
+    "rtl\\afdx_rtc_timebase.v": "2ac72fe3906ce698e2e73dbaecf51d08291352307687148cd1aab499ff818955",
+    "rtl\\afdx_tftp_engine.v": "03f7b63fad3211bf53216379d72d3fb4e10eb39a34d6549d970120e3e4a37a0f",
+    "rtl\\afdx_atomic_file_store.v": "22f37fe277e3af71b05b230c0fa66e582f97e4e43564e8ba9930cffc50dc3623",
+    "rtl\\afdx_615a_error_decoder.v": "d0677c7303c5b0cfb2b804b4cd96a8111e84eba99892e28bf106a0c4474148a7",
+    "rtl\\afdx_615a_endpoint.v": "a70ac18b33c57004fe01b78b7297be8bae31a0a52ab41eac6244df17d97b2a2b",
+    "rtl\\afdx_load_message_fifo.v": "1af8cccf11cc95e4b05838b5bf30848e13ea1b28a953d9f5be19b0158a8478ad",
+    "rtl\\afdx_management_rx_demux_615a.v": "0f0b4c02cb7af66e358b3a0b199d44dab6a1ac1fd579b97eca840fcbca921ed2",
+    "rtl\\afdx_service_tx_arbiter_615a.v": "203068860ba8efebc12dee1a5fa59087ea66cd7973548920aa5e1920b5c5dfe2"
+  },
+  "frozen_core_unchanged": true,
+  "tests": {
+    "system": {
+      "path": "D:\\FPGA\\captain_integration\\build\\logs\\competition_009",
+      "summary_sha256": "275a4eb792d66e1aa5f1b1a3150ae5a6a9430f101bdd4242717fc89b50a259ad",
+      "result": "PASS",
+      "input_mismatches": [],
+      "evidence": {
+        "application_messages": 688,
+        "TX_VLs": 128,
+        "RX_configured_VLs": 4096,
+        "RX_all_VL_functional_coverage": "NOT RUN by this integration test",
+        "application_payload_input_Mbps": 184.16847354170085,
+        "application_payload_delivered_Mbps": 183.88864798559268,
+        "max_application_first_to_last_ns": 62096,
+        "max_same_VL_same_length_range_ns": 528,
+        "minimum_BAG_cycles": 128000,
+        "payload_lengths": [
+          1,
+          64,
+          512,
+          1471
+        ],
+        "dual_network_wire_oracle": true,
+        "single_network_fault_recovery": true,
+        "delayed_B_cycles": 64,
+        "backpressure": true,
+        "synthesis": "NOT RUN",
+        "VO": "NOT RUN",
+        "management_in_new_wrapper": "enabled; automatic SNTP shares sender during application traffic"
+      }
+    },
+    "receiver": {
+      "path": "D:\\FPGA\\captain_integration\\build\\logs\\redundant_rx_007",
+      "summary_sha256": "be260aa7b8f2124071d9042f01e5222a995bd7337f352eb28508d15ae8542424",
+      "result": "PASS",
+      "input_mismatches": [],
+      "evidence": {},
+      "vectors": 17954,
+      "application_deliveries": 8719,
+      "VLs_exercised": 4096,
+      "recovery_timeout_test": "real 625001-cycle waits; expiry never bypasses IC"
+    },
+    "management": {
+      "path": "D:\\FPGA\\captain_integration\\build\\logs\\competition_mgmt_004",
+      "summary_sha256": "6927c9f57853e1dd8cd7aa5e09c09a378f4b54fafff4df9066c4b48649c3dbcd",
+      "result": "PASS",
+      "input_mismatches": [],
+      "evidence": {}
+    },
+    "rtl_smoke": {
+      "path": "D:\\FPGA\\captain_integration\\build\\logs\\competition_smoke_004",
+      "summary_sha256": "90bb636b875d3bcbee3b560ecb1d726599f06a11ba6481402ebbc79d2877485e",
+      "result": "PASS",
+      "input_mismatches": [],
+      "evidence": {
+        "application_messages": 3,
+        "RX_last_VL": "0x2233",
+        "TX_last_VL": "0x12b3",
+        "payload_lengths": [
+          1,
+          1471,
+          64
+        ],
+        "both_networks": true,
+        "duplicate_suppression": true,
+        "autonomous_SNTP": true
+      }
+    },
+    "vo_smoke": {
+      "path": "D:\\FPGA\\captain_integration\\build\\logs\\competition_smoke_vo_002",
+      "summary_sha256": "b98b5b625d95e83f04cb18d48cea91bf5c5365a56cbefd81a2df4135efd56a02",
+      "result": "PASS",
+      "input_mismatches": [],
+      "evidence": {
+        "application_messages": 3,
+        "RX_last_VL": "0x2233",
+        "TX_last_VL": "0x12b3",
+        "payload_lengths": [
+          1,
+          1471,
+          64
+        ],
+        "both_networks": true,
+        "duplicate_suppression": true,
+        "autonomous_SNTP": true
+      }
+    }
+  },
+  "synthesis": {
+    "project": "D:\\FPGA\\captain_integration\\build\\elinx\\AFDXSUB_010",
+    "manifest_sha256": "09e4c60847840ea9cfc312f99a800b24737d398a4fa58af7484059f0b619c8b3",
+    "runner_sha256": "d9ece1ebe14eb05f55028f89035bb41d269d5ce809eab44c5a085ec4a0b2e4ce",
+    "packing_sha256": "a7c4e4e2dc9dde8328feef131b2d79e4e138d566d9090e2b988711ad41653af2",
+    "resources": {
+      "LUTs": 50861,
+      "FFs": 16551,
+      "CLBs": 6876,
+      "Memorys": 356,
+      "DSPs": 0,
+      "PLLs": 0,
+      "Pins": 102
+    },
+    "device": "EQ6HL130",
+    "package": "CSG484_H"
+  },
+  "performance": {
+    "application_messages": 688,
+    "TX_VLs": 128,
+    "RX_configured_VLs": 4096,
+    "RX_all_VL_functional_coverage": "NOT RUN by this integration test",
+    "application_payload_input_Mbps": 184.16847354170085,
+    "application_payload_delivered_Mbps": 183.88864798559268,
+    "max_application_first_to_last_ns": 62096,
+    "max_same_VL_same_length_range_ns": 528,
+    "minimum_BAG_cycles": 128000,
+    "payload_lengths": [
+      1,
+      64,
+      512,
+      1471
+    ],
+    "dual_network_wire_oracle": true,
+    "single_network_fault_recovery": true,
+    "delayed_B_cycles": 64,
+    "backpressure": true,
+    "synthesis": "NOT RUN",
+    "VO": "NOT RUN",
+    "management_in_new_wrapper": "enabled; automatic SNTP shares sender during application traffic"
+  },
+  "continuous_load_input_interval_8000_cycles_without_stalls": true,
+  "timing": {
+    "result": "SETUP_MET_HOLD_NOT_SIGNED_OFF",
+    "scope": "native EQ6HL130 synthesis timing analysis; no placement or routing; unconstrained IO groups are listed separately",
+    "units": "delays and slack in ps; Fmax in MHz",
+    "checks": {
+      "user_100mhz_setup_pass": true,
+      "user_100mhz_setup_margin_ps": 2054,
+      "project_8ns_setup_pass": true,
+      "project_8ns_setup_wns_ps": 54,
+      "pre_route_hold_estimate_pass": false,
+      "pre_route_hold_wns_ps": -68,
+      "placed_routed_timing": "NOT RUN"
+    },
+    "target": {
+      "minimum_user_fmax_mhz": 100.0,
+      "project_clock_period_ps": 8000,
+      "minimum_project_setup_wns_ps": 0,
+      "minimum_pre_route_hold_wns_ps": 0
+    },
+    "timing": {
+      "clock": {
+        "name": "gmii_clk",
+        "period_ps": 8000,
+        "fmax_mhz": 125.8494873046875,
+        "setup_wns_ps": 54,
+        "setup_tns_ps": 0,
+        "setup_failing_endpoints": 0,
+        "setup_endpoints": 69612,
+        "hold_wns_ps": -68,
+        "hold_tns_ps": -42976,
+        "hold_failing_endpoints": 632,
+        "hold_endpoints": 69612
+      },
+      "design_summary": {
+        "timing_summary_id": 1,
+        "setup_wns": 0,
+        "setup_tns": 0,
+        "setup_number_failing_endpoints": 0,
+        "setup_number_endpoints": 69612,
+        "hold_wns": -68,
+        "hold_tns": -42976,
+        "hold_number_failing_endpoints": 632,
+        "hold_number_endpoints": 69612
+      },
+      "critical_setup_path": {
+        "from": "\\core|services.plane|rtc|remainder[7]~I|ff/Q",
+        "to": "\\core|services.plane|rtc|utc_time[63]~I|ff/D",
+        "slack_ps": 54,
+        "total_delay_ps": 7871,
+        "logic_levels": 94,
+        "high_fanout": 24
+      },
+      "unconstrained_path_groups": [
+        {
+          "name": "NONE to NONE",
+          "setup_worst_slack": -5742,
+          "setup_fail_ends": 62,
+          "setup_total_ends": 62,
+          "hold_worst_slack": 4232,
+          "hold_fail_ends": 0,
+          "hold_total_ends": 62
+        },
+        {
+          "name": "NONE to gmii_clk",
+          "setup_worst_slack": -4858,
+          "setup_fail_ends": 58595,
+          "setup_total_ends": 58837,
+          "hold_worst_slack": -738,
+          "hold_fail_ends": 11818,
+          "hold_total_ends": 58837
+        },
+        {
+          "name": "gmii_clk to NONE",
+          "setup_worst_slack": -8306,
+          "setup_fail_ends": 64,
+          "setup_total_ends": 64,
+          "hold_worst_slack": 4622,
+          "hold_fail_ends": 0,
+          "hold_total_ends": 64
+        }
+      ]
+    }
+  },
+  "limitations": {
+    "full_615A_sessions_on_new_wrapper": "NOT RUN",
+    "EQ6_native_mapped_equivalence": "NOT VERIFIED",
+    "place_route": "NOT RUN",
+    "physical_IO_timing": "NOT VERIFIED",
+    "arbitrary_unbounded_bursts": "NOT GUARANTEED",
+    "protocol_certification": "NOT CLAIMED"
+  },
+  "scope": "source-bound application dual-network functional/VO candidate with native 8ns setup; not full protocol certification or physical timing sign-off"
+}

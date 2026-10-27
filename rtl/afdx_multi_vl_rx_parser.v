@@ -5,7 +5,8 @@
 module afdx_multi_vl_rx_parser #(
     parameter integer VL_COUNT=16,
     parameter integer CHECK_PORTS=1,
-    parameter integer MAX_PAYLOAD = 1471
+    parameter integer MAX_PAYLOAD = 1471,
+    parameter integer ENABLE_DISCARD = 0
 ) (
     input  wire        clk,
     input  wire        reset,
@@ -36,7 +37,8 @@ module afdx_multi_vl_rx_parser #(
     output reg  [3:0]  reject_reason,
     output reg  [31:0] accepted_count,
     output reg  [31:0] rejected_count,
-    output reg  [1:0]  banks_busy
+    output reg  [1:0]  banks_busy,
+    input wire payload_discard
 );
     localparam [3:0] ERR_FRAMING=4'd1, ERR_ETHERNET=4'd2,
                      ERR_IPV4=4'd3, ERR_IP_CHECKSUM=4'd4,
@@ -79,7 +81,8 @@ module afdx_multi_vl_rx_parser #(
     assign payload_sop = payload_valid && out_index == 0;
     assign payload_eop = payload_valid && out_index + 11'd1 == payload_length;
     wire out_fire = payload_valid && payload_ready;
-    wire out_done = out_fire && payload_eop;
+    wire out_done = (out_fire && payload_eop) ||
+                    (ENABLE_DISCARD!=0 && payload_discard && payload_valid);
 
     wire [15:0] p_length = ip_total - 16'd28;
     wire [15:0] padding_length = p_length < 16'd17 ? 16'd17 - p_length : 16'd0;
@@ -197,7 +200,7 @@ module afdx_multi_vl_rx_parser #(
             accepted_count<=0; rejected_count<=0;
         end else begin
             candidate_accepted<=0; candidate_rejected<=0;
-            if (out_fire) begin
+            if (out_fire || out_done) begin
                 if (out_done) begin
                     out_index<=0; qhead<=!qhead; banks_busy[out_bank]<=0;
                 end else out_index<=out_index+11'd1;

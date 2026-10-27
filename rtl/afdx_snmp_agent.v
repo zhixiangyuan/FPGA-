@@ -23,7 +23,7 @@ module afdx_snmp_agent #(
  localparam RX_IDLE=0,RX_BODY=1,ROOT=2,VERSION=3,COMMUNITY=4,PDU=5,RID=6,
    ERROR_FIELD=7,INDEX_FIELD=8,VBL=9,VB=10,OID=11,VALUE=12,RESOLVE=13,SEND=14,DROP=15,SET_COPY=16,OID_COPY=17,
    OID_COPY_PRIME=18,SET_COPY_PRIME=19,REPLY_COPY_PRIME=20,FIELD_REQ=21,FIELD_CAPTURE=22,
-   COMMUNITY_REQ=23,COMMUNITY_CAPTURE=24,RID_REQ=25,RID_CAPTURE=26,OID_END_REQ=27,OID_END_CAPTURE=28;
+   COMMUNITY_REQ=23,COMMUNITY_CAPTURE=24,RID_REQ=25,RID_CAPTURE=26,OID_END_REQ=27,OID_END_CAPTURE=28,SELECT_OID=29;
  reg [4:0] state;
  reg [7:0] packet[0:483],sys_name[0:31],contact[0:31],location[0:31];
  reg [7:0] packet_oid_ram[0:511],packet_set_ram[0:511],packet_reply_ram[0:511];
@@ -358,10 +358,12 @@ wire [9:0] result_end=10'd33+response_tail_length;
     VALUE:if(!field_ok||field_end!=vb_end)state<=DROP;
      else begin
       value_start<=field_base;value_length<=field_length;value_tag<=field_header[0];
-      if(vb_end<vbl_end)begin cursor<=vb_end;state<=VB;end else state<=RESOLVE;
+      if(vb_end<vbl_end)begin cursor<=vb_end;state<=VB;end else state<=SELECT_OID;
      end
-    RESOLVE:begin
-     request_count<=request_count+1'b1;selected=0;
+    // Register OID selection before response sizing/error selection. This cuts
+    // the native 8ns oid_length -> compare_oid -> tx_size critical path.
+    SELECT_OID:begin
+     selected=0;
       // Pass a variable (not a literal) so the comparison stays a run-time
       // function for both the Quartus and Yosys front ends.
       for(probe_index=1;probe_index<=6&&selected==0;probe_index=probe_index+1)begin
@@ -369,7 +371,11 @@ wire [9:0] result_end=10'd33+response_tail_length;
        if(pdu_tag==8'ha1)begin if(compare_oid(oid_probe)<0)selected=oid_probe;end
        else if(compare_oid(oid_probe)==0)selected=oid_probe;
       end
-     object_id<=selected;tx_index<=0;state<=SEND;
+     object_id<=selected;state<=RESOLVE;
+    end
+    RESOLVE:begin
+     request_count<=request_count+1'b1;selected=object_id;
+     tx_index<=0;state<=SEND;
       error_binding<=(error_status==0)&&(selected==0||
                      (pdu_tag==8'ha3&&(!private_access||selected<4||selected>6||value_tag!=4||value_length>32)));
       if(error_status!=0||selected==0||(pdu_tag==8'ha3&&(!private_access||selected<4||selected>6||value_tag!=4||value_length>32)))begin

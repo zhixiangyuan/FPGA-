@@ -53,7 +53,7 @@ def main():
     args=parser.parse_args();project=args.project_dir.resolve();family=project.name.split('_',1)[0]
     assert family in ('AFDXS2M','AFDXS2','AFDXSUB','AFDXTFTP','AFDX615')
     manifest=json.loads((project/'project_manifest.json').read_text())
-    assert manifest['device']=='EQ6HL45' and manifest['package']=='CSG225'
+    assert (manifest['device'],manifest['package']) in (('EQ6HL45','CSG225'),('EQ6HL130','CSG484_H'))
     mapping=json.loads((project/'database_mapping_provenance.json').read_text())
     assert mapping['result']=='PASS'
     out=project/f'{family}.runs/synth_1'
@@ -70,7 +70,7 @@ def main():
     audit=project/'native_timing';audit.mkdir(exist_ok=True)
     tcl=audit/'native_timing.tcl'
     wrapper=(f'cd {{{SHELL.as_posix()}}}\nsource {{{official.as_posix()}}}\n'
-             f'run_tming_report {{{project.as_posix()}}} {family} {manifest["top"]} eHiChip6 EQ6HL45 synth_1\nexit 0\n')
+             f'run_tming_report {{{project.as_posix()}}} {family} {manifest["top"]} eHiChip6 {manifest["device"]} synth_1\nexit 0\n')
     if tcl.exists() and tcl.read_text()!=wrapper:raise RuntimeError(f'Existing timing wrapper differs: {tcl}')
     if not tcl.exists():tcl.write_text(wrapper)
     tool=SHELL/'Implementation.exe';command=[str(tool),'-f',str(tcl)]
@@ -100,9 +100,9 @@ def main():
     project_setup_pass=analysis_generated and clock.get('setup_wns_ps',-1)>=0
     hold_estimate_pass=analysis_generated and clock.get('hold_wns_ps',-1)>=0
     timing_pass=analysis_generated and project_setup_pass and hold_estimate_pass
-    result='PASS' if timing_pass else ('PARTIAL_100MHZ_MET' if user_setup_pass else ('FAIL' if analysis_generated else 'UNAVAILABLE'))
+    result='PASS' if timing_pass else ('SETUP_MET_HOLD_NOT_SIGNED_OFF' if project_setup_pass else ('FAIL_PROJECT_SETUP' if analysis_generated else 'UNAVAILABLE'))
     summary=dict(result=result,
-                 scope='native EQ6HL45 synthesis timing analysis; no placement or routing; unconstrained IO groups are listed separately',
+                 scope=f'native {manifest["device"]} synthesis timing analysis; no placement or routing; unconstrained IO groups are listed separately',
                  units='delays and slack in ps; Fmax in MHz',
                  checks=dict(user_100mhz_setup_pass=user_setup_pass,
                              user_100mhz_setup_margin_ps=round(target_period_ps-1000000.0/fmax) if fmax else None,
@@ -116,11 +116,11 @@ def main():
                              minimum_project_setup_wns_ps=0,minimum_pre_route_hold_wns_ps=0),
                  timing=analysis)
     (audit/'timing_summary.json').write_text(json.dumps(summary,indent=2)+'\n')
-    models=SHELL.parent/'Infrastructure/psk_intern/eHiChip6/EQ6HL45'
+    models=SHELL.parent/f'Infrastructure/psk_intern/eHiChip6/{manifest["device"]}'
     proof=dict(result=summary['result'],exit_code=code,error=error,reused_existing_analysis=reuse,
                started_utc=started,completed_utc=datetime.now(timezone.utc).isoformat(),command=command,
-               scope='native EQ6HL45 synthesized timing analysis; no placement or routing',
-               timing_verdict='PASS' if timing_pass else ('PARTIAL' if user_setup_pass else ('FAIL' if analysis_generated else 'NOT VERIFIED')),
+               scope=f'native {manifest["device"]} synthesized timing analysis; no placement or routing',
+               timing_verdict='PASS' if timing_pass else ('SETUP_ONLY' if project_setup_pass else ('FAIL' if analysis_generated else 'NOT VERIFIED')),
                Implementation_place_route='NOT RUN',Bitstream='NOT RUN',
                official_entry_sha256=sha(official),tool_sha256=sha(tool),wrapper_sha256=sha(tcl),
                source_manifest_sha256=sha(project/'project_manifest.json'),

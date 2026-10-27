@@ -1,0 +1,10 @@
+{
+  "path": "D:\\FPGA\\AFDX_archive\\competition_requirements_20261027_001.zip",
+  "sha256": "94a8197b3049b6abf6155ba908e53eae40886b48aea4822cebc92195bc10656a",
+  "bytes": 42866859,
+  "files": 285,
+  "result": "PASS",
+  "scope": "Private local original evidence backup, no work library/WLF or tool databases",
+  "original_evidence_ROOT": "D:\\FPGA\\captain_integration\\build",
+  "licensed_models": "Local licensed use only; do not upload to public repository"
+}

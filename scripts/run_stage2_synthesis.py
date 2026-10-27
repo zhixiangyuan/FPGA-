@@ -15,7 +15,7 @@ def main():
  manifest=json.loads((project/'project_manifest.json').read_text())
  family=project.name.split('_',1)[0];top=manifest['top']
  assert (family,top) in (('AFDXS2','afdx_stage2_top'),('AFDXS2M','afdx_stage2_mgmt_top'),('AFDXSUB','AFDX_top'),('AFDXTFTP','afdx_tftp_file_endpoint'),('AFDX615','afdx_615a_endpoint'))
- assert manifest['device']=='EQ6HL45' and manifest['package']=='CSG225' and manifest['clock_constraint_ns']==8
+ assert (manifest['device'],manifest['package']) in (('EQ6HL45','CSG225'),('EQ6HL130','CSG484_H')) and manifest['clock_constraint_ns']==8
  for r in manifest['sources']:
   assert sha(ROOT/r['canonical_source'])==r['sha256']==sha(project/r['snapshot'])
  for suffix in ('.qsf','.qpf'):
@@ -57,7 +57,7 @@ def main():
         'optimization_technique':args.optimization_technique,'settings_qsf_sha256':sha(project/f'{family}.qsf'),
         'source_manifest_sha256':sha(project/'project_manifest.json'),
         'driver_sha256':sha(tool),'settings_reference':str(reference),'settings_reference_sha256':sha(reference/'AFDXS2.qsf'),
-        'GUI_invocation':False,'bundled_frontend_executable':'quartus_map.exe','device_GUI_profile':'EQ6HL45/CSG225',
+        'GUI_invocation':False,'bundled_frontend_executable':'quartus_map.exe','device_GUI_profile':manifest['device']+'/'+manifest['package'],
         'functional_model_backend':'EP1S80F1508C6 / Stratix compatibility','Implementation':'NOT RUN','Bitstream':'NOT RUN',
         'POST_SYNTH_TIMING':'NOT VERIFIED','EQ6_NATIVE_NETLIST_EQUIVALENCE':'NOT VERIFIED'}
  (project/'synthesis_runner.json').write_text(json.dumps(proof,indent=2)+'\n')

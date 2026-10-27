@@ -26,6 +26,7 @@ def main():
  if passed:
   template=(ROOT/'build/elinx/AFDXV1_001/AFDXV1.runs/synth_1/AFDXV1_pack.tcl').read_text()
   pack=template.replace('D:/FPGA/captain_integration/build/elinx/AFDXV1_001',project.as_posix()).replace('AFDXV1',family).replace('set topEntity AFDX_top',f'set topEntity {manifest["top"]}')
+  pack=pack.replace('set deviceName "EQ6HL45"',f'set deviceName "{manifest["device"]}"').replace('set packageName "CSG225"',f'set packageName "{manifest["package"]}"')
   # run_pack locates PROJECT.vqm. Copy without changing the exported source.
   regular=out/f'{family}.vqm'
   if regular.exists():raise FileExistsError('Do not overwrite existing VQM')

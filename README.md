@@ -4,7 +4,25 @@
 
 正式开发工作区：`D:\FPGA\captain_integration`。日常开发使用`dev`；`main`仅接受队长批准的稳定版本。源码、测试、Golden和配置在同一工程持续维护，常规阶段不复制日期命名的完整工程。
 
-## 当前开发状态
+## 比赛要求补齐候选（2026-10-27）
+
+新增比赛应用入口 `rtl/competition/AFDX_top.v`。该入口接收 VLID + 应用有效载荷，包含独立 A/B MAC、每网完整性检查、跨网消重、128 个业务发送 VL、4096 个业务接收 VL，以及共用发送器的 SNMP、SNTP/RTC 和原配置型 615A 服务。旧 `rtl/submission/AFDX_top.v` 保留为历史管理入口；两份 `AFDX_top` 定义不可同时编译。
+
+应用格式、状态口、配置范围、当前验证结果及限制见 [比赛要求补齐说明](reports/比赛要求补齐_20261027.md)。新源码不会沿用 `a792a18` 或导入前候选的整机 VO PASS。
+
+```powershell
+python scripts/run_redundant_rx.py
+python scripts/run_competition_mgmt.py
+python scripts/run_competition.py
+python scripts/run_competition_smoke.py
+python scripts/prepare_competition_elinx.py
+```
+
+以上入口使用同一组 canonical RTL 和独立 Python Golden。默认真实 125 MHz、1 ms BAG；4096 接收状态的初始化需要 4096 个周期。`initialized` 与 `tx_ready` 有效后才开始应用注入。
+
+当前候选 RTL、EQ6HL130 综合、原生 8 ns setup 及真实综合网表短链路均已通过。应用有效载荷交付 183.8886 Mbps，已测最大应用时延 62.096 μs；128 条发送 VL 全部实际发送，4096 条接收 VL 状态通过 17954 条独立向量。最终综合为 50861 LUT、16551 FF、356 Memory、102 Pins；Fmax 125.8495 MHz，8 ns setup +54 ps。真实 VO 短链路覆盖最小/最大负载、最后 TX/RX VL、双网消重与自动 SNTP，111.344 μs 连续仿真约用时 4 分 12 秒。完整物理时序、新封装完整 615A 会话及 EQ6 原生映射等价仍未签核，不把短测扩大为这些项目的 PASS。机器可读证据见 `reports/COMPETITION_CANDIDATE_20261027.json`，范围见本次比赛补齐报告。以下保留导入和旧候选记录，供历史对照。
+
+## 导入时开发状态（历史对照）
 
 2026-10-27 已按用户要求导入 `FPGA-Final-Project.zip` 的增强版，来源提交为 `b478fa4e9fa1cd8af9ac379224beeabe4fd9cbc2`。保留原始 Git 历史并通过普通 Merge Commit 合入 `dev`；导入前版本 `a792a18` 保存在 `backup/before-final-import-20261027`。压缩包 `source/` 的 173 个文件与导入提交逐项比对一致（统一换行符后）；13 份冻结核心未修改。
 
