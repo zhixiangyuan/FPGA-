@@ -1,0 +1,179 @@
+{
+  "result": "PASS_FOR_DECLARED_PROFILE_PROTOCOL_SCOPE_OPEN",
+  "reviewed_utc": "2026-10-27T15:49:21.041318+00:00",
+  "reviewed_revision": "182a6db3c8fff4445e68a1bf0a3a1fc67c40bbab",
+  "verifier_sha256": "b62c6ab925a1c088b95e788b17c7e439232c93a88cbfa576c0a6c672575ffea3",
+  "coverage_report_sha256": "65a1cde9254c3d695c3cdb56ed88c1ca262cb0c58f46d6e6be5d95d9a76e8553",
+  "RTL_unchanged": true,
+  "checks": [
+    {
+      "name": "Source, official-file, Golden and saved-run fingerprints",
+      "status": "PASS",
+      "details": {
+        "evidence_status": {
+          "system": "PASS",
+          "receiver": "PASS",
+          "capacity": "PASS",
+          "parser": "PASS",
+          "bag": "PASS",
+          "management": "PASS",
+          "pressure": "PASS",
+          "vo": "PASS",
+          "management_vo": "PASS",
+          "snmp": "PASS",
+          "sntp": "PASS",
+          "rtc": "PASS",
+          "loader": "PASS",
+          "smoke": "PASS"
+        },
+        "frozen_sources_unchanged": true
+      }
+    },
+    {
+      "name": "RTL to synthesis database to actual VO provenance",
+      "status": "PASS",
+      "details": {
+        "netlist_sha256": "1109d7253d5c497ab053b1870627bf3a5a74757f141fb0c60da0111c98b3004c",
+        "model": "EP1S80F1508C6 / Stratix compatibility primitives",
+        "EQ6_native_equivalence": "NOT VERIFIED",
+        "physical_timing": "NOT SIGNED OFF"
+      }
+    },
+    {
+      "name": "Full application raw-output and performance recalculation",
+      "status": "PASS",
+      "details": {
+        "application_messages": 688,
+        "TX_VLs": 128,
+        "RX_configured_VLs": 4096,
+        "RX_all_VL_functional_coverage": "NOT RUN by this integration test",
+        "application_payload_input_Mbps": 184.16847354170085,
+        "application_payload_delivered_Mbps": 183.88864798559268,
+        "max_application_first_to_last_ns": 62096,
+        "max_same_VL_same_length_range_ns": 528,
+        "minimum_BAG_cycles": 128000,
+        "payload_lengths": [
+          1,
+          64,
+          512,
+          1471
+        ],
+        "dual_network_wire_oracle": true,
+        "single_network_fault_recovery": true,
+        "delayed_B_cycles": 64,
+        "backpressure": true,
+        "synthesis": "NOT RUN",
+        "VO": "NOT RUN",
+        "management_in_new_wrapper": "enabled; automatic SNTP shares sender during application traffic"
+      }
+    },
+    {
+      "name": "All 4096 receive VLs and input frame CRCs",
+      "status": "PASS",
+      "details": {
+        "VLs": 4096,
+        "application_deliveries": 8192,
+        "wire_frames_per_network": 8192
+      }
+    },
+    {
+      "name": "Per-VL integrity and redundancy raw-output oracle",
+      "status": "PASS",
+      "details": {
+        "vectors": 17954,
+        "application_deliveries": 8719
+      }
+    },
+    {
+      "name": "Eight real BAG timers and wire bytes",
+      "status": "PASS",
+      "details": {
+        "BAG_ms": [
+          1,
+          2,
+          4,
+          8,
+          16,
+          32,
+          64,
+          128
+        ],
+        "observed_gap_cycles": [
+          125003,
+          250003,
+          500003,
+          1000003,
+          2000003,
+          4000003,
+          8000003,
+          16000003
+        ]
+      }
+    },
+    {
+      "name": "Current VO application output and independent wire oracle",
+      "status": "PASS",
+      "details": {
+        "application_messages": 3,
+        "RX_last_VL": "0x2233",
+        "TX_last_VL": "0x12b3",
+        "payload_lengths": [
+          1,
+          1471,
+          64
+        ],
+        "both_networks": true,
+        "duplicate_suppression": true,
+        "autonomous_SNTP": true
+      }
+    },
+    {
+      "name": "Current VO SNMP SET/GET, SNTP and CRC oracle",
+      "status": "PASS",
+      "details": {
+        "frames": 3,
+        "SNMP_response_gap_cycles": 125100,
+        "full_wire_oracle": true
+      }
+    },
+    {
+      "name": "Same-input performance and synthesis-resource comparison",
+      "status": "PASS",
+      "details": {
+        "throughput_gain_percent": 43.569607552038,
+        "maximum_latency_reduction_percent": 93.17125437643365,
+        "same_synthesis_conditions": true
+      }
+    },
+    {
+      "name": "Private archive integrity and archived RTL identity",
+      "status": "PASS",
+      "details": {
+        "files": 880,
+        "archive_sha256": "eb5563df49602a7fdadecbd61c8fdeb858e7d91c8f8bb4de7293d710439738f2",
+        "all_contents_rehashed": true
+      }
+    }
+  ],
+  "failed_checks": [],
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "ACCEPTANCE_SCOPE",
+      "status": "OPEN",
+      "detail": "The guide requires ARINC664P7 communication functions. R01..R19 are project-derived checks, not an official complete checklist. Declared-profile tests pass; complete protocol clause coverage remains unverified. Formal certification is not an explicit contest requirement."
+    },
+    {
+      "id": "F02",
+      "severity": "REPORTING",
+      "status": "CORRECTED",
+      "detail": "Coverage wording now explicitly retains P01 as an open protocol scope instead of implying complete contest conformance."
+    }
+  ],
+  "remaining_exclusions": [
+    "complete protocol clause coverage",
+    "external-system interoperability",
+    "physical timing sign-off",
+    "submission materials deferred by user"
+  ]
+}

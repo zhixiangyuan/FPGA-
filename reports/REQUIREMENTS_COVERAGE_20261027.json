@@ -1,12 +1,18 @@
 {
-  "result": "EXPLICIT_REQUIREMENTS_COVERED_FOR_DECLARED_PROFILE",
-  "audited_utc": "2026-10-27T15:30:49.854431+00:00",
-  "audit_script_sha256": "7800bf09bcd93e68a09ffaf56498ec7a2c5b05c4133f110977c7df3bd163880b",
-  "open_mandatory_items": [],
+  "result": "DECLARED_PROFILE_CHECKS_PASS_PROTOCOL_SCOPE_OPEN",
+  "audited_utc": "2026-10-27T15:48:57.018928+00:00",
+  "audit_script_sha256": "28e5b3977880bb04b5f4ee86aa6a40451d6d22a51e145daff33aa324f9aff48c",
+  "open_functional_check_items": [],
+  "open_protocol_scope": [
+    "P01"
+  ],
+  "official_numbered_checklist": "NOT_PROVIDED; R01..R19 are project-derived engineering checks",
+  "source_notes": "Local V2.1 copy has 2026 in its filename and 2025 on its cover; AFDX core requirements match the guide. Later workbook answers govern clarified requirements.",
   "scope": "engineering implementation/validation audit, not submission materials or complete protocol certification",
   "official_sources": {
     "D:\\FPGA\\全国大学生嵌入式芯片与系统设计竞赛'2026FPGA赛道选题指南-中科亿海微.pdf": "73e44600d609799a373eb84669bcaa75bba1f070e84fc2212accba37ed849afb",
-    "C:\\Users\\袁志祥\\Downloads\\FPGA创新大赛问题汇总 (3).xlsx": "dddf422c6945666f5e3548a8f582c363f3f3ab2051b88b7c7eb9251fd37a3c09"
+    "C:\\Users\\袁志祥\\Downloads\\FPGA创新大赛问题汇总 (3).xlsx": "dddf422c6945666f5e3548a8f582c363f3f3ab2051b88b7c7eb9251fd37a3c09",
+    "D:\\FPGA\\资料\\全国大学生嵌入式芯片与系统设计竞赛2026亿海微赛题V2.1.docx": "38e7ec2367c2289f2ec20f7e4bae71c83bac5ef44da118b34ca0109ad4f95ead"
   },
   "canonical_sources": {
     "vendor\\frozen\\afdx_bag_gate.v": "c3c787e92cf5d9504dbae308eb06c9469b2cc8ac2d033b37956316a8bed0ec2d",
@@ -48,7 +54,7 @@
       "id": "R01",
       "requirement": "FPGA RTL design, eLinx synthesis and post-synthesis functional simulation",
       "source": "Guide PDF p4/p8; Q13/Q46",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "vo",
@@ -60,7 +66,7 @@
       "id": "R02",
       "requirement": "tx_data input and rx_data output carry VLID plus original application payload",
       "source": "Q110/Q120/Q124/Q126",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "system",
@@ -72,7 +78,7 @@
       "id": "R03",
       "requirement": "Independent A/B gigabit GMII MAC paths",
       "source": "Q3/Q59/Q95/Q111",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "system",
@@ -84,7 +90,7 @@
       "id": "R04",
       "requirement": "Ethernet/IPv4/UDP framing, VLID/SN and <=1518-byte Ethernet frame",
       "source": "Guide PDF p5",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "system",
@@ -97,7 +103,7 @@
       "id": "R05",
       "requirement": "Reject malformed FCS/IP/UDP without delivering invalid application data",
       "source": "Guide PDF p4 high-integrity communication",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "parser",
@@ -110,7 +116,7 @@
       "id": "R06",
       "requirement": "Per-network and per-VL sequence integrity, wrap, missing/duplicate/old frame handling",
       "source": "Guide PDF p4; XAPP1130 p9/p15",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "receiver",
@@ -123,7 +129,7 @@
       "id": "R07",
       "requirement": "A/B deduplication, skew and single-network failure/recovery",
       "source": "Q95; high-integrity requirement",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "receiver",
@@ -136,7 +142,7 @@
       "id": "R08",
       "requirement": "Atomic buffering and scheduling without partial-message leakage",
       "source": "Guide PDF p4 buffer/send/receive management",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "system",
@@ -149,7 +155,7 @@
       "id": "R09",
       "requirement": "BAG shaping and service/business scheduling",
       "source": "Guide PDF p4 ARINC664P7; XAPP1130 p6-p9",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "bag",
@@ -163,7 +169,7 @@
       "id": "R10",
       "requirement": ">=100Mbps application payload injection, stable without loss/overflow/blocking",
       "source": "Q58/Q95/Q120",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "system"
@@ -174,7 +180,7 @@
       "id": "R11",
       "requirement": "Application-to-application single-frame worst observed latency below 2ms",
       "source": "Q119/Q123/Q125",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "system",
@@ -187,7 +193,7 @@
       "id": "R12",
       "requirement": "Same-VL, same-length latency range within tens of microseconds",
       "source": "Guide PDF p5; Q119",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "system",
@@ -199,7 +205,7 @@
       "id": "R13",
       "requirement": "Minimum, maximum and at least two intermediate lengths; multi-VL concurrency",
       "source": "Q97",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "system"
@@ -210,7 +216,7 @@
       "id": "R14",
       "requirement": "Configure 128 TX VLs, application stimulus injection",
       "source": "Guide PDF p5; Q120",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "system"
@@ -221,7 +227,7 @@
       "id": "R15",
       "requirement": "4096 RX VL support",
       "source": "Guide PDF p5; Q96",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "receiver",
@@ -233,7 +239,7 @@
       "id": "R16",
       "requirement": "SNMP network management",
       "source": "Guide PDF p4; Q47/Q48",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "snmp",
@@ -246,7 +252,7 @@
       "id": "R17",
       "requirement": "RTC synchronization with network time source",
       "source": "Guide PDF p4; Q47/Q48",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "rtc",
@@ -260,7 +266,7 @@
       "id": "R18",
       "requirement": "Normal synthesis on supported eLinx device",
       "source": "Q121/Q122",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [],
       "scope": "EQ6HL130/CSG484_H, no resource-score threshold"
@@ -269,7 +275,7 @@
       "id": "R19",
       "requirement": "Self-written stimulus and independent verification",
       "source": "Q2/Q5/Q46/Q96",
-      "kind": "EXPLICIT_MANDATORY",
+      "kind": "DERIVED_FUNCTIONAL_CHECK",
       "status": "PASS_FOR_PROFILE",
       "evidence": [
         "system",
@@ -281,10 +287,10 @@
     },
     {
       "id": "P01",
-      "requirement": "ARINC664P7 communication conformance beyond explicit contest items",
+      "requirement": "ARINC664P7 communication functions required by the guide",
       "source": "Guide PDF p4; Q47/Q48",
-      "kind": "PROTOCOL_SCOPE",
-      "status": "NOT_CLAIMED_FULL_STANDARD",
+      "kind": "OFFICIAL_PROTOCOL_SCOPE",
+      "status": "NOT_FULLY_VERIFIED",
       "evidence": [
         "system",
         "receiver",
@@ -293,7 +299,7 @@
         "bag",
         "vo"
       ],
-      "scope": "The listed profile behaviors have engineering tests; complete standard conformance/certification is not claimed."
+      "scope": "Declared-profile behaviors are tested, but no complete clause-by-clause protocol conformance audit exists. Formal certification is not stated as a contest requirement."
     },
     {
       "id": "W01",

@@ -1,0 +1,9 @@
+{
+  "result": "PASS",
+  "archive": "D:\\FPGA\\AFDX_archive\\final_acceptance_review_20261027_001.zip",
+  "archive_sha256": "e89b1cad43b32016395c990290977a883487f4da1d758b555e0c0a2f3fa222cc",
+  "files": 15,
+  "manifest_sha256": "4e65f5bc8fb0554ce9f23cae3ba34ceb056096c0d27e3bc2017c4f92bbcbe9bd",
+  "parent_archive_sha256": "eb5563df49602a7fdadecbd61c8fdeb858e7d91c8f8bb4de7293d710439738f2",
+  "all_archived_files_rehashed": true
+}
