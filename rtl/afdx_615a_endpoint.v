@@ -306,12 +306,12 @@ module afdx_615a_endpoint #(
   begin
    reason=64'h6567616d69206f6e;
    initialization_byte=0;
-   if(i==3)initialization_byte=denied?18:10;
+    if(i==3)initialization_byte=denied?8'd18:8'd10;
    else if(i==4)initialization_byte=8'h41;
    else if(i==5)initialization_byte=8'h33;
-   else if(i==6)initialization_byte=denied?8'h10:0;
-   else if(i==7)initialization_byte=denied?0:1;
-   else if(i==8)initialization_byte=denied?9:1;
+    else if(i==6)initialization_byte=denied?8'h10:8'd0;
+    else if(i==7)initialization_byte=denied?8'd0:8'd1;
+    else if(i==8)initialization_byte=denied?8'd9:8'd1;
    else if(denied&&i>=9&&i<17)initialization_byte=reason[(i-9)*8+:8];
   end
  endfunction
@@ -319,7 +319,7 @@ module afdx_615a_endpoint #(
   input downloading;input [15:0] i;
   begin
    control_byte=0;
-   if(i==3)control_byte=downloading?21:29;
+    if(i==3)control_byte=downloading?8'd21:8'd29;
    else if(i==4)control_byte=8'h41;
    else if(i==5)control_byte=8'h33;
    else if(i==7)control_byte=1;

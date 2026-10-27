@@ -48,7 +48,7 @@ module afdx_sntp_client #(
   if(tx_index==0)tx_data=8'h23;
   else if(tx_index==2)tx_data=8'd6;
   else if(tx_index==3)tx_data=8'he8;
-  else if(tx_index>=40)tx_data=request_t1>>(8*(47-tx_index));
+   else if(tx_index>=40)tx_data=request_t1[(47-tx_index)*8+:8];
  end
  function [31:0] inc;input [31:0] value;
  begin inc=value==32'hffffffff ? value : value+32'd1;end endfunction

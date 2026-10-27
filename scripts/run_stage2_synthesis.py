@@ -5,7 +5,7 @@ implementation, programming, or vendor-model substitution is invoked.
 """
 from pathlib import Path
 from datetime import datetime,timezone
-import argparse,json,hashlib,re,subprocess,sys
+import argparse,json,hashlib,os,re,subprocess,sys
 ROOT=Path(__file__).resolve().parents[1]
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
@@ -44,7 +44,14 @@ def main():
  (out/f'{family}.run.psf').write_text(psf)
  # GUI branding says ehiway_map; the installed executable is quartus_map.
  # Record the actual tool rather than inventing an absent binary.
- tool=Path(r'D:\FPGA\eLinx3.0\bin\Passkey\bin\quartus_map.exe')
+ def find_map_tool():
+  candidates=[os.environ.get('ELINX_MAP_EXE'),
+              r'D:\elinx\eLinx3.0\bin\Passkey\bin\quartus_map.exe',
+              r'D:\FPGA\eLinx3.0\bin\Passkey\bin\quartus_map.exe']
+  for candidate in candidates:
+   if candidate and Path(candidate).is_file():return Path(candidate)
+  raise SystemExit('quartus_map.exe not found; set ELINX_MAP_EXE to its absolute path')
+ tool=find_map_tool()
  command=[str(tool),'--read_settings_files=on','--write_settings_files=off',family]
  proof={'result':'RUNNING','command':command,'started_utc':datetime.now(timezone.utc).isoformat(),
         'optimization_technique':args.optimization_technique,'settings_qsf_sha256':sha(project/f'{family}.qsf'),
