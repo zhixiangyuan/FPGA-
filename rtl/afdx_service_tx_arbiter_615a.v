@@ -35,24 +35,40 @@ module afdx_service_tx_arbiter_615a(
  reg [1:0] last_svc_src;
  reg wire_valid_d,load_started;
  reg [31:0] load_age;
+ reg snmp_started,sntp_started;
+ reg [31:0] snmp_age,sntp_age;
  // Do not reserve the shared frame builder while this VL still owes its BAG.
  // The builder independently checks BAG again; this only schedules eligibility.
  wire load_pending=load_msg_valid&&(!load_started||load_age>=cfg_load_bag_cycles);
+ // All service VLs must be eligible before reserving the shared builder.
+ // Keeping BAG-waiting descriptors outside arbitration lets ready business
+ // frames progress. The frame builder still independently enforces BAG.
+ wire snmp_pending=snmp_msg_valid&&(!snmp_started||snmp_age>=cfg_load_bag_cycles);
+ wire sntp_pending=sntp_msg_valid&&(!sntp_started||sntp_age>=cfg_load_bag_cycles);
  always @(posedge clk)begin
-  if(reset)begin wire_valid_d<=0;load_started<=0;load_age<=0;end
+  if(reset)begin
+   wire_valid_d<=0;load_started<=0;load_age<=0;
+   snmp_started<=0;sntp_started<=0;snmp_age<=0;sntp_age<=0;
+  end
   else begin
    wire_valid_d<=gmii_tx_valid;
    if(gmii_tx_valid&&!wire_valid_d&&state!=SEL_IDLE&&selected==SRC_LOAD)begin
     load_started<=1;load_age<=0;
    end else if(load_started&&load_age<cfg_load_bag_cycles)load_age<=load_age+1'b1;
+   if(gmii_tx_valid&&!wire_valid_d&&state!=SEL_IDLE&&selected==SRC_SNMP)begin
+    snmp_started<=1;snmp_age<=0;
+   end else if(snmp_started&&snmp_age<cfg_load_bag_cycles)snmp_age<=snmp_age+1'b1;
+   if(gmii_tx_valid&&!wire_valid_d&&state!=SEL_IDLE&&selected==SRC_SNTP)begin
+    sntp_started<=1;sntp_age<=0;
+   end else if(sntp_started&&sntp_age<cfg_load_bag_cycles)sntp_age<=sntp_age+1'b1;
   end
  end
- wire service_any=snmp_msg_valid||sntp_msg_valid||load_pending;
+ wire service_any=snmp_pending||sntp_pending||load_pending;
  // Rotate all three services; business still alternates with the service class.
  wire [1:0] svc_pick=last_svc_src==SRC_SNMP?
-  (sntp_msg_valid?SRC_SNTP:load_pending?SRC_LOAD:SRC_SNMP):
-  last_svc_src==SRC_SNTP?(load_pending?SRC_LOAD:snmp_msg_valid?SRC_SNMP:SRC_SNTP):
-  (snmp_msg_valid?SRC_SNMP:sntp_msg_valid?SRC_SNTP:SRC_LOAD);
+  (sntp_pending?SRC_SNTP:load_pending?SRC_LOAD:SRC_SNMP):
+  last_svc_src==SRC_SNTP?(load_pending?SRC_LOAD:snmp_pending?SRC_SNMP:SRC_SNTP):
+  (snmp_pending?SRC_SNMP:sntp_pending?SRC_SNTP:SRC_LOAD);
  // Descriptor and payload selection stay combinational: the frame builder
  // samples the message fields on the same cycle it accepts the descriptor.
  assign service_active=selected!=SRC_BIZ&&state!=SEL_IDLE;

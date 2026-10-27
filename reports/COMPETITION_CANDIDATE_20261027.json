@@ -1,6 +1,6 @@
 {
   "date": "2026-10-27",
-  "audited_utc": "2026-10-27T08:41:11.356190+00:00",
+  "audited_utc": "2026-10-27T15:30:49.142903+00:00",
   "result": "PASS_FOR_DECLARED_SCOPE",
   "errors": [],
   "sources": {
@@ -36,13 +36,13 @@
     "rtl\\afdx_615a_endpoint.v": "a70ac18b33c57004fe01b78b7297be8bae31a0a52ab41eac6244df17d97b2a2b",
     "rtl\\afdx_load_message_fifo.v": "1af8cccf11cc95e4b05838b5bf30848e13ea1b28a953d9f5be19b0158a8478ad",
     "rtl\\afdx_management_rx_demux_615a.v": "0f0b4c02cb7af66e358b3a0b199d44dab6a1ac1fd579b97eca840fcbca921ed2",
-    "rtl\\afdx_service_tx_arbiter_615a.v": "203068860ba8efebc12dee1a5fa59087ea66cd7973548920aa5e1920b5c5dfe2"
+    "rtl\\afdx_service_tx_arbiter_615a.v": "09c111ae98701c4a5da7ddbd2ccd00dc41cdf32015ee155fba19c32fef3bb74e"
   },
   "frozen_core_unchanged": true,
   "tests": {
     "system": {
-      "path": "D:\\FPGA\\captain_integration\\build\\logs\\competition_009",
-      "summary_sha256": "275a4eb792d66e1aa5f1b1a3150ae5a6a9430f101bdd4242717fc89b50a259ad",
+      "path": "D:\\FPGA\\captain_integration\\build\\logs\\competition_010",
+      "summary_sha256": "ba5d751f36e97ddc6517628648cc230b204aab5aed3300ced52b9b4071e3fda4",
       "result": "PASS",
       "input_mismatches": [],
       "evidence": {
@@ -82,15 +82,15 @@
       "recovery_timeout_test": "real 625001-cycle waits; expiry never bypasses IC"
     },
     "management": {
-      "path": "D:\\FPGA\\captain_integration\\build\\logs\\competition_mgmt_004",
-      "summary_sha256": "6927c9f57853e1dd8cd7aa5e09c09a378f4b54fafff4df9066c4b48649c3dbcd",
+      "path": "D:\\FPGA\\captain_integration\\build\\logs\\competition_mgmt_005",
+      "summary_sha256": "cac4ac640d19fe9308e8aa04222e51970c16644e9ba4b9eaa0d66ec364898c11",
       "result": "PASS",
       "input_mismatches": [],
       "evidence": {}
     },
     "rtl_smoke": {
-      "path": "D:\\FPGA\\captain_integration\\build\\logs\\competition_smoke_004",
-      "summary_sha256": "90bb636b875d3bcbee3b560ecb1d726599f06a11ba6481402ebbc79d2877485e",
+      "path": "D:\\FPGA\\captain_integration\\build\\logs\\competition_smoke_005",
+      "summary_sha256": "e1a95fbf5c40e39685cea4e6443e645fb00519ca16dc47672caa3d11f9ae2d23",
       "result": "PASS",
       "input_mismatches": [],
       "evidence": {
@@ -108,8 +108,8 @@
       }
     },
     "vo_smoke": {
-      "path": "D:\\FPGA\\captain_integration\\build\\logs\\competition_smoke_vo_002",
-      "summary_sha256": "b98b5b625d95e83f04cb18d48cea91bf5c5365a56cbefd81a2df4135efd56a02",
+      "path": "D:\\FPGA\\captain_integration\\build\\logs\\competition_smoke_vo_003",
+      "summary_sha256": "0de355826316276972b7601231ed2dcf1f5a47c8447264c7f201b80ef0dbc1a9",
       "result": "PASS",
       "input_mismatches": [],
       "evidence": {
@@ -128,14 +128,14 @@
     }
   },
   "synthesis": {
-    "project": "D:\\FPGA\\captain_integration\\build\\elinx\\AFDXSUB_010",
-    "manifest_sha256": "09e4c60847840ea9cfc312f99a800b24737d398a4fa58af7484059f0b619c8b3",
-    "runner_sha256": "d9ece1ebe14eb05f55028f89035bb41d269d5ce809eab44c5a085ec4a0b2e4ce",
-    "packing_sha256": "a7c4e4e2dc9dde8328feef131b2d79e4e138d566d9090e2b988711ad41653af2",
+    "project": "D:\\FPGA\\captain_integration\\build\\elinx\\AFDXSUB_011",
+    "manifest_sha256": "8060a59648a46bef33554ee7fcaf954c692e3dacd19d7866aa59dc1ac0dbca2e",
+    "runner_sha256": "3f21048775f9b2957e29ffe78df823a0762b4328608b0b7da0c4b99bffc8d2ac",
+    "packing_sha256": "7372a39326f1eb9aa61cfee008c31c0dec6282a2c5704e4c88a094e275e9ccc3",
     "resources": {
-      "LUTs": 50861,
-      "FFs": 16551,
-      "CLBs": 6876,
+      "LUTs": 51015,
+      "FFs": 16618,
+      "CLBs": 6910,
       "Memorys": 356,
       "DSPs": 0,
       "PLLs": 0,
@@ -196,22 +196,22 @@
         "setup_wns_ps": 54,
         "setup_tns_ps": 0,
         "setup_failing_endpoints": 0,
-        "setup_endpoints": 69612,
+        "setup_endpoints": 69743,
         "hold_wns_ps": -68,
         "hold_tns_ps": -42976,
         "hold_failing_endpoints": 632,
-        "hold_endpoints": 69612
+        "hold_endpoints": 69743
       },
       "design_summary": {
         "timing_summary_id": 1,
         "setup_wns": 0,
         "setup_tns": 0,
         "setup_number_failing_endpoints": 0,
-        "setup_number_endpoints": 69612,
+        "setup_number_endpoints": 69743,
         "hold_wns": -68,
         "hold_tns": -42976,
         "hold_number_failing_endpoints": 632,
-        "hold_number_endpoints": 69612
+        "hold_number_endpoints": 69743
       },
       "critical_setup_path": {
         "from": "\\core|services.plane|rtc|remainder[7]~I|ff/Q",
@@ -234,11 +234,11 @@
         {
           "name": "NONE to gmii_clk",
           "setup_worst_slack": -4858,
-          "setup_fail_ends": 58595,
-          "setup_total_ends": 58837,
+          "setup_fail_ends": 58792,
+          "setup_total_ends": 59034,
           "hold_worst_slack": -738,
-          "hold_fail_ends": 11818,
-          "hold_total_ends": 58837
+          "hold_fail_ends": 11885,
+          "hold_total_ends": 59034
         },
         {
           "name": "gmii_clk to NONE",

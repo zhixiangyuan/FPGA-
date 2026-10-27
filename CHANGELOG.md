@@ -1,5 +1,13 @@
 # 变更记录
 
+## 2026-10-27：比赛要求核对与服务调度性能对照
+
+- 将 BAG 到期后再预留共享发送器的调度方式扩展到 SNMP/SNTP，保留发送器的独立 BAG 检查与帧原子仲裁。
+- 当前测试脚本下，基线 `service_pressure_010` 与候选 `service_pressure_011` 使用相同 Golden、激励时刻、125 MHz 时钟和 1 ms BAG；24 条业务消息均无丢失或重复。交付吞吐提高 43.57%，最大实测应用时延降低 93.17%；结论仅适用于该管理积压压力负载。
+- 同综合设置的 `AFDXSUB_010` / `_011` 对照增加 154 LUT、67 FF，Memory 和 Pins 不变；最新候选仍通过原生 8 ns setup。
+- 增加 4096 VL 双网真实 GMII 容量测试、八档合法 BAG 测试、逐项官方要求核对及可重算的性能对照脚本。
+- 当前网表 `eda_stage2_export_014` 的应用口 `competition_smoke_vo_003` 和管理面 `management_netlist_vo_004` 均通过完整 Golden，0 Errors/Fatal；管理测试完成真实 1 ms BAG 的 SNMP SET/GET、SNTP 同步与错误帧拒绝。最终审计的 19 项显式功能要求均在声明配置范围内闭合；完整标准认证与物理时序不据此宣称通过，提交材料暂缓整理。
+
 ## 2026-10-27：比赛应用接口、双网及 VL 容量候选
 
 - 新增 `rtl/competition/AFDX_top.v` 应用入口：输入为 VLID + 原始有效载荷，输出为接收处理后的同格式消息，GMII A/B 独立；用单个 32 位可选择状态口替代大量调试引脚。

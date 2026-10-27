@@ -1,10 +1,11 @@
 {
-  "path": "D:\\FPGA\\AFDX_archive\\competition_requirements_20261027_001.zip",
-  "sha256": "94a8197b3049b6abf6155ba908e53eae40886b48aea4822cebc92195bc10656a",
-  "bytes": 42866859,
-  "files": 285,
   "result": "PASS",
-  "scope": "Private local original evidence backup, no work library/WLF or tool databases",
-  "original_evidence_ROOT": "D:\\FPGA\\captain_integration\\build",
-  "licensed_models": "Local licensed use only; do not upload to public repository"
+  "archive": "D:\\FPGA\\AFDX_archive\\competition_requirements_20261027_002.zip",
+  "archive_sha256": "eb5563df49602a7fdadecbd61c8fdeb858e7d91c8f8bb4de7293d710439738f2",
+  "archive_bytes": 42548701,
+  "files": 880,
+  "manifest_sha256": "3ed53d0a5fbc501f5f5015523c75d028149ce9756cc112ae147043fee21795e9",
+  "verified_all_archived_file_hashes": true,
+  "vendor_models_included": false,
+  "created_utc": "2026-10-27T15:33:16.093315+00:00"
 }

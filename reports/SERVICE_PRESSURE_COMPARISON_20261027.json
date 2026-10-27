@@ -1,0 +1,81 @@
+{
+  "result": "PASS",
+  "baseline": "D:\\FPGA\\captain_integration\\build\\logs\\service_pressure_010",
+  "candidate": "D:\\FPGA\\captain_integration\\build\\logs\\service_pressure_011",
+  "comparison_verifier_sha256": "0fd05e227d5619bd639e98225a38049596fb3bd01afc3990fe9677c8b7b81856",
+  "behavior_verifier_sha256": "eb38f4981e9fd3e5c9178971b191d946eda98ea0fb7e0a99ecf3d6d77ac6cff1",
+  "baseline_summary_sha256": "a8ff4ca6538dcea105b849e6f7623f79cf62c5e6d29b50e50bcffd770f8372dc",
+  "candidate_summary_sha256": "ed87a35aa9f1bdc67b2947e82091c9bcfeaf53ee135dcf919c5f27adcc4f43bc",
+  "changed_source": "afdx_service_tx_arbiter_615a.v",
+  "baseline_source_sha256": "203068860ba8efebc12dee1a5fa59087ea66cd7973548920aa5e1920b5c5dfe2",
+  "candidate_source_sha256": "09c111ae98701c4a5da7ddbd2ccd00dc41cdf32015ee155fba19c32fef3bb74e",
+  "identical_Golden": true,
+  "identical_Testbench": true,
+  "identical_offered_timestamps": true,
+  "clock_ns": 8,
+  "BAG_cycles": 125000,
+  "metrics": {
+    "baseline": {
+      "application_messages": 24,
+      "wire_frames": 27,
+      "payload_bytes": 35304,
+      "payload_input_Mbps": 188.01425125017974,
+      "payload_delivered_Mbps": 125.88519715025352,
+      "max_application_first_to_last_ns": 1060224,
+      "max_same_VL_same_length_range_ns": 24656,
+      "minimum_per_VL_BAG_cycles": 125003,
+      "SET_GET_persistence": true,
+      "autonomous_SNTP_sync": true,
+      "rejected_bad_FCS_IP_UDP_without_SN_state_poisoning": true,
+      "no_application_loss": true,
+      "no_duplicate_application_delivery": true,
+      "workload": "deliberate two-request control-plane burst; 24 business frames, 16VL, 1471 bytes, 8100-cycle interval",
+      "within_engineering_50us_jitter": true
+    },
+    "candidate": {
+      "application_messages": 24,
+      "wire_frames": 27,
+      "payload_bytes": 35304,
+      "payload_input_Mbps": 188.01425125017974,
+      "payload_delivered_Mbps": 180.73288351472831,
+      "max_application_first_to_last_ns": 72400,
+      "max_same_VL_same_length_range_ns": 0,
+      "minimum_per_VL_BAG_cycles": 126297,
+      "SET_GET_persistence": true,
+      "autonomous_SNTP_sync": true,
+      "rejected_bad_FCS_IP_UDP_without_SN_state_poisoning": true,
+      "no_application_loss": true,
+      "no_duplicate_application_delivery": true,
+      "workload": "deliberate two-request control-plane burst; 24 business frames, 16VL, 1471 bytes, 8100-cycle interval",
+      "within_engineering_50us_jitter": true
+    },
+    "delivered_throughput_gain_percent": 43.569607552038,
+    "maximum_latency_reduction_percent": 93.17125437643365
+  },
+  "scope": "Engineering improvement under deliberate two-request management backlog; not a legal-peer BAG throughput claim or global worst-case proof",
+  "innovation": "Eligibility before shared-resource reservation, extended from load VL to SNMP/SNTP with frame-atomic fair arbitration",
+  "algorithmic_novelty": "NOT CLAIMED; inspectable project engineering improvement",
+  "same_synthesis_conditions": true,
+  "performance_sources_match_synthesis": true,
+  "resources": {
+    "baseline": {
+      "LUTs": 50861,
+      "FFs": 16551,
+      "CLBs": 6876,
+      "Memorys": 356,
+      "Pins": 102
+    },
+    "candidate": {
+      "LUTs": 51015,
+      "FFs": 16618,
+      "CLBs": 6910,
+      "Memorys": 356,
+      "Pins": 102
+    },
+    "LUT_increase": 154,
+    "FF_increase": 67,
+    "LUT_increase_percent": 0.3027860246554326,
+    "baseline_manifest_sha256": "09e4c60847840ea9cfc312f99a800b24737d398a4fa58af7484059f0b619c8b3",
+    "candidate_manifest_sha256": "8060a59648a46bef33554ee7fcaf954c692e3dacd19d7866aa59dc1ac0dbca2e"
+  }
+}

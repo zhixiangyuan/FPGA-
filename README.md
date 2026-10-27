@@ -12,15 +12,22 @@
 
 ```powershell
 python scripts/run_redundant_rx.py
+python scripts/run_rx_capacity.py
+python scripts/run_bag_profiles.py
 python scripts/run_competition_mgmt.py
 python scripts/run_competition.py
+python scripts/run_service_pressure.py
 python scripts/run_competition_smoke.py
 python scripts/prepare_competition_elinx.py
 ```
 
 以上入口使用同一组 canonical RTL 和独立 Python Golden。默认真实 125 MHz、1 ms BAG；4096 接收状态的初始化需要 4096 个周期。`initialized` 与 `tx_ready` 有效后才开始应用注入。
 
-当前候选 RTL、EQ6HL130 综合、原生 8 ns setup 及真实综合网表短链路均已通过。应用有效载荷交付 183.8886 Mbps，已测最大应用时延 62.096 μs；128 条发送 VL 全部实际发送，4096 条接收 VL 状态通过 17954 条独立向量。最终综合为 50861 LUT、16551 FF、356 Memory、102 Pins；Fmax 125.8495 MHz，8 ns setup +54 ps。真实 VO 短链路覆盖最小/最大负载、最后 TX/RX VL、双网消重与自动 SNTP，111.344 μs 连续仿真约用时 4 分 12 秒。完整物理时序、新封装完整 615A 会话及 EQ6 原生映射等价仍未签核，不把短测扩大为这些项目的 PASS。机器可读证据见 `reports/COMPETITION_CANDIDATE_20261027.json`，范围见本次比赛补齐报告。以下保留导入和旧候选记录，供历史对照。
+当前候选 RTL、EQ6HL130 综合、原生 8 ns setup，以及当前源码的应用口和管理面真实功能 VO 均已通过。应用有效载荷交付 183.8886 Mbps，已测最大应用时延 62.096 μs；128 条发送 VL 全部实际发送，4096 条接收 VL 均通过双网真实 GMII 注入及应用交付测试。最新综合为 `AFDXSUB_011`：51015 LUT、16618 FF、356 Memory、102 Pins；Fmax 125.8495 MHz，8 ns setup +54 ps。当前 VO 证据为 `competition_smoke_vo_003` 与 `management_netlist_vo_004`，两者均使用 `eda_stage2_export_014/AFDX_top.vo`、真实时钟/BAG 和独立 Golden。
+
+[逐项官方要求核对](reports/官方要求工程覆盖核对_20261027.md) 的 19 项显式功能要求在声明配置范围内均有通过证据，未闭合显式项为 0；机器可读指纹见 `reports/REQUIREMENTS_COVERAGE_20261027.json`。完整 ARINC 标准符合性与认证未作承诺，提交设计文档、视频等材料按本轮要求暂缓整理。
+
+服务调度改为 BAG 到期后才预留共享发送器。在相同输入、Golden、125 MHz 时钟、1 ms BAG 和综合设置的管理积压压力测试中，交付吞吐由 125.8852 提升至 180.7329 Mbps，最大实测应用时延由 1.060224 ms 降至 72.4 μs；综合增加 154 LUT、67 FF。该结论限于记录的 24 帧、16 VL 压力负载，详细条件与原始日志索引见 [同口径性能对照](reports/SERVICE_PRESSURE_COMPARISON_20261027.json)。完整物理时序、新封装完整 615A 会话及 EQ6 原生映射等价仍未签核。以下保留导入和旧候选记录，供历史对照。
 
 ## 导入时开发状态（历史对照）
 
