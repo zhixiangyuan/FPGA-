@@ -1,5 +1,13 @@
 # 变更记录
 
+## 2026-10-27：导入 FPGA Final Project 增强版
+
+- 保留压缩包内完整 Git 历史，普通合并来源提交 `b478fa4` 至 `dev`；导入前 `a792a18` 保存为 `backup/before-final-import-20261027`，支持后续回退。
+- 合入 9 个 RTL、2 个既有脚本的修改及 5 个新增脚本/测试文件；173 个源码快照文件与来源提交一致，冻结核心未变。
+- SNMP 六对象及 SNMPv2c 请求支持、可选接收 BAG 检查、综合兼容及位宽改进随来源版本导入，生产 BAG 检查默认关闭。
+- 导入后六组本机检查 PASS：SNMP 63 用例、SN 4293 次独立判定、615A 模块 30 用例/684 帧、管理集成 58 帧、正式入口 9 帧、接收 BAG/长度边界检查。详见 `reports/FPGA_FINAL_IMPORT_20261027.json`。
+- 新源码完整整机 VO、完整 615A 整机 RTL及重新综合为 NOT RUN；导入前 VO PASS 仅属于旧候选。包内综合和 111 帧 615A 日志未作为本次验收结论。
+
 ## 2026-10-20：正式八端口整机 VO 完整验收
 
 - 同一真实候选 `submission_615a_vo_checkpoint_002` 连续冷恢复至原 Testbench 结束；15 段会话中最终进程退出 0、`SUBMISSION_615A_PASS`、无 Error/Fatal，原完整 Golden 和同候选 RTL 双向逐 VL wire bytes 比较通过。原始摘要、日志、检查点及输入指纹保留在 `build/logs/`。

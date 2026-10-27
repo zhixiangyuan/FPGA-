@@ -6,6 +6,16 @@
 
 ## 当前开发状态
 
+2026-10-27 已按用户要求导入 `FPGA-Final-Project.zip` 的增强版，来源提交为 `b478fa4e9fa1cd8af9ac379224beeabe4fd9cbc2`。保留原始 Git 历史并通过普通 Merge Commit 合入 `dev`；导入前版本 `a792a18` 保存在 `backup/before-final-import-20261027`。压缩包 `source/` 的 173 个文件与导入提交逐项比对一致（统一换行符后）；13 份冻结核心未修改。
+
+本版增加 SNMP 的 sysObjectID、sysContact、sysLocation，对 contact/name/location 支持 SET，并增加 SNMPv2c 请求支持；接收侧新增可选 BAG 检查与可配置长度上限，生产入口默认关闭 BAG 检查。其余改动包括综合前端兼容、位宽处理以及综合/VO 辅助脚本。
+
+本机导入后验证：SNMP 63 用例、SN 完整性 4293 次独立判定、615A 模块 30 用例/684 帧、管理集成 58 帧、正式入口 9 帧，以及接收 BAG/长度边界检查均为 PASS。运行目录、摘要哈希和输入指纹见 [导入验证记录](reports/FPGA_FINAL_IMPORT_20261027.json)。
+
+当前新源码的完整 615A 整机 RTL、重新综合及完整整机 VO 均为 NOT RUN；包内综合数据为外部交付报告，本次未复验。随包 615A 日志的 111 帧与随包脚本要求的 512 个背景业务帧存在对应关系疑点，未作为本次验收证据。下文 30733 LUT、640 帧整机 VO PASS 等结果仅属于导入前候选，不能沿用为当前增强版的验收结论。
+
+## 导入前候选验收记录（a792a18）
+
 正式八端口入口为 `rtl/submission/AFDX_top.v`，内部接入 16 个业务 VL、SNMP、自动 SNTP 和配置型 615A-2（A3、UDP 59）。615A 支持一个 665-2 LSAP、一个 0～4096 字节偶数长度的 `config.bin`，覆盖 LUI/LUR/LUS 上传、LND/LNR/LNS 媒体定义下载、独立状态会话、WAIT/ABORT、有限重试及双 bank 原子提交。存储为易失 RAM；不包含通用多文件/支持文件、FIND/INFORMATION、操作员定义下载、压缩或加密，外部装载器互操作尚未验证。
 
 当前候选 RTL 与独立 Golden 已通过：

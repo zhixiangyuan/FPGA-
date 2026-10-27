@@ -1,0 +1,476 @@
+{
+  "date": "2026-10-27",
+  "baseline": "a792a18ef7c560fc99156c030c296909e4444994",
+  "imported_head": "b478fa4e9fa1cd8af9ac379224beeabe4fd9cbc2",
+  "merge_commit": "f7e8257536adf7766346c98670b63a5958005a5b",
+  "backup_branch": "backup/before-final-import-20261027",
+  "package_sha256": "b6c5bdcacb5f8e8fda4fccfbc59b4c00e89ae080346419087554baf33bcc74d4",
+  "source_snapshot_files_verified": 173,
+  "frozen_core_changed": false,
+  "tests": [
+    {
+      "run": "build/logs/snmp_023",
+      "result": "PASS",
+      "summary_sha256": "c5c092703d25f5b754c0f20060ab9633d63f4a9e6cc3239d2344c711cfd2c9fd",
+      "inputs": {
+        "rtl\\afdx_snmp_agent.v": "609dde402c6254d3c1ca1377df27a3ef381bb6aee1f4ebe61b964522169dc6e8",
+        "sim\\tb_snmp.sv": "c06544d2476af1a3334dd822f7d00ec40d8c18894fa4481e953177a39fca60a3",
+        "scripts\\generate_snmp_golden.py": "9208f3e59d47b31f1f648652e8401d4ac0b2bfba702d4697f1fb60a76cf2a3eb",
+        "scripts\\run_snmp.py": "6729cff7c90d09c262d39e75e370226a33297c7776763cfaa4a63e030e4a6425"
+      },
+      "evidence": {},
+      "independent_cases": 63,
+      "independent_decisions_checked": null
+    },
+    {
+      "run": "build/logs/multi_vl_sn_006",
+      "result": "PASS",
+      "summary_sha256": "b8e1dfc8f789c74974787388edd4985d68951251236eb9b337622a12e3fb28f7",
+      "inputs": {
+        "rtl\\afdx_multi_vl_sn_gate.v": "f531448854c1f3b9482b4b506d42616cb20bede7b04da86f0e178da92800c39b",
+        "sim\\tb_multi_vl_sn.sv": "290288dba621630a5552d877df638735ac9f31e32d8fde8f76fe7918b3fa1c55",
+        "scripts\\run_multi_vl_sn.py": "cfcbb7e42f182944036c514e8758c3c73668132fecbad1f8b4b890d2d3fe1b9d",
+        "scripts\\generate_multi_vl_sn_golden.py": "c94460949befb8e30370195d39f55dc895f1c97a92ea80a53b4c00cf7d0d54fb"
+      },
+      "evidence": {},
+      "independent_cases": null,
+      "independent_decisions_checked": 4293
+    },
+    {
+      "run": "build/logs/a615a_010",
+      "result": "PASS",
+      "summary_sha256": "32e6699272c5a2394dee12cfb0d057faccae3a0bd9ecd18165b585b44fc56a61",
+      "inputs": {
+        "D:\\FPGA\\captain_integration\\rtl\\afdx_tftp_engine.v": "03f7b63fad3211bf53216379d72d3fb4e10eb39a34d6549d970120e3e4a37a0f",
+        "D:\\FPGA\\captain_integration\\rtl\\afdx_atomic_file_store.v": "22f37fe277e3af71b05b230c0fa66e582f97e4e43564e8ba9930cffc50dc3623",
+        "D:\\FPGA\\captain_integration\\rtl\\afdx_615a_error_decoder.v": "d0677c7303c5b0cfb2b804b4cd96a8111e84eba99892e28bf106a0c4474148a7",
+        "D:\\FPGA\\captain_integration\\rtl\\afdx_615a_endpoint.v": "a70ac18b33c57004fe01b78b7297be8bae31a0a52ab41eac6244df17d97b2a2b",
+        "D:\\FPGA\\captain_integration\\sim\\tb_615a_endpoint.sv": "6d03dc81a118602e88235a7378916cea442ec94d9792d331394f73081829f498",
+        "D:\\FPGA\\captain_integration\\scripts\\run_615a.py": "3736ac08e0f0a4b747ef738f1427d921ae25d9029076df718d784022ad1a2c73",
+        "D:\\FPGA\\captain_integration\\scripts\\generate_615a_golden.py": "152265cc6a4d8c645108ef56e932fe4a1af26541da4d83e65940bdaac17c9d53",
+        "D:\\FPGA\\captain_integration\\scripts\\generate_tftp_golden.py": "6ddf5eec1066830571df8ef8b804e7bee98ef2aaf6f0c43f70eec8be513da10a",
+        "D:\\FPGA\\captain_integration\\scripts\\run_stage2_mgmt.py": "3db932a0bc40ee0e313a9d81a66650a1a728d842c54bb541b9706783d4a1498d",
+        "D:\\FPGA\\captain_integration\\scripts\\modelsim_support.py": "0c995e4d657de0282685c02366857075bfbebeed294ce977c96af6b3a8e54d73"
+      },
+      "evidence": {
+        "cases": 30,
+        "packets": 684,
+        "peer_packets": 681,
+        "tx_payload_bytes": 26340,
+        "case_results": [
+          {
+            "name": "download initialization denied without an image",
+            "status_files": 0,
+            "bulk_requests": 0,
+            "expected_generation": 0
+          },
+          {
+            "name": "upload with independent status while header reply is lost",
+            "status_files": 7,
+            "bulk_requests": 3,
+            "expected_generation": 1
+          },
+          {
+            "name": "media defined download of committed image",
+            "status_files": 4,
+            "bulk_requests": 0,
+            "expected_generation": 1
+          },
+          {
+            "name": "data CRC rejection preserves old bank",
+            "status_files": 4,
+            "bulk_requests": 2,
+            "expected_generation": 1
+          },
+          {
+            "name": "download after CRC rejection still returns old image",
+            "status_files": 4,
+            "bulk_requests": 0,
+            "expected_generation": 1
+          },
+          {
+            "name": "total load CRC rejection despite valid per-file CRC",
+            "status_files": 4,
+            "bulk_requests": 2,
+            "expected_generation": 1
+          },
+          {
+            "name": "header CRC rejected",
+            "status_files": 3,
+            "bulk_requests": 1,
+            "expected_generation": 1
+          },
+          {
+            "name": "wrong hardware identity with valid CRCs",
+            "status_files": 3,
+            "bulk_requests": 1,
+            "expected_generation": 1
+          },
+          {
+            "name": "unsupported LUR file count rejected",
+            "status_files": 2,
+            "bulk_requests": 0,
+            "expected_generation": 1
+          },
+          {
+            "name": "payload length mismatch rejected",
+            "status_files": 4,
+            "bulk_requests": 2,
+            "expected_generation": 1
+          },
+          {
+            "name": "subsequent valid upload recovers",
+            "status_files": 4,
+            "bulk_requests": 2,
+            "expected_generation": 2
+          },
+          {
+            "name": "download recovered image",
+            "status_files": 3,
+            "bulk_requests": 0,
+            "expected_generation": 2
+          },
+          {
+            "name": "header WAIT grants one second then resumes",
+            "status_files": 7,
+            "bulk_requests": 3,
+            "expected_generation": 3
+          },
+          {
+            "name": "operator ABORT identifies its source",
+            "status_files": 3,
+            "bulk_requests": 1,
+            "expected_generation": 3
+          },
+          {
+            "name": "data WAIT after a full staged block restarts safely",
+            "status_files": 7,
+            "bulk_requests": 3,
+            "expected_generation": 4
+          },
+          {
+            "name": "status server WAIT before ACK0 is retried",
+            "status_files": 4,
+            "bulk_requests": 2,
+            "expected_generation": 5
+          },
+          {
+            "name": "repeated zero-second WAIT is bounded",
+            "status_files": 3,
+            "bulk_requests": 3,
+            "expected_generation": 5
+          },
+          {
+            "name": "WAIT above 65535 seconds is rejected",
+            "status_files": 3,
+            "bulk_requests": 1,
+            "expected_generation": 5
+          },
+          {
+            "name": "wrong TID WAIT cannot change timeout classification",
+            "status_files": 42,
+            "bulk_requests": 2,
+            "expected_generation": 5
+          },
+          {
+            "name": "wrong TID WAIT cannot delay valid data",
+            "status_files": 5,
+            "bulk_requests": 2,
+            "expected_generation": 6
+          },
+          {
+            "name": "maximum WAIT is accepted and operator can abort via status",
+            "status_files": 4,
+            "bulk_requests": 1,
+            "expected_generation": 6
+          },
+          {
+            "name": "all header responses lost, status remains live",
+            "status_files": 40,
+            "bulk_requests": 4,
+            "expected_generation": 6
+          },
+          {
+            "name": "LUR deadline expires with status still live",
+            "status_files": 51,
+            "bulk_requests": 0,
+            "expected_generation": 6
+          },
+          {
+            "name": "unknown file does not start an operation",
+            "status_files": 0,
+            "bulk_requests": 0,
+            "expected_generation": 6
+          },
+          {
+            "name": "reset discards only volatile metadata and cancels staging",
+            "status_files": 3,
+            "bulk_requests": 2,
+            "expected_generation": 0
+          },
+          {
+            "name": "valid upload after reset",
+            "status_files": 4,
+            "bulk_requests": 2,
+            "expected_generation": 1
+          },
+          {
+            "name": "full 4096-byte load",
+            "status_files": 10,
+            "bulk_requests": 2,
+            "expected_generation": 2
+          },
+          {
+            "name": "full 4096-byte download",
+            "status_files": 9,
+            "bulk_requests": 0,
+            "expected_generation": 2
+          },
+          {
+            "name": "empty load uses a zero-byte final DATA",
+            "status_files": 4,
+            "bulk_requests": 2,
+            "expected_generation": 3
+          },
+          {
+            "name": "empty download",
+            "status_files": 3,
+            "bulk_requests": 0,
+            "expected_generation": 3
+          }
+        ],
+        "clock_ns": 8,
+        "profile": "ARINC615A-2 (A3, UDP 59), canonical 665-2 one-LSAP/config.bin target, 0..4096 even bytes",
+        "whole_system_VO": "NOT RUN"
+      },
+      "independent_cases": null,
+      "independent_decisions_checked": null
+    },
+    {
+      "run": "build/logs/mgmt_load_004",
+      "result": "PASS",
+      "summary_sha256": "3b4738b7d7a15a17cdf02362e8b4d564da8bea3cf04e22b4813bbb4b566d4d31",
+      "inputs": {
+        "vendor\\frozen\\afdx_bag_gate.v": "c3c787e92cf5d9504dbae308eb06c9469b2cc8ac2d033b37956316a8bed0ec2d",
+        "vendor\\frozen\\afdx_byte_fifo.v": "d4a68a1e90c4cebf11c8fecf074eec9af25ac655ffa36ec8b94d3530cfeb8748",
+        "vendor\\frozen\\afdx_ipv4_checksum.v": "d0ca0a58ebb7ee03e6058a7ac6a943a7e0d20a9bbf4fd17677379261ef15b1da",
+        "vendor\\frozen\\afdx_network_tx_top.v": "04fe1b917178e9fe00fa0513f6da04e4885e095453a28488ccc8900d2f5eb6af",
+        "vendor\\frozen\\afdx_protocol_rx_top.v": "78bf1bfb675ea40d032cf49667a10c40f8e2a1c0b9fa5648aed8d1b90eddc3d5",
+        "vendor\\frozen\\afdx_single_vl_rx_candidate.v": "d9f70c2aec4a71995eb16a7f4030165c6fe4e2378d128588dd2268cf98573558",
+        "vendor\\frozen\\afdx_single_vl_sn_gate.v": "7ff9e5bf97f9f57f85c305435e2f5659ed4025dfad8c4ff864b1c1fedebe7425",
+        "vendor\\frozen\\afdx_single_vl_tx.v": "dcf165241bebae6c481ead513ebd8c7c72a689d312996a52914c6a36112afd8a",
+        "vendor\\frozen\\mac_crc32_byte.v": "ace81c3b570adb774ab07221377cd443bcd4a1c1d50470b1fc682872d4ed7e05",
+        "vendor\\frozen\\mac_frame_store.v": "0aafd302a77c9ae219814ccb94e085ec98e00bd5805dfbd00b4b1f9ee4b3e069",
+        "vendor\\frozen\\mac_gmii_core.v": "fdac547e7180027b7cc8e68ca73e4aa7673f303e1a9ec3b020a7e0dedae6fc7d",
+        "vendor\\frozen\\mac_gmii_rx.v": "b2c3d4cfd8e7e70251df01bc063ed0ccbb65878c85b4c7a3a8038cbb62466849",
+        "vendor\\frozen\\mac_gmii_tx.v": "5dc651da9ce140be4649ea91e129c3de354919f69f8f949c21d84f2ae73b1be8",
+        "rtl\\afdx_multi_vl_rx_parser.v": "717281cfb38d62385108fa7a8b0a3844a2c579224f081b65e037dcc037fa52e9",
+        "rtl\\afdx_multi_vl_sn_gate.v": "f531448854c1f3b9482b4b506d42616cb20bede7b04da86f0e178da92800c39b",
+        "rtl\\afdx_multi_vl_echo_queue.v": "0f692dbf08a2b7c0669bc37cf4d55314c7b92eba9e95af696506c454b655e803",
+        "rtl\\afdx_multi_vl_tx.v": "a63f1269f3aadd39d9b895f1acde1826919b059f4d1c53fe6f9b5e07a5750a01",
+        "rtl\\afdx_snmp_agent.v": "609dde402c6254d3c1ca1377df27a3ef381bb6aee1f4ebe61b964522169dc6e8",
+        "rtl\\afdx_service_message_fifo.v": "3c13319ad0ccc36eb8f1e86fffd82188ed22ffbf3233edc39f6a79f7f6407e22",
+        "rtl\\afdx_sntp_client.v": "4be49c1222cf5f66f524bdec0ecfccc66f6f6fc98f05303ca4e7c2bed536bbbb",
+        "rtl\\afdx_rtc_timebase.v": "2ac72fe3906ce698e2e73dbaecf51d08291352307687148cd1aab499ff818955",
+        "rtl\\afdx_tftp_engine.v": "03f7b63fad3211bf53216379d72d3fb4e10eb39a34d6549d970120e3e4a37a0f",
+        "rtl\\afdx_atomic_file_store.v": "22f37fe277e3af71b05b230c0fa66e582f97e4e43564e8ba9930cffc50dc3623",
+        "rtl\\afdx_615a_error_decoder.v": "d0677c7303c5b0cfb2b804b4cd96a8111e84eba99892e28bf106a0c4474148a7",
+        "rtl\\afdx_615a_endpoint.v": "a70ac18b33c57004fe01b78b7297be8bae31a0a52ab41eac6244df17d97b2a2b",
+        "rtl\\afdx_load_message_fifo.v": "1af8cccf11cc95e4b05838b5bf30848e13ea1b28a953d9f5be19b0158a8478ad",
+        "rtl\\afdx_management_rx_demux_615a.v": "0f0b4c02cb7af66e358b3a0b199d44dab6a1ac1fd579b97eca840fcbca921ed2",
+        "rtl\\afdx_service_tx_arbiter_615a.v": "203068860ba8efebc12dee1a5fa59087ea66cd7973548920aa5e1920b5c5dfe2",
+        "rtl\\afdx_stage3_mgmt_top.v": "04ce6726ea2e8e340fe48dd10545e8fbd7486f925f8d1edef409904bdb5632f5",
+        "sim\\tb_stage2_mgmt.sv": "2ce70da6963066730fcc9d5941b8908b4ad03ed37cacba2f9d3d5b3d46d77852",
+        "scripts\\run_stage2_mgmt.py": "3db932a0bc40ee0e313a9d81a66650a1a728d842c54bb541b9706783d4a1498d",
+        "scripts\\generate_stage2_mgmt_golden.py": "d5cd36b642496cba832111e3f052f75f40c0d1e3c215dc34654f85ab9e75cc33",
+        "scripts\\generate_snmp_golden.py": "9208f3e59d47b31f1f648652e8401d4ac0b2bfba702d4697f1fb60a76cf2a3eb",
+        "scripts\\frozen_frame_reference.py": "8e8d6f57721b21315fe559218865e5be9b5f1f62dce94bc3a5bd8969c04e1236",
+        "scripts\\submission_sources.py": "c685ab67a4f564cf1bd64d0edf554fdd608ad5bfe64c44ab5fb9729ab01a839c",
+        "scripts\\prepare_stage2_mgmt_elinx.py": "4d072453141fa529a5508937eaafbae233d3745883a2abcf6b8ab592d7d0a24e"
+      },
+      "evidence": {
+        "frames_compared": 58,
+        "service_responses": 56,
+        "snmp_ber_cases_over_the_link": 61,
+        "time_service": {
+          "accepted": 1,
+          "synchronized": 1,
+          "request_origin": "e900000000000000",
+          "delay_ntp_units": 8250392,
+          "offset_ntp_units": -3076620
+        },
+        "negative_cases": {
+          "unknown_port_drained": 1,
+          "parser_rejected_peer": 3,
+          "gate_rejected_duplicate_sn": 1
+        },
+        "counters": {
+          "tx_frames": 58,
+          "tx_bytes": 7665,
+          "demux_routed": 61,
+          "demux_dropped": 1,
+          "demux_last_dropped_port": 9999,
+          "snmp_request": 55,
+          "snmp_response": 55,
+          "snmp_error": 14,
+          "snmp_trap": 0,
+          "mgmt_parser_accepted": 64,
+          "mgmt_parser_rejected": 3,
+          "mgmt_gate_accepted": 63,
+          "mgmt_gate_rejected": 1,
+          "mgmt_gate_delivered": 63,
+          "business_parser_accepted": 2,
+          "business_parser_rejected": 65,
+          "business_gate_accepted": 2,
+          "business_gate_delivered": 2,
+          "application_stored": 2,
+          "application_sent": 2,
+          "application_error": 0,
+          "snmp_fifo_captured": 55,
+          "snmp_fifo_overflow": 0,
+          "snmp_fifo_sent": 55,
+          "sntp_fifo_captured": 1,
+          "sntp_fifo_overflow": 0,
+          "sntp_fifo_sent": 1,
+          "demux_sntp_routed": 1,
+          "arbiter_snmp_sent": 55,
+          "arbiter_sntp_sent": 1,
+          "sntp_accepted": 1,
+          "sntp_rejected": 0,
+          "sntp_timeout": 0,
+          "sntp_request_t1": 16789419410837209088,
+          "sntp_t1": 16789419410837209088,
+          "sntp_t2": 16789419410838257664,
+          "sntp_t3": 16789419410838260412,
+          "sntp_t4": 16789419410845462228,
+          "sntp_rx_timestamp": 16789419410845462228,
+          "rtc_synchronized": 1,
+          "rtc_sync_accepted": 0,
+          "rtc_sync_rejected": 0,
+          "rtc_sync_count": 1,
+          "rtc_error_count": 0,
+          "rtc_last_offset": 18446744073706474996,
+          "rtc_last_delay": 8250392,
+          "rtc_utc_time": 16789419411171819186,
+          "arbiter_service_sent": 56,
+          "arbiter_service_error": 0,
+          "uptime_ticks": 7,
+          "biz_msg_valid_end": 0,
+          "biz_msg_ready_end": 0,
+          "tx_msg_valid_end": 0,
+          "tx_msg_ready_end": 1,
+          "service_active_end": 0,
+          "snmp_msg_valid_end": 0,
+          "sntp_msg_valid_end": 0,
+          "biz_valid_cycles": 4,
+          "biz_stall_cycles": 2,
+          "last_biz_valid_cycle": 9490970,
+          "tx_msg_valid_cycles": 58,
+          "last_tx_msg_valid_cycle": 9490970,
+          "service_active_cycles": 11536
+        },
+        "bag_cycles": {
+          "0x1234": {
+            "min": 145747,
+            "max": 145747
+          },
+          "0x1244": {
+            "min": 139969,
+            "max": 560380
+          },
+          "0x1245": {
+            "frames": 1
+          }
+        },
+        "gmii_in_to_out_ns": {
+          "min": 3232,
+          "max": 48256
+        },
+        "snmp_uptime_ticks_final": 7
+      },
+      "independent_cases": null,
+      "independent_decisions_checked": null
+    },
+    {
+      "run": "build/logs/submission_007",
+      "result": "PASS",
+      "summary_sha256": "c646407e6b5153de6676efa2a2d54f51e2405dfff6675106fec10eb2b87da24b",
+      "inputs": {
+        "vendor\\frozen\\afdx_bag_gate.v": "c3c787e92cf5d9504dbae308eb06c9469b2cc8ac2d033b37956316a8bed0ec2d",
+        "vendor\\frozen\\afdx_byte_fifo.v": "d4a68a1e90c4cebf11c8fecf074eec9af25ac655ffa36ec8b94d3530cfeb8748",
+        "vendor\\frozen\\afdx_ipv4_checksum.v": "d0ca0a58ebb7ee03e6058a7ac6a943a7e0d20a9bbf4fd17677379261ef15b1da",
+        "vendor\\frozen\\afdx_network_tx_top.v": "04fe1b917178e9fe00fa0513f6da04e4885e095453a28488ccc8900d2f5eb6af",
+        "vendor\\frozen\\afdx_protocol_rx_top.v": "78bf1bfb675ea40d032cf49667a10c40f8e2a1c0b9fa5648aed8d1b90eddc3d5",
+        "vendor\\frozen\\afdx_single_vl_rx_candidate.v": "d9f70c2aec4a71995eb16a7f4030165c6fe4e2378d128588dd2268cf98573558",
+        "vendor\\frozen\\afdx_single_vl_sn_gate.v": "7ff9e5bf97f9f57f85c305435e2f5659ed4025dfad8c4ff864b1c1fedebe7425",
+        "vendor\\frozen\\afdx_single_vl_tx.v": "dcf165241bebae6c481ead513ebd8c7c72a689d312996a52914c6a36112afd8a",
+        "vendor\\frozen\\mac_crc32_byte.v": "ace81c3b570adb774ab07221377cd443bcd4a1c1d50470b1fc682872d4ed7e05",
+        "vendor\\frozen\\mac_frame_store.v": "0aafd302a77c9ae219814ccb94e085ec98e00bd5805dfbd00b4b1f9ee4b3e069",
+        "vendor\\frozen\\mac_gmii_core.v": "fdac547e7180027b7cc8e68ca73e4aa7673f303e1a9ec3b020a7e0dedae6fc7d",
+        "vendor\\frozen\\mac_gmii_rx.v": "b2c3d4cfd8e7e70251df01bc063ed0ccbb65878c85b4c7a3a8038cbb62466849",
+        "vendor\\frozen\\mac_gmii_tx.v": "5dc651da9ce140be4649ea91e129c3de354919f69f8f949c21d84f2ae73b1be8",
+        "rtl\\afdx_multi_vl_rx_parser.v": "717281cfb38d62385108fa7a8b0a3844a2c579224f081b65e037dcc037fa52e9",
+        "rtl\\afdx_multi_vl_sn_gate.v": "f531448854c1f3b9482b4b506d42616cb20bede7b04da86f0e178da92800c39b",
+        "rtl\\afdx_multi_vl_echo_queue.v": "0f692dbf08a2b7c0669bc37cf4d55314c7b92eba9e95af696506c454b655e803",
+        "rtl\\afdx_multi_vl_tx.v": "a63f1269f3aadd39d9b895f1acde1826919b059f4d1c53fe6f9b5e07a5750a01",
+        "rtl\\afdx_snmp_agent.v": "609dde402c6254d3c1ca1377df27a3ef381bb6aee1f4ebe61b964522169dc6e8",
+        "rtl\\afdx_service_message_fifo.v": "3c13319ad0ccc36eb8f1e86fffd82188ed22ffbf3233edc39f6a79f7f6407e22",
+        "rtl\\afdx_sntp_client.v": "4be49c1222cf5f66f524bdec0ecfccc66f6f6fc98f05303ca4e7c2bed536bbbb",
+        "rtl\\afdx_rtc_timebase.v": "2ac72fe3906ce698e2e73dbaecf51d08291352307687148cd1aab499ff818955",
+        "rtl\\afdx_tftp_engine.v": "03f7b63fad3211bf53216379d72d3fb4e10eb39a34d6549d970120e3e4a37a0f",
+        "rtl\\afdx_atomic_file_store.v": "22f37fe277e3af71b05b230c0fa66e582f97e4e43564e8ba9930cffc50dc3623",
+        "rtl\\afdx_615a_error_decoder.v": "d0677c7303c5b0cfb2b804b4cd96a8111e84eba99892e28bf106a0c4474148a7",
+        "rtl\\afdx_615a_endpoint.v": "a70ac18b33c57004fe01b78b7297be8bae31a0a52ab41eac6244df17d97b2a2b",
+        "rtl\\afdx_load_message_fifo.v": "1af8cccf11cc95e4b05838b5bf30848e13ea1b28a953d9f5be19b0158a8478ad",
+        "rtl\\afdx_management_rx_demux_615a.v": "0f0b4c02cb7af66e358b3a0b199d44dab6a1ac1fd579b97eca840fcbca921ed2",
+        "rtl\\afdx_service_tx_arbiter_615a.v": "203068860ba8efebc12dee1a5fa59087ea66cd7973548920aa5e1920b5c5dfe2",
+        "rtl\\afdx_stage3_mgmt_top.v": "04ce6726ea2e8e340fe48dd10545e8fbd7486f925f8d1edef409904bdb5632f5",
+        "rtl\\afdx_poll_timer.v": "f86edbbf6d058e6e59ea634077d8d740c8443af6233391b4146d99228a612b66",
+        "rtl\\submission\\AFDX_top.v": "d4c48e6a66206d303d13050841c701bb721d56ff604c80cc7694433153e03c4c",
+        "sim\\tb_submission.sv": "228db4685c849516b8633fc39eae1a6f65f4bc00414805f61c0d1f7b1ecbb66a",
+        "scripts\\run_submission.py": "7898847562021fd2ef1c7cc6144754444b4c6e326a613588d6c6e2ee4cd6f39f",
+        "scripts\\submission_sources.py": "c685ab67a4f564cf1bd64d0edf554fdd608ad5bfe64c44ab5fb9729ab01a839c",
+        "scripts\\prepare_stage2_mgmt_elinx.py": "4d072453141fa529a5508937eaafbae233d3745883a2abcf6b8ab592d7d0a24e",
+        "scripts\\modelsim_support.py": "0c995e4d657de0282685c02366857075bfbebeed294ce977c96af6b3a8e54d73",
+        "scripts\\run_stage2_mgmt.py": "3db932a0bc40ee0e313a9d81a66650a1a728d842c54bb541b9706783d4a1498d",
+        "scripts\\generate_stage2_mgmt_golden.py": "d5cd36b642496cba832111e3f052f75f40c0d1e3c215dc34654f85ab9e75cc33",
+        "scripts\\generate_snmp_golden.py": "9208f3e59d47b31f1f648652e8401d4ac0b2bfba702d4697f1fb60a76cf2a3eb",
+        "scripts\\frozen_frame_reference.py": "8e8d6f57721b21315fe559218865e5be9b5f1f62dce94bc3a5bd8969c04e1236"
+      },
+      "evidence": {
+        "frames": 9,
+        "wire_bytes": 956,
+        "minimum_repeated_VL_BAG_cycles": 125575,
+        "production_ports": 8,
+        "io_bits": 22,
+        "clock_ns": 8,
+        "auto_SNTP_requests": 3,
+        "valid_SNTP_sync": 1,
+        "real_10ms_sysUpTime": true,
+        "reset_recovery": true,
+        "SET_GET": true,
+        "duplicate_and_bad_community_silent": true,
+        "periodic_timer_checked": true,
+        "VO": "NOT RUN"
+      },
+      "independent_cases": null,
+      "independent_decisions_checked": null
+    },
+    {
+      "run": "build/logs/rx_policing_import_20261027",
+      "result": "PASS",
+      "summary_sha256": "7aebfd69b4063ae5e1e474796078d7a4f41cf7625543f01960dd4ae9d3d63221",
+      "inputs": {
+        "rtl\\afdx_multi_vl_sn_gate.v": "f531448854c1f3b9482b4b506d42616cb20bede7b04da86f0e178da92800c39b",
+        "sim\\tb_rx_policing.sv": "5ae43368182278d00f91797875c03951c178e706d735b6b1ad4246c117cbbf0a"
+      },
+      "evidence": {},
+      "independent_cases": null,
+      "independent_decisions_checked": null
+    }
+  ],
+  "full_system_615a_RTL": "NOT RUN",
+  "new_source_synthesis": "NOT RUN",
+  "new_source_full_system_VO": "NOT RUN",
+  "EQ6_native_equivalence": "NOT VERIFIED"
+}
