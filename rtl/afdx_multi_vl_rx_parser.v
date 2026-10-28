@@ -6,7 +6,9 @@ module afdx_multi_vl_rx_parser #(
     parameter integer VL_COUNT=16,
     parameter integer CHECK_PORTS=1,
     parameter integer MAX_PAYLOAD = 1471,
-    parameter integer ENABLE_DISCARD = 0
+    parameter integer ENABLE_DISCARD = 0,
+    parameter integer BANKS=2,
+    parameter integer PARALLEL_MAC_CHECK=0
 ) (
     input  wire        clk,
     input  wire        reset,
@@ -37,26 +39,28 @@ module afdx_multi_vl_rx_parser #(
     output reg  [3:0]  reject_reason,
     output reg  [31:0] accepted_count,
     output reg  [31:0] rejected_count,
-    output reg  [1:0]  banks_busy,
-    input wire payload_discard
+    output reg  [BANKS-1:0]  banks_busy,
+    input wire payload_discard,
+    input wire frame_done,frame_good,input wire [15:0] wire_frame_length
 );
     localparam [3:0] ERR_FRAMING=4'd1, ERR_ETHERNET=4'd2,
                      ERR_IPV4=4'd3, ERR_IP_CHECKSUM=4'd4,
                      ERR_UDP=4'd5, ERR_LENGTH=4'd6, ERR_PADDING=4'd7;
-    reg [7:0] bank0 [0:MAX_PAYLOAD-1];
-    reg [7:0] bank1 [0:MAX_PAYLOAD-1];
-    reg [10:0] bank_length [0:1];
-    reg [15:0] bank_vlid [0:1];
-    reg [7:0] bank_sn [0:1];
-    reg [15:0] bank_src_port[0:1],bank_dst_port[0:1];
+    localparam BW=$clog2(BANKS);
+    reg [7:0] payload_ram[0:BANKS*2048-1];
+    reg [10:0] bank_length [0:BANKS-1];
+    reg [15:0] bank_vlid [0:BANKS-1];
+    reg [7:0] bank_sn [0:BANKS-1];
+    reg [15:0] bank_src_port[0:BANKS-1],bank_dst_port[0:BANKS-1];
     reg [15:0] wire_vlid,wire_src_port,wire_dst_port,udp_checksum;
     reg [31:0] udp_sum;
     reg [7:0] udp_hi;
-    reg qbank [0:1];
-    reg qhead, qtail;
-    reg [1:0] qcount;
+    reg [BW-1:0] qbank [0:BANKS-1];
+    reg [BW-1:0] qhead, qtail;
+    reg [BW:0] qcount;
     reg [10:0] out_index;
-    reg active, write_bank;
+    reg active;reg [BW-1:0] write_bank;
+    reg await_mac,pending_valid;reg [3:0] pending_error;
     reg [15:0] byte_index, declared_length, ip_total, udp_length;
     reg [7:0] ip_hi;
     reg [19:0] ip_sum;
@@ -65,16 +69,18 @@ module afdx_multi_vl_rx_parser #(
     reg [15:0] vlid_q, src_port_q, dst_port_q;
     reg [47:0] src_mac_q;
 
-    wire any_free = !banks_busy[0] || !banks_busy[1];
-    wire free_bank = banks_busy[0];
-    assign in_ready = !reset && (active || any_free);
+    wire any_free = !(&banks_busy);
+    reg [BW-1:0] free_bank;reg found;integer slot;
+    always @*begin free_bank=0;found=0;for(slot=0;slot<BANKS;slot=slot+1)if(!banks_busy[slot]&&!found)begin free_bank=slot;found=1;end end
+    assign in_ready = !reset && !await_mac && (active || any_free);
     wire in_fire = in_valid && in_ready;
-    wire out_bank = qbank[qhead];
+    wire [BW-1:0] out_bank = qbank[qhead];
     assign payload_src_port=payload_valid?bank_src_port[out_bank]:16'd0;
     assign payload_dst_port=payload_valid?bank_dst_port[out_bank]:16'd0;
-    assign payload_valid = !reset && qcount != 0;
-    assign payload_data = !payload_valid ? 8'h00 :
-                          (out_bank ? bank1[out_index] : bank0[out_index]);
+    reg [7:0] payload_q;
+    reg payload_q_valid;
+    assign payload_valid = !reset && qcount != 0 && payload_q_valid;
+    assign payload_data = !payload_valid ? 8'h00 : payload_q;
     assign payload_length = !payload_valid ? 11'd0 : bank_length[out_bank];
     assign payload_vlid = !payload_valid ? 16'd0 : bank_vlid[out_bank];
     assign payload_sn_unchecked = !payload_valid ? 8'd0 : bank_sn[out_bank];
@@ -83,6 +89,19 @@ module afdx_multi_vl_rx_parser #(
     wire out_fire = payload_valid && payload_ready;
     wire out_done = (out_fire && payload_eop) ||
                     (ENABLE_DISCARD!=0 && payload_discard && payload_valid);
+
+    // Synchronous RAM read with one-byte lookahead preserves continuous
+    // delivery and holds the current byte under backpressure. A new empty
+    // queue waits for its first registered read before asserting valid.
+    wire [BW-1:0] next_head = qhead + 1'b1;
+    wire [BW-1:0] read_bank = out_done ? qbank[next_head] : out_bank;
+    wire [10:0] read_index = out_done ? 11'd0 :
+                             out_fire ? out_index + 11'd1 : out_index;
+    always @(posedge clk) begin
+        payload_q <= payload_ram[{read_bank,11'd0}+read_index];
+        if (reset) payload_q_valid <= 0;
+        else payload_q_valid <= qcount != 0 && (!out_done || qcount > 1);
+    end
 
     wire [15:0] p_length = ip_total - 16'd28;
     wire [15:0] padding_length = p_length < 16'd17 ? 16'd17 - p_length : 16'd0;
@@ -113,7 +132,7 @@ module afdx_multi_vl_rx_parser #(
     reg [3:0] beat_error;
     always @* begin
         beat_error = 0;
-        if (active && (in_sop || in_length != declared_length)) beat_error = ERR_FRAMING;
+        if (active && (in_sop || (PARALLEL_MAC_CHECK==0&&in_length != declared_length))) beat_error = ERR_FRAMING;
         if (active && byte_index < 16'd42) begin
             case (byte_index)
                 0: if (in_data != da_prefix_q[31:24]) beat_error=ERR_ETHERNET;
@@ -172,17 +191,20 @@ module afdx_multi_vl_rx_parser #(
                              !length_legal ? ERR_LENGTH :
                              folded_sum(ip_sum) != 16'hffff ? ERR_IP_CHECKSUM :
                              !udp_checksum_legal ? ERR_UDP :
-                             byte_index != sn_index || byte_index + 16'd1 != in_length ? ERR_LENGTH :
+                             byte_index != sn_index || (PARALLEL_MAC_CHECK==0&&byte_index + 16'd1 != in_length) ? ERR_LENGTH :
                              4'd0;
     // A legal final beat is the SN byte, after every header/padding byte.
     // Their errors are already retained in first_error. Avoid routing the
     // current byte through the header error encoder just to commit the bank.
     wire frame_commit = in_fire && active && in_eop && first_error == 0 &&
-                        !in_sop && in_length == declared_length && length_legal &&
+                        !in_sop && (PARALLEL_MAC_CHECK!=0||in_length == declared_length) && length_legal &&
                         folded_sum(ip_sum) == 16'hffff && udp_checksum_legal &&
-                        byte_index == sn_index && byte_index + 16'd1 == in_length;
+                        byte_index == sn_index && (PARALLEL_MAC_CHECK!=0||byte_index + 16'd1 == in_length);
     wire frame_reject = in_fire && active && in_eop && !frame_commit;
+    wire publish=PARALLEL_MAC_CHECK==0?frame_commit:
+      (frame_done&&await_mac&&pending_valid&&frame_good&&wire_frame_length==declared_length);
 
+    integer init_bank;
     always @(posedge clk) begin
         if (reset) begin
             banks_busy<=0; qhead<=0; qtail<=0; qcount<=0; out_index<=0;
@@ -190,19 +212,19 @@ module afdx_multi_vl_rx_parser #(
             ip_total<=0; udp_length<=0; ip_hi<=0; ip_sum<=0; first_error<=0;
             da_prefix_q<=0; src_ip_q<=0; dst_ip_q<=0; vlid_q<=0;
             src_port_q<=0; dst_port_q<=0; src_mac_q<=0;
-            bank_length[0]<=0; bank_length[1]<=0;
-            bank_vlid[0]<=0; bank_vlid[1]<=0;
-            bank_sn[0]<=0; bank_sn[1]<=0;
-            bank_src_port[0]<=0;bank_src_port[1]<=0;bank_dst_port[0]<=0;bank_dst_port[1]<=0;
+            for(init_bank=0;init_bank<BANKS;init_bank=init_bank+1)begin
+             bank_length[init_bank]<=0;bank_vlid[init_bank]<=0;bank_sn[init_bank]<=0;
+             bank_src_port[init_bank]<=0;bank_dst_port[init_bank]<=0;qbank[init_bank]<=0;
+            end
             wire_vlid<=0;wire_src_port<=0;wire_dst_port<=0;udp_checksum<=0;udp_sum<=0;udp_hi<=0;
-            qbank[0]<=0; qbank[1]<=0;
+            await_mac<=0;pending_valid<=0;pending_error<=0;
             candidate_accepted<=0; candidate_rejected<=0; reject_reason<=0;
             accepted_count<=0; rejected_count<=0;
         end else begin
             candidate_accepted<=0; candidate_rejected<=0;
             if (out_fire || out_done) begin
                 if (out_done) begin
-                    out_index<=0; qhead<=!qhead; banks_busy[out_bank]<=0;
+                    out_index<=0; qhead<=qhead+1'b1; banks_busy[out_bank]<=0;
                 end else out_index<=out_index+11'd1;
             end
             if (in_fire) begin
@@ -242,6 +264,7 @@ module afdx_multi_vl_rx_parser #(
                     if (beat_error!=0 && first_error==0) first_error<=beat_error;
                     if (byte_index==16) ip_total[15:8]<=in_data;
                     if (byte_index==17) ip_total[7:0]<=in_data;
+                    if (PARALLEL_MAC_CHECK!=0&&byte_index==18)declared_length<=expected_length;
                     if (byte_index==38) udp_length[15:8]<=in_data;
                     if (byte_index==39) udp_length[7:0]<=in_data;
                     if (byte_index>=14 && byte_index<=33) begin
@@ -250,8 +273,7 @@ module afdx_multi_vl_rx_parser #(
                     end
                     if (byte_index>=42 && byte_index<payload_end &&
                         p_length>=1 && p_length<=MAX_PAYLOAD) begin
-                        if(write_bank)bank1[byte_index-16'd42]<=in_data;
-                        else bank0[byte_index-16'd42]<=in_data;
+                        payload_ram[{write_bank,11'd0}+byte_index-16'd42]<=in_data;
                     end
                     if (in_eop) begin
                         active<=0;
@@ -261,18 +283,37 @@ module afdx_multi_vl_rx_parser #(
                             bank_src_port[write_bank]<=wire_src_port;
                             bank_dst_port[write_bank]<=wire_dst_port;
                             bank_sn[write_bank]<=in_data;
-                            qbank[qtail]<=write_bank; qtail<=!qtail;
-                            candidate_accepted<=1;
-                            accepted_count<=sat_inc(accepted_count);
-                        end else begin
+                            if(PARALLEL_MAC_CHECK==0)begin
+                             qbank[qtail]<=write_bank;qtail<=qtail+1'b1;
+                             candidate_accepted<=1;accepted_count<=sat_inc(accepted_count);
+                            end
+                        end else if(PARALLEL_MAC_CHECK==0)begin
                             banks_busy[write_bank]<=0;
                             candidate_rejected<=1; reject_reason<=final_error;
                             rejected_count<=sat_inc(rejected_count);
                         end
+                        if(PARALLEL_MAC_CHECK!=0)begin await_mac<=1;pending_valid<=frame_commit;pending_error<=final_error;end
                     end
                 end
             end
-            case ({frame_commit,out_done})
+            if(PARALLEL_MAC_CHECK!=0&&frame_done&&(active||await_mac))begin
+             active<=0;await_mac<=0;pending_valid<=0;
+             if(publish)begin
+              qbank[qtail]<=write_bank;qtail<=qtail+1'b1;
+              candidate_accepted<=1;accepted_count<=sat_inc(accepted_count);
+             end else begin
+              banks_busy[write_bank]<=0;
+              // A physically invalid frame belongs to the MAC drop counter.
+              // Release the speculative payload bank without double-counting
+              // it as a protocol rejection (same ownership as the old path).
+              if(frame_good)begin
+               candidate_rejected<=1;
+               reject_reason<=!await_mac||wire_frame_length!=declared_length?ERR_LENGTH:pending_error;
+               rejected_count<=sat_inc(rejected_count);
+              end
+             end
+            end
+            case ({publish,out_done})
                 2'b10: qcount<=qcount+2'd1;
                 2'b01: qcount<=qcount-2'd1;
                 default: begin end

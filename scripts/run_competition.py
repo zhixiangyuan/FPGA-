@@ -13,7 +13,7 @@ def sha(p):
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def sources():
-    names = ('afdx_app_tx_queue.v', 'afdx_redundant_rx.v', 'afdx_competition_core.v', 'afdx_mac_rx_buffered.v',
+    names = ('afdx_app_tx_queue.v', 'afdx_redundant_rx.v', 'afdx_competition_core.v', 'afdx_mac_rx_buffered.v', 'afdx_mac_tx_stream.v', 'afdx_mac_rx_checked.v',
              'afdx_multi_vl_tx.v', 'afdx_multi_vl_rx_parser.v', 'competition/AFDX_top.v',
              'afdx_management_plane.v', 'afdx_poll_timer.v', 'afdx_snmp_agent.v',
              'afdx_service_message_fifo.v','afdx_sntp_client.v','afdx_rtc_timebase.v',

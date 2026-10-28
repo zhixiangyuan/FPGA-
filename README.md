@@ -4,7 +4,19 @@
 
 正式开发工作区：`D:\FPGA\captain_integration`。日常开发使用`dev`；`main`仅接受队长批准的稳定版本。源码、测试、Golden和配置在同一工程持续维护，常规阶段不复制日期命名的完整工程。
 
-## 比赛要求补齐候选（2026-10-27）
+## 当前已验收候选（2026-10-28）
+
+当前比赛入口为 `rtl/competition/AFDX_top.v`，规范源码清单由 `scripts/run_competition.py` 的 `sources()` 给出。使用真实 125 MHz 时钟、1 ms BAG、128 TX VL 和 4096 RX VL；下文旧入口和旧指标仅作历史对照。
+
+23 组 RTL 功能检查及当前完整网表的关键后仿通过。全容量接收以 84 周期间隔注入，A/B 每网 8192 帧，应用端交付 8192 条。688 帧整机测试的有效载荷交付速率为 184.024 Mbps，全样本首字节到首字节最大时延为 87.496 μs、首字节到末字节为 100.656 μs，同 VL 同长度抖动为 15.392 μs；固定输入回放抖动为 15.416 μs，10 μs 工程目标未达到。
+
+新版综合工程为 `AFDXSUB_013`：60572 LUT、21741 FF、318 个工具统计存储单元。原生综合 Fmax 为 125.8495 MHz，8 ns setup 余量为 54 ps。当前网表来自 `eda_stage2_export_015`，`acceptance_short_vo_001` 已通过最短/最长帧、末端 TX/RX VL、A/B 去重、CRC/IP/UDP 拒收、独立复位的 SNMP SET/GET 和 SNTP 同步检查，网表只编译一次并复用。
+
+全容量、长时吞吐/抖动、同 VL SET→GET 状态保持和真实 BAG 在同版本完整 RTL 覆盖，未全部重复后仿。预布线 hold 估计为 -68 ps，IO 约束、报告所列 146 个环路相关单元的最终物理核查及完整 ARINC664P7 功能逐条覆盖仍未完成；EP1S80/Stratix 兼容功能网表不能证明 EQ6 原生映射等价。未执行布局布线、Bitstream 或硬件下载，未据此宣称全部比赛要求无条件通过。
+
+源码、TB、Golden、工具、器件、约束、网表指纹及原始日志保存在本机 `build/acceptance_20261028` 和 `build/logs`。原始证据归档为 `D:\FPGA\AFDX_archive\AFDX_acceptance_20261028_215948.zip`，SHA-256 为 `e92ec5327e8e3c7de9e445556a4dcc4793d9672de983f37c64f5f99af4d7c92b`。构建产物和厂商仿真库不上传 GitHub。
+
+## 前次候选记录（2026-10-27，历史对照）
 
 新增比赛应用入口 `rtl/competition/AFDX_top.v`。该入口接收 VLID + 应用有效载荷，包含独立 A/B MAC、每网完整性检查、跨网消重、128 个业务发送 VL、4096 个业务接收 VL，以及共用发送器的 SNMP、SNTP/RTC 和原配置型 615A 服务。旧 `rtl/submission/AFDX_top.v` 保留为历史管理入口；两份 `AFDX_top` 定义不可同时编译。
 

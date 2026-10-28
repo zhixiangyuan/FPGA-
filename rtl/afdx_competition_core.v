@@ -39,18 +39,20 @@ module afdx_competition_core #(
  wire [15:0] frame_length;
  wire [1:0] ready,done,reject;
  reg [1:0] done_seen;
+ wire [15:0] wire_vlid,completed_vlid;
  wire pair_done=&(done|done_seen);
  always @(posedge clk)begin
   if(reset||msg_done||msg_error)done_seen<=0;else done_seen<=done_seen|done;
  end
- afdx_app_tx_queue #(.VL_COUNT(TX_VL_COUNT),.SLOTS(TX_SLOTS),.VL_BASE(VL_BASE),.BAG_CYCLES(BAG_CYCLES)) queue(
+ afdx_app_tx_queue #(.VL_COUNT(TX_VL_COUNT),.SLOTS(TX_SLOTS),.VL_BASE(VL_BASE),.BAG_CYCLES(BAG_CYCLES),.PIPELINED_MAC(2)) queue(
   .clk(clk),.reset(reset),.tx_data(tx_data),.tx_valid(tx_valid&&initialized),.tx_ready(tx_ready_raw),
   .msg_valid(msg_valid),.msg_ready(msg_ready),.msg_vlid(msg_vlid),.msg_length(msg_length),
   .payload_data(pdata),.payload_valid(pvalid),.payload_ready(pready),.payload_last(plast),
-  .msg_done(msg_done&&!service_active),.msg_error(msg_error&&!service_active),.gmii_tx_en(gmii_a_tx_en&&!service_active),
+  .msg_done(msg_done&&!service_active),.msg_error(msg_error&&!service_active),.gmii_tx_en(gmii_a_tx_en),
+  .gmii_vlid(wire_vlid),.completed_vlid(completed_vlid),.gmii_done(done[0]),
   .accepted_count(app_accepted),.rejected_count(app_rejected),.sent_count(app_sent),.occupied());
  assign tx_ready=tx_ready_raw&&initialized;
- afdx_multi_vl_tx #(.VL_COUNT(TX_VL_COUNT+(MANAGEMENT_ENABLE!=0?3:0)),.VL_BASE(VL_BASE)) sender(
+ afdx_multi_vl_tx #(.VL_COUNT(TX_VL_COUNT+(MANAGEMENT_ENABLE!=0?3:0)),.VL_BASE(VL_BASE),.PIPELINED_MAC(1),.STREAMING_MAC(1)) sender(
   .clk(clk),.reset(reset),.msg_valid(send_valid),.msg_ready(send_ready),.msg_payload_length(send_length),
   .msg_da_const(32'h03000000),.msg_vlid(send_vlid),.msg_src_mac(ES_MAC),.msg_src_ip(ES_IP),
   .msg_dst_ip(service_active?MANAGER_IP:GROUP_IP),.msg_src_port(send_src_port),.msg_dst_port(send_dst_port),.msg_ttl(8'd1),
@@ -58,7 +60,7 @@ module afdx_competition_core #(
   .payload_data(send_data),.payload_valid(send_pvalid),.payload_ready(send_pready),.payload_last(send_plast),.payload_abort(1'b0),
   .mac_tx_data(frame_data),.mac_tx_valid(frame_valid),.mac_tx_ready(frame_ready),
   .mac_tx_sop(frame_sop),.mac_tx_eop(frame_eop),.mac_tx_length(frame_length),.mac_tx_afdx(frame_afdx),
-  .mac_tx_done(pair_done),.mac_tx_reject(|reject),.gmii_tx_en(gmii_a_tx_en),
+  .mac_tx_done(pair_done),.mac_tx_reject(|reject),.gmii_tx_en(gmii_a_tx_en),.gmii_vlid(wire_vlid),
   .msg_done(msg_done),.msg_error(msg_error),.error_code(),.late_count());
  assign frame_ready=&ready;
  wire [7:0] network_txd[0:1],network_rxd[0:1];
@@ -86,16 +88,21 @@ module afdx_competition_core #(
   wire business_ready,service_ready;
   assign mac_ready=business_ready&&service_ready;
   // Atomic fork: either both MACs consume this client byte, or neither does.
-  mac_gmii_tx mac_tx(.clk(clk),.reset(reset),.client_data(frame_data),.client_valid(frame_valid&&ready[1-net]),
+  wire [15:0] start_tag,end_tag;
+  if(net==0)begin: tag_owner
+   assign wire_vlid=start_tag;assign completed_vlid=end_tag;
+  end
+  afdx_mac_tx_stream mac_tx(.clk(clk),.reset(reset),.client_data(frame_data),.client_valid(frame_valid&&ready[1-net]),
+   .client_direct(!service_active),.client_vlid(send_vlid),
    .client_sop(frame_sop),.client_eop(frame_eop),.client_length(frame_length),.client_afdx_prepared(frame_afdx),.client_ready(ready[net]),
    .gmii_txd(network_txd[net]),.gmii_tx_en(network_en[net]),.gmii_tx_er(network_er[net]),
-   .done(done[net]),.reject(reject[net]),.sent_frames(),.rejected_frames(),.counter_saturated());
-  afdx_mac_rx_buffered #(.BANKS(16)) mac_rx(.clk(clk),.reset(reset),
+   .done(done[net]),.reject(reject[net]),.started_vlid(start_tag),.completed_vlid(end_tag));
+  wire mac_frame_done,mac_frame_good;
+  afdx_mac_rx_checked mac_rx(.clk(clk),.reset(reset),
    .gmii_rxd(network_rxd[net]),.gmii_rx_dv(network_dv[net]),.gmii_rx_er(network_rx_er[net]),
-   .client_data(mac_data),.client_valid(mac_valid),.client_sop(mac_sop),.client_eop(mac_eop),.client_ready(mac_ready),.client_length(mac_length),
-   .accepted(),.dropped(),.drop_reason(),.seen_frames(),.good_frames(),.drop_frames(mac_drop[net]),
-   .delivered_frames(),.banks_busy(),.counter_saturated());
-  afdx_multi_vl_rx_parser #(.VL_COUNT(RX_VL_COUNT),.ENABLE_DISCARD(1)) parser(
+   .stream_data(mac_data),.stream_valid(mac_valid),.stream_sop(mac_sop),.stream_eop(mac_eop),.stream_ready(mac_ready),
+   .frame_done(mac_frame_done),.frame_good(mac_frame_good),.frame_length(mac_length),.drop_frames(mac_drop[net]));
+  afdx_multi_vl_rx_parser #(.VL_COUNT(RX_VL_COUNT),.ENABLE_DISCARD(1),.BANKS(8),.PARALLEL_MAC_CHECK(1)) parser(
    .clk(clk),.reset(reset),.in_data(mac_data),.in_valid(mac_valid&&service_ready),.in_ready(business_ready),
    .in_sop(mac_sop),.in_eop(mac_eop),.in_length(mac_length),
    .cfg_da_prefix(32'h03000000),.cfg_vlid(VL_BASE),.cfg_src_mac(PEER_MAC),
@@ -104,9 +111,9 @@ module afdx_competition_core #(
    .payload_sop(candidate_sop[net]),.payload_eop(candidate_eop[net]),.payload_length(candidate_length[net]),
    .payload_vlid(candidate_vlid[net]),.payload_sn_unchecked(candidate_sn[net]),.payload_src_port(),.payload_dst_port(),
    .candidate_accepted(),.candidate_rejected(),.reject_reason(),.accepted_count(),.rejected_count(parse_drop[net]),.banks_busy(),
-   .payload_discard(candidate_discard[net]));
+   .payload_discard(candidate_discard[net]),.frame_done(mac_frame_done),.frame_good(mac_frame_good),.wire_frame_length(mac_length));
   if(MANAGEMENT_ENABLE!=0)begin: management
-   afdx_multi_vl_rx_parser #(.VL_COUNT(3),.CHECK_PORTS(0),.ENABLE_DISCARD(1)) parser(
+   afdx_multi_vl_rx_parser #(.VL_COUNT(3),.CHECK_PORTS(0),.ENABLE_DISCARD(1),.BANKS(8),.PARALLEL_MAC_CHECK(1)) parser(
     .clk(clk),.reset(reset),.in_data(mac_data),.in_valid(mac_valid&&business_ready),.in_ready(service_ready),
     .in_sop(mac_sop),.in_eop(mac_eop),.in_length(mac_length),
     .cfg_da_prefix(32'h03000000),.cfg_vlid(MGMT_BASE),.cfg_src_mac(MANAGER_MAC),
@@ -116,7 +123,7 @@ module afdx_competition_core #(
     .payload_vlid(svc_vlid[net]),.payload_sn_unchecked(svc_sn[net]),
     .payload_src_port(svc_src[net]),.payload_dst_port(svc_dst[net]),
     .candidate_accepted(),.candidate_rejected(),.reject_reason(),.accepted_count(),.rejected_count(),.banks_busy(),
-    .payload_discard(svc_discard[net]));
+    .payload_discard(svc_discard[net]),.frame_done(mac_frame_done),.frame_good(mac_frame_good),.wire_frame_length(mac_length));
   end else begin: no_management
    assign service_ready=1'b1;assign svc_valid[net]=0;assign svc_sop[net]=0;assign svc_eop[net]=0;
    assign svc_data[net]=0;assign svc_sn[net]=0;assign svc_length[net]=0;assign svc_vlid[net]=0;
@@ -149,7 +156,7 @@ module afdx_competition_core #(
    .rx_vlid(svc_rx_vlid),.rx_length(svc_rx_length),.rx_src_port(svc_rx_src),.rx_dst_port(svc_rx_dst),
    .initialized(service_initialized),.a_discard(svc_discard[0]),.b_discard(svc_discard[1]),
    .delivered_count(),.duplicate_count(),.integrity_error_count(),.control_count());
-  afdx_management_plane #(.ES_IP(ES_IP),.MANAGER_IP(MANAGER_IP),.MANAGER_MAC(MANAGER_MAC),.SNTP_SERVER_IP(MANAGER_IP),
+  afdx_management_plane #(.PIPELINED_MAC(1),.ES_IP(ES_IP),.MANAGER_IP(MANAGER_IP),.MANAGER_MAC(MANAGER_MAC),.SNTP_SERVER_IP(MANAGER_IP),
    .MGMT_VLID(MGMT_BASE),.SNTP_VLID(MGMT_BASE+16'd1),.LOAD_VLID(MGMT_BASE+16'd2)) plane(
    .clk(clk),.reset(reset),.svc_data(svc_rx_data),.svc_valid(svc_rx_valid),.svc_ready(svc_rx_ready),
    .svc_sop(svc_rx_sop),.svc_eop(svc_rx_eop),.svc_length(svc_rx_length),.svc_vlid(svc_rx_vlid),
@@ -160,6 +167,7 @@ module afdx_competition_core #(
    .out_src_port(send_src_port),.out_dst_port(send_dst_port),.out_data(send_data),.out_valid(send_pvalid),
    .out_ready(send_pready),.out_last(send_plast),.finish(msg_done),.error(msg_error),.gmii_en(gmii_a_tx_en),
    .time_request(poll&&(SNTP_AUTO_ENABLE!=0)),.active_service(service_active),
+   .gmii_vlid(wire_vlid),.completed_vlid(completed_vlid),.gmii_done(done[0]),
    .snmp_requests(snmp_requests),.snmp_responses(snmp_responses),.service_errors(service_errors),.time_synchronized(time_synchronized));
  end else begin: business_only
   assign service_initialized=1'b1;

@@ -2,6 +2,7 @@
 // Production development core: 16 business VLs, SNMP, SNTP and a configured
 // 615A load VL. Legacy stage2 stays separate for hash-bound regression.
 module afdx_management_plane #(
+ parameter integer PIPELINED_MAC=0,
  parameter [31:0] ES_IP=32'h0a000001,
  parameter [31:0] GROUP_IP=32'he0e0003c,
  parameter [47:0] ES_MAC=48'h020000000009,
@@ -43,6 +44,7 @@ module afdx_management_plane #(
  output wire [15:0] out_vlid,out_src_port,out_dst_port,
  output wire [7:0] out_data,output wire out_valid,input wire out_ready,output wire out_last,
  input wire finish,error,gmii_en,time_request,
+ input wire [15:0] gmii_vlid,completed_vlid,input wire gmii_done,
  output wire active_service,output wire [31:0] snmp_requests,snmp_responses,service_errors,
  output wire time_synchronized
 );
@@ -215,7 +217,8 @@ module afdx_management_plane #(
   .utc_time(rtc_utc_time),.monotonic_cycles(rtc_monotonic_cycles),
   .synchronized(rtc_synchronized),.sync_accepted(rtc_sync_accepted),.sync_rejected(rtc_sync_rejected),
   .last_offset(rtc_last_offset),.last_delay(rtc_last_delay),.sync_count(rtc_sync_count),.error_count(rtc_error_count));
- afdx_service_tx_arbiter_615a arbiter(.clk(clk),.reset(reset),
+ afdx_service_tx_arbiter_615a #(.PIPELINED_MAC(PIPELINED_MAC)) arbiter(.clk(clk),.reset(reset),
+  .gmii_vlid(gmii_vlid),.completed_vlid(completed_vlid),.gmii_done(gmii_done),
   .gmii_tx_valid(gmii_en),.cfg_load_bag_cycles(MGMT_BAG_CYCLES),
   .biz_msg_length(biz_msg_length),.biz_msg_vlid(biz_vlid),.biz_msg_src_port(biz_msg_src_port),.biz_msg_dst_port(biz_msg_dst_port),
   .biz_msg_valid(biz_msg_valid),.biz_msg_ready(biz_msg_ready),

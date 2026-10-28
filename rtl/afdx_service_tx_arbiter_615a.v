@@ -1,7 +1,8 @@
 // Production arbiter: business plus SNMP, SNTP and the load-service VL.
-module afdx_service_tx_arbiter_615a(
+module afdx_service_tx_arbiter_615a #(parameter integer PIPELINED_MAC=0)(
  input wire clk,reset,
  input wire gmii_tx_valid,input wire [31:0] cfg_load_bag_cycles,
+ input wire [15:0] gmii_vlid,completed_vlid,input wire gmii_done,
  input wire [10:0] biz_msg_length,
  input wire [15:0] biz_msg_vlid,biz_msg_src_port,biz_msg_dst_port,
  input wire biz_msg_valid,output wire biz_msg_ready,
@@ -37,29 +38,36 @@ module afdx_service_tx_arbiter_615a(
  reg [31:0] load_age;
  reg snmp_started,sntp_started;
  reg [31:0] snmp_age,sntp_age;
+ reg load_reserved,snmp_reserved,sntp_reserved;
  // Do not reserve the shared frame builder while this VL still owes its BAG.
  // The builder independently checks BAG again; this only schedules eligibility.
- wire load_pending=load_msg_valid&&(!load_started||load_age>=cfg_load_bag_cycles);
+ wire load_pending=load_msg_valid&&!load_reserved&&(!load_started||load_age>=cfg_load_bag_cycles);
  // All service VLs must be eligible before reserving the shared builder.
  // Keeping BAG-waiting descriptors outside arbitration lets ready business
  // frames progress. The frame builder still independently enforces BAG.
- wire snmp_pending=snmp_msg_valid&&(!snmp_started||snmp_age>=cfg_load_bag_cycles);
- wire sntp_pending=sntp_msg_valid&&(!sntp_started||sntp_age>=cfg_load_bag_cycles);
+ wire snmp_pending=snmp_msg_valid&&!snmp_reserved&&(!snmp_started||snmp_age>=cfg_load_bag_cycles);
+ wire sntp_pending=sntp_msg_valid&&!sntp_reserved&&(!sntp_started||sntp_age>=cfg_load_bag_cycles);
  always @(posedge clk)begin
   if(reset)begin
    wire_valid_d<=0;load_started<=0;load_age<=0;
    snmp_started<=0;sntp_started<=0;snmp_age<=0;sntp_age<=0;
+   load_reserved<=0;snmp_reserved<=0;sntp_reserved<=0;
   end
   else begin
    wire_valid_d<=gmii_tx_valid;
-   if(gmii_tx_valid&&!wire_valid_d&&state!=SEL_IDLE&&selected==SRC_LOAD)begin
-    load_started<=1;load_age<=0;
+   if(PIPELINED_MAC!=0&&state==SEL_DONE&&tx_msg_done)begin
+    if(selected==SRC_LOAD)load_reserved<=1;
+    if(selected==SRC_SNMP)snmp_reserved<=1;
+    if(selected==SRC_SNTP)sntp_reserved<=1;
+   end
+   if(gmii_tx_valid&&!wire_valid_d&&(PIPELINED_MAC!=0?gmii_vlid==load_msg_vlid:state!=SEL_IDLE&&selected==SRC_LOAD))begin
+    load_started<=1;load_age<=0;load_reserved<=0;
    end else if(load_started&&load_age<cfg_load_bag_cycles)load_age<=load_age+1'b1;
-   if(gmii_tx_valid&&!wire_valid_d&&state!=SEL_IDLE&&selected==SRC_SNMP)begin
-    snmp_started<=1;snmp_age<=0;
+   if(gmii_tx_valid&&!wire_valid_d&&(PIPELINED_MAC!=0?gmii_vlid==snmp_msg_vlid:state!=SEL_IDLE&&selected==SRC_SNMP))begin
+    snmp_started<=1;snmp_age<=0;snmp_reserved<=0;
    end else if(snmp_started&&snmp_age<cfg_load_bag_cycles)snmp_age<=snmp_age+1'b1;
-   if(gmii_tx_valid&&!wire_valid_d&&state!=SEL_IDLE&&selected==SRC_SNTP)begin
-    sntp_started<=1;sntp_age<=0;
+   if(gmii_tx_valid&&!wire_valid_d&&(PIPELINED_MAC!=0?gmii_vlid==sntp_msg_vlid:state!=SEL_IDLE&&selected==SRC_SNTP))begin
+    sntp_started<=1;sntp_age<=0;sntp_reserved<=0;
    end else if(sntp_started&&sntp_age<cfg_load_bag_cycles)sntp_age<=sntp_age+1'b1;
   end
  end
@@ -93,7 +101,15 @@ module afdx_service_tx_arbiter_615a(
   if(reset)begin
    state<=SEL_IDLE;selected<=SRC_BIZ;last_service<=0;last_svc_src<=SRC_SNMP;
    service_sent_count<=0;service_error_count<=0;snmp_sent_count<=0;sntp_sent_count<=0;load_sent_count<=0;
-  end else case(state)
+  end else begin
+   if(PIPELINED_MAC!=0&&gmii_done)begin
+    if(completed_vlid==snmp_msg_vlid||completed_vlid==sntp_msg_vlid||completed_vlid==load_msg_vlid)
+     service_sent_count<=service_sent_count+1'b1;
+    if(completed_vlid==snmp_msg_vlid)snmp_sent_count<=snmp_sent_count+1'b1;
+    if(completed_vlid==sntp_msg_vlid)sntp_sent_count<=sntp_sent_count+1'b1;
+    if(completed_vlid==load_msg_vlid)load_sent_count<=load_sent_count+1'b1;
+   end
+   case(state)
    SEL_IDLE:begin
     if(!last_service)begin
      if(service_any)begin selected<=svc_pick;state<=SEL_DESCR;end
@@ -110,9 +126,9 @@ module afdx_service_tx_arbiter_615a(
    end
    SEL_STREAM:if(tx_payload_valid&&tx_payload_ready&&tx_payload_last)state<=SEL_DONE;
    SEL_DONE:if(tx_msg_done||tx_msg_error)begin
-    if(selected!=SRC_BIZ)begin
+   if(selected!=SRC_BIZ)begin
      if(tx_msg_error)service_error_count<=service_error_count+1'b1;
-     else begin
+     else if(PIPELINED_MAC==0)begin
       service_sent_count<=service_sent_count+1'b1;
       if(selected==SRC_SNMP)snmp_sent_count<=snmp_sent_count+1'b1;
       else if(selected==SRC_SNTP)sntp_sent_count<=sntp_sent_count+1'b1;
@@ -122,6 +138,7 @@ module afdx_service_tx_arbiter_615a(
     state<=SEL_IDLE;
    end
    default:state<=SEL_IDLE;
-  endcase
+   endcase
+  end
  end
 endmodule

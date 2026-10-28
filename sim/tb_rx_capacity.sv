@@ -27,7 +27,7 @@ module tb_rx_capacity;
   fd=$fopen("application.csv","w");$fwrite(fd,"sop,eop,data\n");$readmemh("golden/wire.mem",frames);
   repeat(8)@(negedge clk);reset=0;wait(init);@(negedge clk);start_cycle=cycle;
   for(integer f=0;f<8192;f=f+1)begin
-   while(cycle<start_cycle+f*512)@(negedge clk);
+   while(cycle<start_cycle+f*FRAME_INTERVAL)@(negedge clk);
    for(integer p=0;p<72;p=p+1)begin data=frames[f*72+p];valid=1;@(negedge clk);end
    valid=0;
    if(f%1024==1023)$display("RX_CAPACITY_PROGRESS frames=%0d delivered=%0d",f+1,got);

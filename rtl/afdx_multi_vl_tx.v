@@ -6,6 +6,8 @@ module afdx_multi_vl_tx #(
     parameter integer VL_COUNT = 16,
     parameter [15:0] VL_BASE = 16'h1234,
     parameter [7:0] RESET_SN = 8'd1,
+    parameter integer PIPELINED_MAC = 0,
+    parameter integer STREAMING_MAC = 0,
     parameter [31:0] CLK_HZ = 32'd125000000
 ) (
     input  wire        clk,
@@ -41,6 +43,7 @@ module afdx_multi_vl_tx #(
     input  wire       mac_tx_done,
     input  wire       mac_tx_reject,
     input  wire       gmii_tx_en,
+    input  wire [15:0] gmii_vlid,
 
     output reg        msg_done,
     output reg        msg_error,
@@ -143,10 +146,10 @@ module afdx_multi_vl_tx #(
                         !payload_last && (payload_remaining == 11'd1);
     wire cancel_event = (state_building && payload_abort) || payload_early || payload_late ||
                         ((state == ST_WAIT_DONE) && mac_tx_reject);
-    wire frame_pending = (state == ST_SN);
+    wire frame_pending = STREAMING_MAC!=0?(state==ST_ETH&&eth_index==0):(state==ST_SN);
     wire sn_release;
     wire late_pulse;
-    wire frame_eop_fire = (state == ST_SN) && tx_fire && mac_tx_eop;
+    wire frame_eop_fire = STREAMING_MAC!=0?(state==ST_ETH&&eth_index==0&&tx_fire):((state == ST_SN) && tx_fire && mac_tx_eop);
 
     assign msg_ready = !reset && (state == ST_IDLE) && mac_tx_ready;
     assign payload_ready = !reset &&
@@ -171,7 +174,7 @@ module afdx_multi_vl_tx #(
     generate for(vl=0;vl<VL_COUNT;vl=vl+1)begin: vl_bag
         afdx_bag_gate gate(
             .clk(clk),.reset(reset),
-            .gmii_tx_en(gmii_tx_en && active_vl==vl),
+            .gmii_tx_en(gmii_tx_en && (PIPELINED_MAC!=0 ? gmii_vlid==VL_BASE+vl : active_vl==vl)),
             .frame_arm(legal_desc_fire && descriptor_index==vl),
             .frame_cancel(cancel_event && active_vl==vl),
             .frame_pending(frame_pending && active_vl==vl),
@@ -191,7 +194,7 @@ module afdx_multi_vl_tx #(
             case (state)
                 ST_ETH: begin
                     mac_tx_data = eth_shift[111:104];
-                    mac_tx_valid = 1'b1;
+                    mac_tx_valid = STREAMING_MAC!=0&&eth_index==0?sn_release:1'b1;
                     mac_tx_sop = (eth_index == 4'd0);
                 end
                 ST_IPV4: begin
@@ -212,8 +215,8 @@ module afdx_multi_vl_tx #(
                 end
                 ST_SN: begin
                     mac_tx_data = active_sn;
-                    mac_tx_valid = sn_release;
-                    mac_tx_eop = sn_release;
+                    mac_tx_valid = STREAMING_MAC!=0?1'b1:sn_release;
+                    mac_tx_eop = STREAMING_MAC!=0?1'b1:sn_release;
                 end
                 ST_ABORT: begin
                     // B0 abort contract: repeated SOP in an in-progress frame
@@ -358,7 +361,13 @@ module afdx_multi_vl_tx #(
                     end
 
                     ST_SN: if (tx_fire) begin
-                        state <= ST_WAIT_DONE;
+                        if(PIPELINED_MAC!=0)begin
+                            // EOP atomically committed a complete frame to the MAC.
+                            // Its VL tag, rather than the next builder owner, drives BAG.
+                            msg_done<=1'b1;state<=ST_IDLE;
+                            if(active_sn==8'd255)next_sn[active_vl]<=8'd1;
+                            else next_sn[active_vl]<=active_sn+1'b1;
+                        end else state <= ST_WAIT_DONE;
                     end
 
                     ST_WAIT_DONE: begin

@@ -64,7 +64,7 @@ def main():
  with (project/'synthesis_console.log').open('wb') as log:
   process=subprocess.Popen(command,cwd=project,stdout=log,stderr=subprocess.STDOUT)
   proof['pid']=process.pid;(project/'synthesis_runner.json').write_text(json.dumps(proof,indent=2)+'\n')
-  print(f'STAGE2_OFFICIAL_SYNTHESIS {project} PID {process.pid}',flush=True);code=process.wait(timeout=1800)
+  print(f'STAGE2_OFFICIAL_SYNTHESIS {project} PID {process.pid}',flush=True);code=process.wait(timeout=7200)
  report=out/f'{family}.map.rpt';text=report.read_text(errors='replace') if report.exists() else ''
  passed=code==0 and 'Analysis & Synthesis was successful' in text and 'Error (' not in text
  backend_code=None

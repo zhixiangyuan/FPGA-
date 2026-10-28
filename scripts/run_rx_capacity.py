@@ -1,12 +1,13 @@
 """Full receive chain: all 4096 VLs, both networks, two distinct SNs per VL."""
 from datetime import datetime,timezone
 from pathlib import Path
-import csv,json,os,shutil,subprocess
+import argparse,csv,json,os,shutil,subprocess
 from run_competition import ROOT,MS,sources,sha
 from frozen_frame_reference import make_client,wire_for
 from modelsim_support import prepare_ini
 
 def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--interval',type=int,choices=(84,512),default=512);args=parser.parse_args()
     i=1
     while (ROOT/f'build/logs/rx_capacity_{i:03d}').exists():i+=1
     run=ROOT/f'build/logs/rx_capacity_{i:03d}';run.mkdir(parents=True);out=run/'golden';out.mkdir()
@@ -17,7 +18,7 @@ def main():
             frame=frame[:4]+vl.to_bytes(2,'big')+frame[6:];w=wire_for(frame);assert len(w)==72
             wire.extend(w);expected.append(vl.to_bytes(2,'big')+data)
     (out/'wire.mem').write_text(''.join(f'{b:02x}\n' for b in wire))
-    (out/'constants.vh').write_text(f'localparam WIRE_BYTES={len(wire)};\n')
+    (out/'constants.vh').write_text(f'localparam WIRE_BYTES={len(wire)},FRAME_INTERVAL={args.interval};\n')
     (out/'expected.json').write_text(json.dumps([p.hex() for p in expected])+'\n')
     files=sources()+[ROOT/'sim/tb_rx_capacity.sv']
     inputs=files+[Path(__file__),ROOT/'scripts/run_competition.py',ROOT/'scripts/frozen_frame_reference.py',ROOT/'scripts/modelsim_support.py']
@@ -46,7 +47,7 @@ def main():
         except Exception as e:passed=False;error=repr(e)
     proof.update(result='PASS' if passed else 'FAIL',error=error,exit_code=code,
                  configured_RX_VLs=4096,wire_frames_per_network=8192,application_deliveries=8192,
-                 source='real GMII wire including preamble/SFD/FCS',both_networks=True,
+                 source='real GMII wire including preamble/SFD/FCS',both_networks=True,wire_frame_interval_cycles=args.interval,
                  completed_utc=datetime.now(timezone.utc).isoformat())
     path.write_text(json.dumps(proof,indent=2)+'\n');print(text[-1300:]);print(json.dumps({k:v for k,v in proof.items() if k not in ('inputs','golden')},indent=2))
     return 0 if passed else 1
