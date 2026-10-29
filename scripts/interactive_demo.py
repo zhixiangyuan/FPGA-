@@ -156,14 +156,14 @@ def verify(run, plan):
                 clock_ns=8,BAG_cycles=125000,wire_frames=len(a),application_messages=len(packets),
                 minimum_per_VL_BAG_cycles=min(gaps) if gaps else None,status=status,rx_oracle=rx,rtc=rtc,metrics=metrics)
 
-def readable_result(run,proof,compact=False):
+def readable_result(run,proof,compact=False,data_only=False):
     if proof['result']!='PASS':return '核对失败：'+proof.get('error','查看 transcript.log')
     s=proof['status'];text=[f"本次场景 PASS｜应用发送 {s['sent']} 帧，交付 {s['delivered']} 帧，消重 {s['duplicates']} 次，序号异常 {s['integrity']} 次",
         f"MAC 丢弃 A/B：{s['dropa']}/{s['dropb']}；协议拒绝 A/B：{s['parsea']}/{s['parseb']}；SNMP 请求/响应：{s['requests']}/{s['responses']}"]
-    if proof['minimum_per_VL_BAG_cycles'] is not None:
+    if not data_only and proof['minimum_per_VL_BAG_cycles'] is not None:
         text.append(f"同 VL 实测最小发送间隔：{proof['minimum_per_VL_BAG_cycles']*8/1e6:.6f} ms；独立 BAG 核对通过")
     packets=app_packets(run/'application.csv')
-    for first,last,data in ([] if compact else packets[-2:]):
+    for first,last,data in ([] if compact else packets[-1:] if data_only else packets[-2:]):
         try:
             decoded=data[2:82].decode('utf-8')
             if not decoded.isprintable():decoded='二进制载荷（见 HEX）'
@@ -174,7 +174,7 @@ def readable_result(run,proof,compact=False):
     if wire and not compact:
         start,end,w,_=wire[-1];vl=int.from_bytes(w[12:14],'big');length=int.from_bytes(w[46:48],'big')-8
         text.append(f"最近真实 GMII 帧：VLID=0x{vl:04X}，UDP 载荷={length}，SN={w[-5]}，FCS={w[-4:].hex().upper()}（独立 CRC 核对通过）")
-        if vl==0x12b4:
+        if vl==0x12b4 and not data_only:
             # Show OCTET STRING values from actual response bytes only after exact Golden comparison.
             p=w[50:50+length];strings=[];i=0
             while i+2<=len(p):
@@ -187,10 +187,10 @@ def readable_result(run,proof,compact=False):
     if m:
         text.append(f"有效载荷吞吐：{m['delivered_payload_Mbps']:.4f} Mbps；应用首字节至末字节最大观测时延：{m['max_application_first_to_last_us']:.3f} μs")
         value=m['max_same_VL_same_length_range_us']
-        text.append('同 VL 同长度时延极差：'+(f'{value:.3f} μs' if value is not None else '样本不足（每组至少 2 帧）'))
-    if proof['rtc']:
+        if not data_only:text.append('同 VL 同长度时延极差：'+(f'{value:.3f} μs' if value is not None else '样本不足（每组至少 2 帧）'))
+    if proof['rtc'] and not data_only:
         r=proof['rtc'][-1];text.append(f"RTC 已同步：实际 offset={r['offset_us']:.6f} μs，delay={r['delay_us']:.6f} μs；四时间戳算术核对通过")
-    text.append('以上仅为本次声明输入条件的 RTL 场景结果；完整证据：'+str(run/'verification.json'))
+    if not data_only:text.append('以上仅为本次声明输入条件的 RTL 场景结果；完整证据：'+str(run/'verification.json'))
     return '\n'.join(text)
 
 def focus_wave(run):
@@ -398,7 +398,6 @@ class Controller:
             ttk.Label(self.body,text='测试环境模拟时间服务器；原始 t1 来自真实请求。实际 RTC 校正量按四时间戳核对。').pack(anchor='w')
             ttk.Button(self.body,text='发送本人确认的时间响应',command=self.sync).pack(anchor='w',pady=6)
         self.output=tk.Text(self.window,height=16,wrap='word');self.output.pack(fill='both',expand=True,padx=18,pady=12)
-        self.output.insert('end','尚未执行手动操作。窗口中的建议参数不会自动发送。\n')
         self.window.after(100,lambda:self.start(scenario));self.window.protocol('WM_DELETE_WINDOW',self.close)
         self.window.mainloop()
     def field(self,label,key,value):
@@ -411,13 +410,13 @@ class Controller:
     def get(self,key):return self.entries[key].get()
     def log(self,text):self.output.insert('end',text+'\n');self.output.see('end')
     def start(self,scenario):
-        try:self.s=Session(scenario);self.log('本次原始记录：'+str(self.s.run));self.deadline=time.time()+240;self.await_ready()
-        except Exception as exc:self.state.set('启动失败');self.log(str(exc))
+        try:self.s=Session(scenario);self.deadline=time.time()+240;self.await_ready()
+        except Exception as exc:self.state.set('启动失败');self.mb.showerror('启动失败',str(exc))
     def await_ready(self):
         if (self.s.run/'ready.txt').exists():
-            self.busy=False;self.state.set('等待本人操作：仿真已加载并停在 100 μs');self.log('GUI 已加载；没有自动发送应用数据。');return
+            self.busy=False;self.state.set('等待本人操作：仿真已加载并停在 100 μs');return
         if self.s.process.poll() is not None or time.time()>self.deadline:
-            self.state.set('启动未完成，请查看 transcript.log');self.log('ModelSim 未返回 READY。');return
+            self.state.set('启动未完成，请查看 transcript.log');self.mb.showerror('启动未完成','ModelSim 未返回 READY。');return
         self.window.after(300,self.await_ready)
     def action(self,callback):
         if self.busy:self.mb.showinfo('请稍候','仿真启动或运行中，请等待结果。');return
@@ -435,11 +434,13 @@ class Controller:
             proof=self.s.result() if response.strip()=='DONE' else dict(result='FAIL',error=response)
             self.failed=proof['result']!='PASS'
             self.state.set('本次独立核对通过；等待下一次本人操作' if not self.failed else '本次核对失败，请保留日志')
-            self.log(readable_result(self.s.run,proof))
+            self.output.delete('1.0','end')
+            if self.failed:self.mb.showerror('本次核对失败',proof.get('error','查看 transcript.log'))
+            else:self.log(readable_result(self.s.run,proof,data_only=True))
             if not self.failed:focus_wave(self.s.run)
             return
         if self.s.process.poll() is not None or time.time()>self.deadline:
-            self.busy=False;self.failed=True;self.state.set('仿真退出或超时；本次未通过');self.log('查看 transcript.log 与 plan.json。');return
+            self.busy=False;self.failed=True;self.state.set('仿真退出或超时；本次未通过');self.output.delete('1.0','end');self.mb.showerror('仿真退出或超时','查看 transcript.log 与 plan.json。');return
         self.window.after(300,self.await_result)
     def send(self):
         self.action(lambda:self.s.app(int(self.get('vl'),16),self.get('data').encode('utf-8'),interval=max(64,len(self.get('data').encode('utf-8'))+3)))
@@ -457,8 +458,7 @@ class Controller:
     def snmp(self,write):
         def work():
             obj=int(self.get('object')[0]);value=self.get('value').encode('ascii') if write else None
-            self.log(('SET' if write else 'GET')+' 请求；响应值将在独立 Golden 与真实 GMII 字节完全一致后显示。')
-            duration=self.s.snmp(obj,value);self.log('期望值（待核对）：'+self.s.values[obj].decode('ascii'));return duration
+            return self.s.snmp(obj,value)
         self.action(work)
     def sync(self):self.action(lambda:self.s.sync(float(self.get('offset'))))
     def close(self):
