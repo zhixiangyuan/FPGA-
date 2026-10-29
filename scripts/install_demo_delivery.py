@@ -5,7 +5,7 @@ from interactive_demo import DELIVERY,ROOT,TITLES
 
 def main():
     DELIVERY.mkdir(parents=True,exist_ok=True)
-    ps=r'''param([ValidateRange(1,9)][int]$Scenario=1)
+    ps=r'''param([ValidateRange(1,10)][int]$Scenario=10)
 $ErrorActionPreference='Stop'
 $project='D:\FPGA\captain_integration'
 $python='E:\ICAN\PYthon-3.10\python.exe'
@@ -26,7 +26,8 @@ try {
  New-Item -ItemType Directory -Path $logDir -Force | Out-Null
  $stamp=Get-Date -Format 'yyyyMMdd_HHmmss_fff'
  $script=Join-Path $project 'scripts\interactive_demo.py'
- Start-Process -FilePath $python -ArgumentList @('"'+$script+'"','--scenario',"$Scenario") -WorkingDirectory $project -WindowStyle Hidden -RedirectStandardOutput (Join-Path $logDir "$stamp.out.log") -RedirectStandardError (Join-Path $logDir "$stamp.err.log")
+ $demoArgs=if ($Scenario -eq 10) { @('"'+$script+'"','--basic') } else { @('"'+$script+'"','--scenario',"$Scenario") }
+ Start-Process -FilePath $python -ArgumentList $demoArgs -WorkingDirectory $project -WindowStyle Hidden -RedirectStandardOutput (Join-Path $logDir "$stamp.out.log") -RedirectStandardError (Join-Path $logDir "$stamp.err.log")
  Write-Host '已启动。请等待中文控制窗口与 ModelSim；关键操作由本人完成。'
 } catch {
  Write-Host "启动失败：$_" -ForegroundColor Red
@@ -35,14 +36,21 @@ try {
 }
 '''
     (DELIVERY/'launch.ps1').write_text(ps,encoding='utf-8-sig')
+    legacy=DELIVERY/'单项测试入口';legacy.mkdir(exist_ok=True)
     for i,title in enumerate(TITLES+['工程与综合报告证据'],1):
-        cmd=f'@echo off\r\n"%SystemRoot%\u005cSystem32\u005cWindowsPowerShell\u005cv1.0\u005cpowershell.exe" -NoProfile -ExecutionPolicy Bypass -File "%~dp0launch.ps1" -Scenario {i}\r\nif errorlevel 1 pause\r\n'
-        (DELIVERY/f'{i:02d}_{title}演示.cmd').write_bytes(cmd.encode('ascii',errors='strict'))
+        name=f'{i:02d}_{title}演示.cmd';old=DELIVERY/name;target=legacy/name
+        assert old.resolve().parent==DELIVERY.resolve() and target.resolve().parent==legacy.resolve()
+        if old.exists() and not target.exists():old.replace(target)
+        cmd=f'@echo off\r\n"%SystemRoot%\u005cSystem32\u005cWindowsPowerShell\u005cv1.0\u005cpowershell.exe" -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\\launch.ps1" -Scenario {i}\r\nif errorlevel 1 pause\r\n'
+        target.write_bytes(cmd.encode('ascii',errors='strict'))
+    for name,scenario in (('视频1_系统基础功能演示.cmd',10),('视频2_系统性能展示.cmd',7),('视频3_调度优化对照演示.cmd',8)):
+        cmd=f'@echo off\r\n"%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "%~dp0launch.ps1" -Scenario {scenario}\r\nif errorlevel 1 pause\r\n'
+        (DELIVERY/name).write_bytes(cmd.encode('ascii'))
     for name in ('新手操作手册.md','三分钟讲解与录屏步骤.md','验证状态说明.md'):
         source=ROOT/'docs'/'interactive_demo'/name
         if source.exists():(DELIVERY/name).write_bytes(source.read_bytes())
-    files=[p for p in DELIVERY.iterdir() if p.is_file() and p.name!='交付文件哈希.json']
-    (DELIVERY/'交付文件哈希.json').write_text(json.dumps({p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in files},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    files=[p for p in DELIVERY.iterdir() if p.is_file() and p.name!='交付文件哈希.json']+list(legacy.glob('*.cmd'))
+    (DELIVERY/'交付文件哈希.json').write_text(json.dumps({str(p.relative_to(DELIVERY)):hashlib.sha256(p.read_bytes()).hexdigest() for p in files},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(DELIVERY)
 
 if __name__=='__main__':main()

@@ -1,0 +1,1783 @@
+{
+  "result": "PASS",
+  "kind": "automated real-RTL implementation check, not human acceptance",
+  "source_sha256": {
+    "scripts\\basic_demo.py": "d6b07e68afd18e8257e35af50c82b23834f9581872edc3f26590bb0a15863c91",
+    "scripts\\interactive_demo.py": "830803d9a34a9f933404ab6fb8ada07cc93bc3e556ab1ef506cfeca7d16df788"
+  },
+  "items": {
+    "1": {
+      "status": "完成",
+      "covered": [
+        "原样收发"
+      ],
+      "required": [
+        "原样收发"
+      ],
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184703_570560",
+      "last_result": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +1 帧；消重 +1 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：双网正常；本次未交付：0 帧\n本次实际接收：VLID=0x1234；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 34 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：1234=1 帧\n本次应用首字节至末字节最大观测时延：1.728 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：样本不足\n本次有效载荷交付吞吐：50.9259 Mbps\n本次同 VL 最小发送间隔：样本不足\n本次最近发送帧：VLID=0x1234；SN=1；FCS=EAA700AE｜帧字节核对：通过\n本会话累计：发送 1 帧；交付 1 帧；SNMP 请求/响应 0/0",
+      "last_action": 1
+    },
+    "2": {
+      "status": "完成",
+      "covered": [
+        "多 VL 完整交付",
+        "同 VL BAG"
+      ],
+      "required": [
+        "多 VL 完整交付",
+        "同 VL BAG"
+      ],
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184800_835360",
+      "last_result": "本次操作：用户确认批量负载｜功能核对：通过\n本次计数变化：发送 +32 帧；交付 +32 帧；消重 +32 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；32 帧；4 个 VL；每帧 64 字节\n载荷来源：测试环境生成的批量字节。\n已生效链路：双网正常；本次未交付：0 帧\n本次实际接收：VLID=0x1236；64 字节；内容：二进制载荷（见 HEX）\n本次接收 HEX：12 36 BB E0 05 2A 50 75 9A BF E5 0A 2F 54 7A 9F C4 E9 0F 34 59 7E A4 C9 EE 13 39 5E 83 A8 CE F3 18 3D …\n本次实际接收：VLID=0x1237；64 字节；内容：二进制载荷（见 HEX）\n本次接收 HEX：12 37 C8 ED 12 37 5D 82 A7 CC F2 17 3C 61 87 AC D1 F6 1C 41 66 8B B1 D6 FB 20 46 6B 90 B5 DB 00 25 4A …\n本次各 VL 交付：1234=8 帧；1235=8 帧；1236=8 帧；1237=8 帧\n本次应用首字节至末字节最大观测时延：3.528 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：0.192 μs\n本次有效载荷交付吞吐：2.0011 Mbps\n本次同 VL 最小发送间隔：1.055936 ms｜达标状态：达标\n本次最近发送帧：VLID=0x1237；SN=8；FCS=D7B692BA｜帧字节核对：通过\n本会话累计：发送 32 帧；交付 32 帧；SNMP 请求/响应 0/0",
+      "last_action": 1
+    },
+    "3": {
+      "status": "完成",
+      "covered": [
+        "双网交付与消重",
+        "仅 A 交付",
+        "仅 B 交付",
+        "A 错误时 B 交付",
+        "双网断开无交付",
+        "恢复后交付"
+      ],
+      "required": [
+        "双网交付与消重",
+        "仅 A 交付",
+        "仅 B 交付",
+        "A 错误时 B 交付",
+        "双网断开无交付",
+        "恢复后交付"
+      ],
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+      "last_result": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +1 帧；消重 +0 次；序号异常 +1 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：双网正常；本次未交付：0 帧\n本次实际接收：VLID=0x1234；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 34 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：1234=1 帧\n本次应用首字节至末字节最大观测时延：2.264 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：样本不足\n本次有效载荷交付吞吐：38.8693 Mbps\n本次同 VL 最小发送间隔：3.178040 ms｜达标状态：达标\n本次最近发送帧：VLID=0x1234；SN=6；FCS=49326430｜帧字节核对：通过\n本会话累计：发送 6 帧；交付 5 帧；SNMP 请求/响应 0/0",
+      "last_action": 11
+    },
+    "4": {
+      "status": "完成",
+      "covered": [
+        "正常报文交付",
+        "FCS 错误拒收",
+        "IP 错误拒收",
+        "UDP 错误拒收",
+        "异常序号拒收",
+        "错误后正常交付"
+      ],
+      "required": [
+        "正常报文交付",
+        "FCS 错误拒收",
+        "IP 错误拒收",
+        "UDP 错误拒收",
+        "异常序号拒收",
+        "错误后正常交付"
+      ],
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+      "last_result": "本次操作：手动对端报文注入｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +2 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次注入：正常报文；VLID=0x12A0；SN=9；内容：I LOVE FPGA\n本次实际接收：无新数据（不显示上次接收内容）。\n接收侧检测到序号异常；本次功能通过表示拒收行为符合独立参考。\n本会话累计：发送 0 帧；交付 2 帧；SNMP 请求/响应 0/0",
+      "last_action": 6
+    },
+    "5": {
+      "status": "完成",
+      "covered": [
+        "GET 初始值",
+        "SET 新值",
+        "GET 读回新值"
+      ],
+      "required": [
+        "GET 初始值",
+        "SET 新值",
+        "GET 读回新值"
+      ],
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185102_242696",
+      "last_result": "本次操作：SNMP GET｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+1/+1\n本次 SNMP 请求/响应：+1/+1；对象：sysContact\n实际 SNMP 响应值：I LOVE FPGA｜响应内容核对：通过\n实际响应请求编号：3；错误状态：0\n本次 SNMP 请求首字节至响应末字节：3.944 μs\n本次最近发送帧：VLID=0x12B4；SN=3；FCS=9E0140F3｜帧字节核对：通过\n本会话累计：发送 0 帧；交付 0 帧；SNMP 请求/响应 3/3",
+      "last_action": 3
+    },
+    "6": {
+      "status": "完成",
+      "covered": [
+        "四时间戳校时"
+      ],
+      "required": [
+        "四时间戳校时"
+      ],
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185135_898702",
+      "last_result": "本次操作：发送模拟时间服务器响应｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+1/+1\nRTC 同步状态：0 → 1｜四时间戳计算核对：通过\n实际 RTC offset：232.167775 μs；delay：35.664300 μs\n绝对 UTC 精度：未测量（本次使用模拟时间服务器）。\n本次最近发送帧：VLID=0x12B5；SN=1；FCS=DCBE8D37｜帧字节核对：通过\n本会话累计：发送 0 帧；交付 0 帧；SNMP 请求/响应 0/0",
+      "last_action": 1
+    }
+  },
+  "checks": [
+    {
+      "stage": 1,
+      "case": "01 default text",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184703_570560",
+      "action": 1,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 2,
+        "application_messages": 1,
+        "minimum_per_VL_BAG_cycles": null,
+        "status": {
+          "cycle": "407552",
+          "accepted": "1",
+          "rejected": "0",
+          "sent": "1",
+          "delivered": "1",
+          "duplicates": "1",
+          "integrity": "0",
+          "dropa": "0",
+          "dropb": "0",
+          "parsea": "0",
+          "parseb": "0",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {}
+        },
+        "rtc": [],
+        "metrics": {
+          "delivered_payload_Mbps": 50.925925925925924,
+          "max_application_first_to_last_us": 1.728,
+          "max_same_VL_same_length_range_us": null,
+          "range_groups_with_at_least_2_samples": 0,
+          "matched_application_messages": 1,
+          "actual_application_input_start_interval_min_cycles": null,
+          "actual_application_input_start_interval_max_cycles": null
+        },
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184703_570560",
+        "updated_utc": "2026-10-29T10:48:00.833362+00:00"
+      },
+      "display": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +1 帧；消重 +1 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：双网正常；本次未交付：0 帧\n本次实际接收：VLID=0x1234；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 34 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：1234=1 帧\n本次应用首字节至末字节最大观测时延：1.728 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：样本不足\n本次有效载荷交付吞吐：50.9259 Mbps\n本次同 VL 最小发送间隔：样本不足\n本次最近发送帧：VLID=0x1234；SN=1；FCS=EAA700AE｜帧字节核对：通过\n本会话累计：发送 1 帧；交付 1 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "完成",
+        "covered": [
+          "原样收发"
+        ],
+        "required": [
+          "原样收发"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184703_570560",
+        "last_result": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +1 帧；消重 +1 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：双网正常；本次未交付：0 帧\n本次实际接收：VLID=0x1234；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 34 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：1234=1 帧\n本次应用首字节至末字节最大观测时延：1.728 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：样本不足\n本次有效载荷交付吞吐：50.9259 Mbps\n本次同 VL 最小发送间隔：样本不足\n本次最近发送帧：VLID=0x1234；SN=1；FCS=EAA700AE｜帧字节核对：通过\n本会话累计：发送 1 帧；交付 1 帧；SNMP 请求/响应 0/0",
+        "last_action": 1
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 2,
+      "case": "02 default batch",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184800_835360",
+      "action": 1,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 33,
+        "application_messages": 32,
+        "minimum_per_VL_BAG_cycles": 131992,
+        "status": {
+          "cycle": "2341888",
+          "accepted": "32",
+          "rejected": "0",
+          "sent": "32",
+          "delivered": "32",
+          "duplicates": "32",
+          "integrity": "0",
+          "dropa": "0",
+          "dropb": "0",
+          "parsea": "0",
+          "parseb": "0",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 32,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {}
+        },
+        "rtc": [],
+        "metrics": {
+          "delivered_payload_Mbps": 2.0011471419651694,
+          "max_application_first_to_last_us": 3.528,
+          "max_same_VL_same_length_range_us": 0.192,
+          "range_groups_with_at_least_2_samples": 4,
+          "matched_application_messages": 32,
+          "actual_application_input_start_interval_min_cycles": 33000,
+          "actual_application_input_start_interval_max_cycles": 33000
+        },
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184800_835360",
+        "updated_utc": "2026-10-29T10:49:40.833646+00:00"
+      },
+      "display": "本次操作：用户确认批量负载｜功能核对：通过\n本次计数变化：发送 +32 帧；交付 +32 帧；消重 +32 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；32 帧；4 个 VL；每帧 64 字节\n载荷来源：测试环境生成的批量字节。\n已生效链路：双网正常；本次未交付：0 帧\n本次实际接收：VLID=0x1236；64 字节；内容：二进制载荷（见 HEX）\n本次接收 HEX：12 36 BB E0 05 2A 50 75 9A BF E5 0A 2F 54 7A 9F C4 E9 0F 34 59 7E A4 C9 EE 13 39 5E 83 A8 CE F3 18 3D …\n本次实际接收：VLID=0x1237；64 字节；内容：二进制载荷（见 HEX）\n本次接收 HEX：12 37 C8 ED 12 37 5D 82 A7 CC F2 17 3C 61 87 AC D1 F6 1C 41 66 8B B1 D6 FB 20 46 6B 90 B5 DB 00 25 4A …\n本次各 VL 交付：1234=8 帧；1235=8 帧；1236=8 帧；1237=8 帧\n本次应用首字节至末字节最大观测时延：3.528 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：0.192 μs\n本次有效载荷交付吞吐：2.0011 Mbps\n本次同 VL 最小发送间隔：1.055936 ms｜达标状态：达标\n本次最近发送帧：VLID=0x1237；SN=8；FCS=D7B692BA｜帧字节核对：通过\n本会话累计：发送 32 帧；交付 32 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "完成",
+        "covered": [
+          "多 VL 完整交付",
+          "同 VL BAG"
+        ],
+        "required": [
+          "多 VL 完整交付",
+          "同 VL BAG"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184800_835360",
+        "last_result": "本次操作：用户确认批量负载｜功能核对：通过\n本次计数变化：发送 +32 帧；交付 +32 帧；消重 +32 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；32 帧；4 个 VL；每帧 64 字节\n载荷来源：测试环境生成的批量字节。\n已生效链路：双网正常；本次未交付：0 帧\n本次实际接收：VLID=0x1236；64 字节；内容：二进制载荷（见 HEX）\n本次接收 HEX：12 36 BB E0 05 2A 50 75 9A BF E5 0A 2F 54 7A 9F C4 E9 0F 34 59 7E A4 C9 EE 13 39 5E 83 A8 CE F3 18 3D …\n本次实际接收：VLID=0x1237；64 字节；内容：二进制载荷（见 HEX）\n本次接收 HEX：12 37 C8 ED 12 37 5D 82 A7 CC F2 17 3C 61 87 AC D1 F6 1C 41 66 8B B1 D6 FB 20 46 6B 90 B5 DB 00 25 4A …\n本次各 VL 交付：1234=8 帧；1235=8 帧；1236=8 帧；1237=8 帧\n本次应用首字节至末字节最大观测时延：3.528 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：0.192 μs\n本次有效载荷交付吞吐：2.0011 Mbps\n本次同 VL 最小发送间隔：1.055936 ms｜达标状态：达标\n本次最近发送帧：VLID=0x1237；SN=8；FCS=D7B692BA｜帧字节核对：通过\n本会话累计：发送 32 帧；交付 32 帧；SNMP 请求/响应 0/0",
+        "last_action": 1
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 3,
+      "case": "03 normal is not full fault coverage",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+      "action": 1,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 2,
+        "application_messages": 1,
+        "minimum_per_VL_BAG_cycles": null,
+        "status": {
+          "cycle": "407552",
+          "accepted": "1",
+          "rejected": "0",
+          "sent": "1",
+          "delivered": "1",
+          "duplicates": "1",
+          "integrity": "0",
+          "dropa": "0",
+          "dropb": "0",
+          "parsea": "0",
+          "parseb": "0",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {}
+        },
+        "rtc": [],
+        "metrics": {
+          "delivered_payload_Mbps": 50.925925925925924,
+          "max_application_first_to_last_us": 1.728,
+          "max_same_VL_same_length_range_us": null,
+          "range_groups_with_at_least_2_samples": 0,
+          "matched_application_messages": 1,
+          "actual_application_input_start_interval_min_cycles": null,
+          "actual_application_input_start_interval_max_cycles": null
+        },
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "updated_utc": "2026-10-29T10:50:10.223251+00:00"
+      },
+      "display": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +1 帧；消重 +1 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：双网正常；本次未交付：0 帧\n本次实际接收：VLID=0x1234；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 34 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：1234=1 帧\n本次应用首字节至末字节最大观测时延：1.728 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：样本不足\n本次有效载荷交付吞吐：50.9259 Mbps\n本次同 VL 最小发送间隔：样本不足\n本次最近发送帧：VLID=0x1234；SN=1；FCS=EAA700AE｜帧字节核对：通过\n本会话累计：发送 1 帧；交付 1 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "双网交付与消重"
+        ],
+        "required": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付",
+          "双网断开无交付",
+          "恢复后交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "last_result": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +1 帧；消重 +1 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：双网正常；本次未交付：0 帧\n本次实际接收：VLID=0x1234；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 34 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：1234=1 帧\n本次应用首字节至末字节最大观测时延：1.728 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：样本不足\n本次有效载荷交付吞吐：50.9259 Mbps\n本次同 VL 最小发送间隔：样本不足\n本次最近发送帧：VLID=0x1234；SN=1；FCS=EAA700AE｜帧字节核对：通过\n本会话累计：发送 1 帧；交付 1 帧；SNMP 请求/响应 0/0",
+        "last_action": 1
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 3,
+      "case": "03 apply A",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+      "action": 2,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 2,
+        "application_messages": 1,
+        "minimum_per_VL_BAG_cycles": null,
+        "status": {
+          "cycle": "409600",
+          "accepted": "1",
+          "rejected": "0",
+          "sent": "1",
+          "delivered": "1",
+          "duplicates": "1",
+          "integrity": "0",
+          "dropa": "0",
+          "dropb": "0",
+          "parsea": "0",
+          "parseb": "0",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {}
+        },
+        "rtc": [],
+        "metrics": {
+          "delivered_payload_Mbps": 50.925925925925924,
+          "max_application_first_to_last_us": 1.728,
+          "max_same_VL_same_length_range_us": null,
+          "range_groups_with_at_least_2_samples": 0,
+          "matched_application_messages": 1,
+          "actual_application_input_start_interval_min_cycles": null,
+          "actual_application_input_start_interval_max_cycles": null
+        },
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "updated_utc": "2026-10-29T10:50:10.662354+00:00"
+      },
+      "display": "本次操作：选择链路故障或恢复｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n已生效链路：仅 A；A 接收错误注入：关闭\n本次只切换链路，未发送业务数据。\n本会话累计：发送 1 帧；交付 1 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "双网交付与消重"
+        ],
+        "required": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付",
+          "双网断开无交付",
+          "恢复后交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "last_result": "本次操作：选择链路故障或恢复｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n已生效链路：仅 A；A 接收错误注入：关闭\n本次只切换链路，未发送业务数据。\n本会话累计：发送 1 帧；交付 1 帧；SNMP 请求/响应 0/0",
+        "last_action": 2
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 3,
+      "case": "03 A delivery",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+      "action": 3,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 3,
+        "application_messages": 2,
+        "minimum_per_VL_BAG_cycles": 397127,
+        "status": {
+          "cycle": "804864",
+          "accepted": "2",
+          "rejected": "0",
+          "sent": "2",
+          "delivered": "2",
+          "duplicates": "1",
+          "integrity": "0",
+          "dropa": "0",
+          "dropb": "0",
+          "parsea": "0",
+          "parseb": "0",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {}
+        },
+        "rtc": [],
+        "metrics": {
+          "delivered_payload_Mbps": 0.0553677804818507,
+          "max_application_first_to_last_us": 1.784,
+          "max_same_VL_same_length_range_us": 0.056,
+          "range_groups_with_at_least_2_samples": 1,
+          "matched_application_messages": 2,
+          "actual_application_input_start_interval_min_cycles": 397120,
+          "actual_application_input_start_interval_max_cycles": 397120
+        },
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "updated_utc": "2026-10-29T10:50:14.396554+00:00"
+      },
+      "display": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +1 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：仅 A；本次未交付：0 帧\n本次实际接收：VLID=0x1234；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 34 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：1234=1 帧\n本次应用首字节至末字节最大观测时延：1.784 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：样本不足\n本次有效载荷交付吞吐：49.3274 Mbps\n本次同 VL 最小发送间隔：3.177016 ms｜达标状态：达标\n本次最近发送帧：VLID=0x1234；SN=2；FCS=50F60937｜帧字节核对：通过\n本会话累计：发送 2 帧；交付 2 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "双网交付与消重",
+          "仅 A 交付"
+        ],
+        "required": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付",
+          "双网断开无交付",
+          "恢复后交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "last_result": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +1 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：仅 A；本次未交付：0 帧\n本次实际接收：VLID=0x1234；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 34 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：1234=1 帧\n本次应用首字节至末字节最大观测时延：1.784 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：样本不足\n本次有效载荷交付吞吐：49.3274 Mbps\n本次同 VL 最小发送间隔：3.177016 ms｜达标状态：达标\n本次最近发送帧：VLID=0x1234；SN=2；FCS=50F60937｜帧字节核对：通过\n本会话累计：发送 2 帧；交付 2 帧；SNMP 请求/响应 0/0",
+        "last_action": 3
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 3,
+      "case": "03 apply B",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+      "action": 4,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 3,
+        "application_messages": 2,
+        "minimum_per_VL_BAG_cycles": 397127,
+        "status": {
+          "cycle": "806912",
+          "accepted": "2",
+          "rejected": "0",
+          "sent": "2",
+          "delivered": "2",
+          "duplicates": "1",
+          "integrity": "0",
+          "dropa": "0",
+          "dropb": "0",
+          "parsea": "0",
+          "parseb": "0",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {}
+        },
+        "rtc": [],
+        "metrics": {
+          "delivered_payload_Mbps": 0.0553677804818507,
+          "max_application_first_to_last_us": 1.784,
+          "max_same_VL_same_length_range_us": 0.056,
+          "range_groups_with_at_least_2_samples": 1,
+          "matched_application_messages": 2,
+          "actual_application_input_start_interval_min_cycles": 397120,
+          "actual_application_input_start_interval_max_cycles": 397120
+        },
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "updated_utc": "2026-10-29T10:50:14.830151+00:00"
+      },
+      "display": "本次操作：选择链路故障或恢复｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n已生效链路：仅 B；A 接收错误注入：关闭\n本次只切换链路，未发送业务数据。\n本会话累计：发送 2 帧；交付 2 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "双网交付与消重",
+          "仅 A 交付"
+        ],
+        "required": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付",
+          "双网断开无交付",
+          "恢复后交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "last_result": "本次操作：选择链路故障或恢复｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n已生效链路：仅 B；A 接收错误注入：关闭\n本次只切换链路，未发送业务数据。\n本会话累计：发送 2 帧；交付 2 帧；SNMP 请求/响应 0/0",
+        "last_action": 4
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 3,
+      "case": "03 B delivery",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+      "action": 5,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 4,
+        "application_messages": 3,
+        "minimum_per_VL_BAG_cycles": 397127,
+        "status": {
+          "cycle": "1201152",
+          "accepted": "3",
+          "rejected": "0",
+          "sent": "3",
+          "delivered": "3",
+          "duplicates": "1",
+          "integrity": "0",
+          "dropa": "0",
+          "dropb": "0",
+          "parsea": "0",
+          "parseb": "0",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {}
+        },
+        "rtc": [],
+        "metrics": {
+          "delivered_payload_Mbps": 0.04152708950472025,
+          "max_application_first_to_last_us": 2.352,
+          "max_same_VL_same_length_range_us": 0.624,
+          "range_groups_with_at_least_2_samples": 1,
+          "matched_application_messages": 3,
+          "actual_application_input_start_interval_min_cycles": 397120,
+          "actual_application_input_start_interval_max_cycles": 397248
+        },
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "updated_utc": "2026-10-29T10:50:18.373240+00:00"
+      },
+      "display": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +1 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：仅 B；本次未交付：0 帧\n本次实际接收：VLID=0x1234；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 34 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：1234=1 帧\n本次应用首字节至末字节最大观测时延：2.352 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：样本不足\n本次有效载荷交付吞吐：37.4150 Mbps\n本次同 VL 最小发送间隔：3.178040 ms｜达标状态：达标\n本次最近发送帧：VLID=0x1234；SN=3；FCS=C6C60E40｜帧字节核对：通过\n本会话累计：发送 3 帧；交付 3 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付"
+        ],
+        "required": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付",
+          "双网断开无交付",
+          "恢复后交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "last_result": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +1 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：仅 B；本次未交付：0 帧\n本次实际接收：VLID=0x1234；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 34 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：1234=1 帧\n本次应用首字节至末字节最大观测时延：2.352 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：样本不足\n本次有效载荷交付吞吐：37.4150 Mbps\n本次同 VL 最小发送间隔：3.178040 ms｜达标状态：达标\n本次最近发送帧：VLID=0x1234；SN=3；FCS=C6C60E40｜帧字节核对：通过\n本会话累计：发送 3 帧；交付 3 帧；SNMP 请求/响应 0/0",
+        "last_action": 5
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 3,
+      "case": "03 apply A error",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+      "action": 6,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 4,
+        "application_messages": 3,
+        "minimum_per_VL_BAG_cycles": 397127,
+        "status": {
+          "cycle": "1203200",
+          "accepted": "3",
+          "rejected": "0",
+          "sent": "3",
+          "delivered": "3",
+          "duplicates": "1",
+          "integrity": "0",
+          "dropa": "0",
+          "dropb": "0",
+          "parsea": "0",
+          "parseb": "0",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {}
+        },
+        "rtc": [],
+        "metrics": {
+          "delivered_payload_Mbps": 0.04152708950472025,
+          "max_application_first_to_last_us": 2.352,
+          "max_same_VL_same_length_range_us": 0.624,
+          "range_groups_with_at_least_2_samples": 1,
+          "matched_application_messages": 3,
+          "actual_application_input_start_interval_min_cycles": 397120,
+          "actual_application_input_start_interval_max_cycles": 397248
+        },
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "updated_utc": "2026-10-29T10:50:18.822174+00:00"
+      },
+      "display": "本次操作：选择链路故障或恢复｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n已生效链路：双网正常；A 接收错误注入：开启\n本次只切换链路，未发送业务数据。\n本会话累计：发送 3 帧；交付 3 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付"
+        ],
+        "required": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付",
+          "双网断开无交付",
+          "恢复后交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "last_result": "本次操作：选择链路故障或恢复｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n已生效链路：双网正常；A 接收错误注入：开启\n本次只切换链路，未发送业务数据。\n本会话累计：发送 3 帧；交付 3 帧；SNMP 请求/响应 0/0",
+        "last_action": 6
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 3,
+      "case": "03 A error survives",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+      "action": 7,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 5,
+        "application_messages": 4,
+        "minimum_per_VL_BAG_cycles": 397127,
+        "status": {
+          "cycle": "1598464",
+          "accepted": "4",
+          "rejected": "0",
+          "sent": "4",
+          "delivered": "4",
+          "duplicates": "1",
+          "integrity": "0",
+          "dropa": "1",
+          "dropb": "0",
+          "parsea": "0",
+          "parseb": "0",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {
+            "MAC": 1
+          }
+        },
+        "rtc": [],
+        "metrics": {
+          "delivered_payload_Mbps": 0.03691532212393984,
+          "max_application_first_to_last_us": 2.408,
+          "max_same_VL_same_length_range_us": 0.68,
+          "range_groups_with_at_least_2_samples": 1,
+          "matched_application_messages": 4,
+          "actual_application_input_start_interval_min_cycles": 397120,
+          "actual_application_input_start_interval_max_cycles": 397248
+        },
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "updated_utc": "2026-10-29T10:50:22.356290+00:00"
+      },
+      "display": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +1 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+1/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：双网正常；本次未交付：0 帧\n本次实际接收：VLID=0x1234；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 34 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：1234=1 帧\n本次应用首字节至末字节最大观测时延：2.408 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：样本不足\n本次有效载荷交付吞吐：36.5449 Mbps\n本次同 VL 最小发送间隔：3.178040 ms｜达标状态：达标\n本次最近发送帧：VLID=0x1234；SN=4；FCS=65536ADE｜帧字节核对：通过\n本会话累计：发送 4 帧；交付 4 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付"
+        ],
+        "required": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付",
+          "双网断开无交付",
+          "恢复后交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "last_result": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +1 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+1/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：双网正常；本次未交付：0 帧\n本次实际接收：VLID=0x1234；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 34 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：1234=1 帧\n本次应用首字节至末字节最大观测时延：2.408 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：样本不足\n本次有效载荷交付吞吐：36.5449 Mbps\n本次同 VL 最小发送间隔：3.178040 ms｜达标状态：达标\n本次最近发送帧：VLID=0x1234；SN=4；FCS=65536ADE｜帧字节核对：通过\n本会话累计：发送 4 帧；交付 4 帧；SNMP 请求/响应 0/0",
+        "last_action": 7
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 3,
+      "case": "03 apply disconnect",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+      "action": 8,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 5,
+        "application_messages": 4,
+        "minimum_per_VL_BAG_cycles": 397127,
+        "status": {
+          "cycle": "1600512",
+          "accepted": "4",
+          "rejected": "0",
+          "sent": "4",
+          "delivered": "4",
+          "duplicates": "1",
+          "integrity": "0",
+          "dropa": "1",
+          "dropb": "0",
+          "parsea": "0",
+          "parseb": "0",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {
+            "MAC": 1
+          }
+        },
+        "rtc": [],
+        "metrics": {
+          "delivered_payload_Mbps": 0.03691532212393984,
+          "max_application_first_to_last_us": 2.408,
+          "max_same_VL_same_length_range_us": 0.68,
+          "range_groups_with_at_least_2_samples": 1,
+          "matched_application_messages": 4,
+          "actual_application_input_start_interval_min_cycles": 397120,
+          "actual_application_input_start_interval_max_cycles": 397248
+        },
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "updated_utc": "2026-10-29T10:50:22.794064+00:00"
+      },
+      "display": "本次操作：选择链路故障或恢复｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n已生效链路：双网断开；A 接收错误注入：关闭\n本次只切换链路，未发送业务数据。\n本会话累计：发送 4 帧；交付 4 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付"
+        ],
+        "required": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付",
+          "双网断开无交付",
+          "恢复后交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "last_result": "本次操作：选择链路故障或恢复｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n已生效链路：双网断开；A 接收错误注入：关闭\n本次只切换链路，未发送业务数据。\n本会话累计：发送 4 帧；交付 4 帧；SNMP 请求/响应 0/0",
+        "last_action": 8
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 3,
+      "case": "03 no stale delivery",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+      "action": 9,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 6,
+        "application_messages": 4,
+        "minimum_per_VL_BAG_cycles": 397127,
+        "status": {
+          "cycle": "1995776",
+          "accepted": "5",
+          "rejected": "0",
+          "sent": "5",
+          "delivered": "4",
+          "duplicates": "1",
+          "integrity": "0",
+          "dropa": "1",
+          "dropb": "0",
+          "parsea": "0",
+          "parseb": "0",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {
+            "MAC": 1
+          }
+        },
+        "rtc": [],
+        "metrics": {
+          "delivered_payload_Mbps": 0.03691532212393984,
+          "max_application_first_to_last_us": 2.408,
+          "max_same_VL_same_length_range_us": 0.68,
+          "range_groups_with_at_least_2_samples": 1,
+          "matched_application_messages": 4,
+          "actual_application_input_start_interval_min_cycles": 397120,
+          "actual_application_input_start_interval_max_cycles": 397248
+        },
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "updated_utc": "2026-10-29T10:50:27.367214+00:00"
+      },
+      "display": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：双网断开；本次未交付：1 帧\n本次实际接收：无新数据（不显示上次接收内容）。\n本次时延／吞吐／极差：无交付样本\n本次同 VL 最小发送间隔：3.177784 ms｜达标状态：达标\n本次最近发送帧：VLID=0x1234；SN=5；FCS=F3636DA9｜帧字节核对：通过\n本会话累计：发送 5 帧；交付 4 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付",
+          "双网断开无交付"
+        ],
+        "required": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付",
+          "双网断开无交付",
+          "恢复后交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "last_result": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：双网断开；本次未交付：1 帧\n本次实际接收：无新数据（不显示上次接收内容）。\n本次时延／吞吐／极差：无交付样本\n本次同 VL 最小发送间隔：3.177784 ms｜达标状态：达标\n本次最近发送帧：VLID=0x1234；SN=5；FCS=F3636DA9｜帧字节核对：通过\n本会话累计：发送 5 帧；交付 4 帧；SNMP 请求/响应 0/0",
+        "last_action": 9
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 3,
+      "case": "03 apply restore",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+      "action": 10,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 6,
+        "application_messages": 4,
+        "minimum_per_VL_BAG_cycles": 397127,
+        "status": {
+          "cycle": "1997824",
+          "accepted": "5",
+          "rejected": "0",
+          "sent": "5",
+          "delivered": "4",
+          "duplicates": "1",
+          "integrity": "0",
+          "dropa": "1",
+          "dropb": "0",
+          "parsea": "0",
+          "parseb": "0",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {
+            "MAC": 1
+          }
+        },
+        "rtc": [],
+        "metrics": {
+          "delivered_payload_Mbps": 0.03691532212393984,
+          "max_application_first_to_last_us": 2.408,
+          "max_same_VL_same_length_range_us": 0.68,
+          "range_groups_with_at_least_2_samples": 1,
+          "matched_application_messages": 4,
+          "actual_application_input_start_interval_min_cycles": 397120,
+          "actual_application_input_start_interval_max_cycles": 397248
+        },
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "updated_utc": "2026-10-29T10:50:27.821261+00:00"
+      },
+      "display": "本次操作：选择链路故障或恢复｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n已生效链路：双网正常；A 接收错误注入：关闭\n本次只切换链路，未发送业务数据。\n本会话累计：发送 5 帧；交付 4 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付",
+          "双网断开无交付"
+        ],
+        "required": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付",
+          "双网断开无交付",
+          "恢复后交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "last_result": "本次操作：选择链路故障或恢复｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n已生效链路：双网正常；A 接收错误注入：关闭\n本次只切换链路，未发送业务数据。\n本会话累计：发送 5 帧；交付 4 帧；SNMP 请求/响应 0/0",
+        "last_action": 10
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 3,
+      "case": "03 restored delivery completes fault coverage",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+      "action": 11,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 7,
+        "application_messages": 5,
+        "minimum_per_VL_BAG_cycles": 397127,
+        "status": {
+          "cycle": "2393088",
+          "accepted": "6",
+          "rejected": "0",
+          "sent": "6",
+          "delivered": "5",
+          "duplicates": "1",
+          "integrity": "1",
+          "dropa": "1",
+          "dropb": "0",
+          "parsea": "0",
+          "parseb": "0",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 1,
+          "control": 0,
+          "malformed": {
+            "MAC": 1
+          }
+        },
+        "rtc": [],
+        "metrics": {
+          "delivered_payload_Mbps": 0.027688350000880994,
+          "max_application_first_to_last_us": 3180.248,
+          "max_same_VL_same_length_range_us": 3178.52,
+          "range_groups_with_at_least_2_samples": 1,
+          "matched_application_messages": 5,
+          "actual_application_input_start_interval_min_cycles": 397120,
+          "actual_application_input_start_interval_max_cycles": 397248
+        },
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "updated_utc": "2026-10-29T10:50:31.584240+00:00"
+      },
+      "display": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +1 帧；消重 +0 次；序号异常 +1 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：双网正常；本次未交付：0 帧\n本次实际接收：VLID=0x1234；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 34 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：1234=1 帧\n本次应用首字节至末字节最大观测时延：2.264 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：样本不足\n本次有效载荷交付吞吐：38.8693 Mbps\n本次同 VL 最小发送间隔：3.178040 ms｜达标状态：达标\n本次最近发送帧：VLID=0x1234；SN=6；FCS=49326430｜帧字节核对：通过\n本会话累计：发送 6 帧；交付 5 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "完成",
+        "covered": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付",
+          "双网断开无交付",
+          "恢复后交付"
+        ],
+        "required": [
+          "双网交付与消重",
+          "仅 A 交付",
+          "仅 B 交付",
+          "A 错误时 B 交付",
+          "双网断开无交付",
+          "恢复后交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_184940_852784",
+        "last_result": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +1 帧；消重 +0 次；序号异常 +1 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：双网正常；本次未交付：0 帧\n本次实际接收：VLID=0x1234；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 34 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：1234=1 帧\n本次应用首字节至末字节最大观测时延：2.264 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：样本不足\n本次有效载荷交付吞吐：38.8693 Mbps\n本次同 VL 最小发送间隔：3.178040 ms｜达标状态：达标\n本次最近发送帧：VLID=0x1234；SN=6；FCS=49326430｜帧字节核对：通过\n本会话累计：发送 6 帧；交付 5 帧；SNMP 请求/响应 0/0",
+        "last_action": 11
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 4,
+      "case": "04 normal is not full error coverage",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+      "action": 1,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 1,
+        "application_messages": 1,
+        "minimum_per_VL_BAG_cycles": null,
+        "status": {
+          "cycle": "31744",
+          "accepted": "0",
+          "rejected": "0",
+          "sent": "0",
+          "delivered": "1",
+          "duplicates": "1",
+          "integrity": "0",
+          "dropa": "0",
+          "dropb": "0",
+          "parsea": "0",
+          "parseb": "0",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {}
+        },
+        "rtc": [],
+        "metrics": {},
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+        "updated_utc": "2026-10-29T10:50:58.047527+00:00"
+      },
+      "display": "本次操作：手动对端报文注入｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +1 帧；消重 +1 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次注入：正常报文；VLID=0x12A0；SN=1；内容：I LOVE FPGA\n本次实际接收：VLID=0x12A0；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 A0 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：12A0=1 帧\n本次最近发送帧：VLID=0x12B5；SN=1；FCS=DCBE8D37｜帧字节核对：通过\n本会话累计：发送 0 帧；交付 1 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "正常报文交付"
+        ],
+        "required": [
+          "正常报文交付",
+          "FCS 错误拒收",
+          "IP 错误拒收",
+          "UDP 错误拒收",
+          "异常序号拒收",
+          "错误后正常交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+        "last_result": "本次操作：手动对端报文注入｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +1 帧；消重 +1 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次注入：正常报文；VLID=0x12A0；SN=1；内容：I LOVE FPGA\n本次实际接收：VLID=0x12A0；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 A0 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：12A0=1 帧\n本次最近发送帧：VLID=0x12B5；SN=1；FCS=DCBE8D37｜帧字节核对：通过\n本会话累计：发送 0 帧；交付 1 帧；SNMP 请求/响应 0/0",
+        "last_action": 1
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 4,
+      "case": "04 FCS rejection",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+      "action": 2,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 1,
+        "application_messages": 1,
+        "minimum_per_VL_BAG_cycles": null,
+        "status": {
+          "cycle": "52224",
+          "accepted": "0",
+          "rejected": "0",
+          "sent": "0",
+          "delivered": "1",
+          "duplicates": "1",
+          "integrity": "0",
+          "dropa": "1",
+          "dropb": "1",
+          "parsea": "0",
+          "parseb": "0",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {
+            "MAC": 2
+          }
+        },
+        "rtc": [],
+        "metrics": {},
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+        "updated_utc": "2026-10-29T10:50:59.090010+00:00"
+      },
+      "display": "本次操作：手动对端报文注入｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+1/+1；业务解析器拒绝 A/B：+0/+0\n本次注入：FCS错误；VLID=0x12A0；SN=2；内容：I LOVE FPGA\n本次实际接收：无新数据（不显示上次接收内容）。\n本会话累计：发送 0 帧；交付 1 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "正常报文交付",
+          "FCS 错误拒收"
+        ],
+        "required": [
+          "正常报文交付",
+          "FCS 错误拒收",
+          "IP 错误拒收",
+          "UDP 错误拒收",
+          "异常序号拒收",
+          "错误后正常交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+        "last_result": "本次操作：手动对端报文注入｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+1/+1；业务解析器拒绝 A/B：+0/+0\n本次注入：FCS错误；VLID=0x12A0；SN=2；内容：I LOVE FPGA\n本次实际接收：无新数据（不显示上次接收内容）。\n本会话累计：发送 0 帧；交付 1 帧；SNMP 请求/响应 0/0",
+        "last_action": 2
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 4,
+      "case": "04 IP rejection",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+      "action": 3,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 1,
+        "application_messages": 1,
+        "minimum_per_VL_BAG_cycles": null,
+        "status": {
+          "cycle": "71680",
+          "accepted": "0",
+          "rejected": "0",
+          "sent": "0",
+          "delivered": "1",
+          "duplicates": "1",
+          "integrity": "0",
+          "dropa": "1",
+          "dropb": "1",
+          "parsea": "1",
+          "parseb": "1",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {
+            "MAC": 2,
+            "parser": 2
+          }
+        },
+        "rtc": [],
+        "metrics": {},
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+        "updated_utc": "2026-10-29T10:51:00.133810+00:00"
+      },
+      "display": "本次操作：手动对端报文注入｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+1/+1\n本次注入：IP校验错误；VLID=0x12A0；SN=2；内容：I LOVE FPGA\n本次实际接收：无新数据（不显示上次接收内容）。\n本会话累计：发送 0 帧；交付 1 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "正常报文交付",
+          "FCS 错误拒收",
+          "IP 错误拒收"
+        ],
+        "required": [
+          "正常报文交付",
+          "FCS 错误拒收",
+          "IP 错误拒收",
+          "UDP 错误拒收",
+          "异常序号拒收",
+          "错误后正常交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+        "last_result": "本次操作：手动对端报文注入｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+1/+1\n本次注入：IP校验错误；VLID=0x12A0；SN=2；内容：I LOVE FPGA\n本次实际接收：无新数据（不显示上次接收内容）。\n本会话累计：发送 0 帧；交付 1 帧；SNMP 请求/响应 0/0",
+        "last_action": 3
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 4,
+      "case": "04 UDP rejection",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+      "action": 4,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 1,
+        "application_messages": 1,
+        "minimum_per_VL_BAG_cycles": null,
+        "status": {
+          "cycle": "92160",
+          "accepted": "0",
+          "rejected": "0",
+          "sent": "0",
+          "delivered": "1",
+          "duplicates": "1",
+          "integrity": "0",
+          "dropa": "1",
+          "dropb": "1",
+          "parsea": "2",
+          "parseb": "2",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 1,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {
+            "MAC": 2,
+            "parser": 4
+          }
+        },
+        "rtc": [],
+        "metrics": {},
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+        "updated_utc": "2026-10-29T10:51:00.963692+00:00"
+      },
+      "display": "本次操作：手动对端报文注入｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+1/+1\n本次注入：UDP长度错误；VLID=0x12A0；SN=2；内容：I LOVE FPGA\n本次实际接收：无新数据（不显示上次接收内容）。\n本会话累计：发送 0 帧；交付 1 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "正常报文交付",
+          "FCS 错误拒收",
+          "IP 错误拒收",
+          "UDP 错误拒收"
+        ],
+        "required": [
+          "正常报文交付",
+          "FCS 错误拒收",
+          "IP 错误拒收",
+          "UDP 错误拒收",
+          "异常序号拒收",
+          "错误后正常交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+        "last_result": "本次操作：手动对端报文注入｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+1/+1\n本次注入：UDP长度错误；VLID=0x12A0；SN=2；内容：I LOVE FPGA\n本次实际接收：无新数据（不显示上次接收内容）。\n本会话累计：发送 0 帧；交付 1 帧；SNMP 请求/响应 0/0",
+        "last_action": 4
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 4,
+      "case": "04 recover correct frame",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+      "action": 5,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 1,
+        "application_messages": 2,
+        "minimum_per_VL_BAG_cycles": null,
+        "status": {
+          "cycle": "111616",
+          "accepted": "0",
+          "rejected": "0",
+          "sent": "0",
+          "delivered": "2",
+          "duplicates": "2",
+          "integrity": "0",
+          "dropa": "1",
+          "dropb": "1",
+          "parsea": "2",
+          "parseb": "2",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 2,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {
+            "MAC": 2,
+            "parser": 4
+          }
+        },
+        "rtc": [],
+        "metrics": {},
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+        "updated_utc": "2026-10-29T10:51:01.599407+00:00"
+      },
+      "display": "本次操作：手动对端报文注入｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +1 帧；消重 +1 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次注入：正常报文；VLID=0x12A0；SN=2；内容：I LOVE FPGA\n本次实际接收：VLID=0x12A0；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 A0 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：12A0=1 帧\n本会话累计：发送 0 帧；交付 2 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "正常报文交付",
+          "FCS 错误拒收",
+          "IP 错误拒收",
+          "UDP 错误拒收",
+          "错误后正常交付"
+        ],
+        "required": [
+          "正常报文交付",
+          "FCS 错误拒收",
+          "IP 错误拒收",
+          "UDP 错误拒收",
+          "异常序号拒收",
+          "错误后正常交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+        "last_result": "本次操作：手动对端报文注入｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +1 帧；消重 +1 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次注入：正常报文；VLID=0x12A0；SN=2；内容：I LOVE FPGA\n本次实际接收：VLID=0x12A0；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 A0 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：12A0=1 帧\n本会话累计：发送 0 帧；交付 2 帧；SNMP 请求/响应 0/0",
+        "last_action": 5
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 4,
+      "case": "04 abnormal SN completes error coverage",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+      "action": 6,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 1,
+        "application_messages": 2,
+        "minimum_per_VL_BAG_cycles": null,
+        "status": {
+          "cycle": "132096",
+          "accepted": "0",
+          "rejected": "0",
+          "sent": "0",
+          "delivered": "2",
+          "duplicates": "2",
+          "integrity": "2",
+          "dropa": "1",
+          "dropb": "1",
+          "parsea": "2",
+          "parseb": "2",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 2,
+          "integrity": 2,
+          "control": 0,
+          "malformed": {
+            "MAC": 2,
+            "parser": 4
+          }
+        },
+        "rtc": [],
+        "metrics": {},
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+        "updated_utc": "2026-10-29T10:51:02.240603+00:00"
+      },
+      "display": "本次操作：手动对端报文注入｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +2 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次注入：正常报文；VLID=0x12A0；SN=9；内容：I LOVE FPGA\n本次实际接收：无新数据（不显示上次接收内容）。\n接收侧检测到序号异常；本次功能通过表示拒收行为符合独立参考。\n本会话累计：发送 0 帧；交付 2 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "完成",
+        "covered": [
+          "正常报文交付",
+          "FCS 错误拒收",
+          "IP 错误拒收",
+          "UDP 错误拒收",
+          "异常序号拒收",
+          "错误后正常交付"
+        ],
+        "required": [
+          "正常报文交付",
+          "FCS 错误拒收",
+          "IP 错误拒收",
+          "UDP 错误拒收",
+          "异常序号拒收",
+          "错误后正常交付"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185031_587558",
+        "last_result": "本次操作：手动对端报文注入｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +2 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次注入：正常报文；VLID=0x12A0；SN=9；内容：I LOVE FPGA\n本次实际接收：无新数据（不显示上次接收内容）。\n接收侧检测到序号异常；本次功能通过表示拒收行为符合独立参考。\n本会话累计：发送 0 帧；交付 2 帧；SNMP 请求/响应 0/0",
+        "last_action": 6
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 5,
+      "case": "05 GET initial",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185102_242696",
+      "action": 1,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 2,
+        "application_messages": 0,
+        "minimum_per_VL_BAG_cycles": null,
+        "status": {
+          "cycle": "172032",
+          "accepted": "0",
+          "rejected": "0",
+          "sent": "0",
+          "delivered": "0",
+          "duplicates": "0",
+          "integrity": "0",
+          "dropa": "0",
+          "dropb": "0",
+          "parsea": "1",
+          "parseb": "1",
+          "requests": "1",
+          "responses": "1",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 0,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {}
+        },
+        "rtc": [],
+        "metrics": {},
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185102_242696",
+        "updated_utc": "2026-10-29T10:51:32.338284+00:00"
+      },
+      "display": "本次操作：SNMP GET｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+1/+1\n本次 SNMP 请求/响应：+1/+1；对象：sysContact\n实际 SNMP 响应值：afdx-es-team3｜响应内容核对：通过\n实际响应请求编号：1；错误状态：0\n本次 SNMP 请求首字节至响应末字节：3.992 μs\n本次最近发送帧：VLID=0x12B4；SN=1；FCS=E8D9CE52｜帧字节核对：通过\n本会话累计：发送 0 帧；交付 0 帧；SNMP 请求/响应 1/1",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "GET 初始值"
+        ],
+        "required": [
+          "GET 初始值",
+          "SET 新值",
+          "GET 读回新值"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185102_242696",
+        "last_result": "本次操作：SNMP GET｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+1/+1\n本次 SNMP 请求/响应：+1/+1；对象：sysContact\n实际 SNMP 响应值：afdx-es-team3｜响应内容核对：通过\n实际响应请求编号：1；错误状态：0\n本次 SNMP 请求首字节至响应末字节：3.992 μs\n本次最近发送帧：VLID=0x12B4；SN=1；FCS=E8D9CE52｜帧字节核对：通过\n本会话累计：发送 0 帧；交付 0 帧；SNMP 请求/响应 1/1",
+        "last_action": 1
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 5,
+      "case": "05 SET is not readback",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185102_242696",
+      "action": 2,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 3,
+        "application_messages": 0,
+        "minimum_per_VL_BAG_cycles": 160003,
+        "status": {
+          "cycle": "331776",
+          "accepted": "0",
+          "rejected": "0",
+          "sent": "0",
+          "delivered": "0",
+          "duplicates": "0",
+          "integrity": "0",
+          "dropa": "0",
+          "dropb": "0",
+          "parsea": "2",
+          "parseb": "2",
+          "requests": "2",
+          "responses": "2",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 0,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {}
+        },
+        "rtc": [],
+        "metrics": {},
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185102_242696",
+        "updated_utc": "2026-10-29T10:51:34.195397+00:00"
+      },
+      "display": "本次操作：SNMP SET｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+1/+1\n本次 SNMP 请求/响应：+1/+1；对象：sysContact\n本次 SET 输入：I LOVE FPGA\n实际 SNMP 响应值：I LOVE FPGA｜响应内容核对：通过\n实际响应请求编号：2；错误状态：0\n本次 SNMP 请求首字节至响应末字节：4.264 μs\n本次最近发送帧：VLID=0x12B4；SN=2；FCS=A666F387｜帧字节核对：通过\n本会话累计：发送 0 帧；交付 0 帧；SNMP 请求/响应 2/2",
+      "coverage": {
+        "status": "进行中",
+        "covered": [
+          "GET 初始值",
+          "SET 新值"
+        ],
+        "required": [
+          "GET 初始值",
+          "SET 新值",
+          "GET 读回新值"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185102_242696",
+        "last_result": "本次操作：SNMP SET｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+1/+1\n本次 SNMP 请求/响应：+1/+1；对象：sysContact\n本次 SET 输入：I LOVE FPGA\n实际 SNMP 响应值：I LOVE FPGA｜响应内容核对：通过\n实际响应请求编号：2；错误状态：0\n本次 SNMP 请求首字节至响应末字节：4.264 μs\n本次最近发送帧：VLID=0x12B4；SN=2；FCS=A666F387｜帧字节核对：通过\n本会话累计：发送 0 帧；交付 0 帧；SNMP 请求/响应 2/2",
+        "last_action": 2
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 5,
+      "case": "05 GET actual readback completes management",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185102_242696",
+      "action": 3,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 4,
+        "application_messages": 0,
+        "minimum_per_VL_BAG_cycles": 159941,
+        "status": {
+          "cycle": "491520",
+          "accepted": "0",
+          "rejected": "0",
+          "sent": "0",
+          "delivered": "0",
+          "duplicates": "0",
+          "integrity": "0",
+          "dropa": "0",
+          "dropb": "0",
+          "parsea": "3",
+          "parseb": "3",
+          "requests": "3",
+          "responses": "3",
+          "errors": "0",
+          "sync": "0"
+        },
+        "rx_oracle": {
+          "duplicates": 0,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {}
+        },
+        "rtc": [],
+        "metrics": {},
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185102_242696",
+        "updated_utc": "2026-10-29T10:51:35.889168+00:00"
+      },
+      "display": "本次操作：SNMP GET｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+1/+1\n本次 SNMP 请求/响应：+1/+1；对象：sysContact\n实际 SNMP 响应值：I LOVE FPGA｜响应内容核对：通过\n实际响应请求编号：3；错误状态：0\n本次 SNMP 请求首字节至响应末字节：3.944 μs\n本次最近发送帧：VLID=0x12B4；SN=3；FCS=9E0140F3｜帧字节核对：通过\n本会话累计：发送 0 帧；交付 0 帧；SNMP 请求/响应 3/3",
+      "coverage": {
+        "status": "完成",
+        "covered": [
+          "GET 初始值",
+          "SET 新值",
+          "GET 读回新值"
+        ],
+        "required": [
+          "GET 初始值",
+          "SET 新值",
+          "GET 读回新值"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185102_242696",
+        "last_result": "本次操作：SNMP GET｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+1/+1\n本次 SNMP 请求/响应：+1/+1；对象：sysContact\n实际 SNMP 响应值：I LOVE FPGA｜响应内容核对：通过\n实际响应请求编号：3；错误状态：0\n本次 SNMP 请求首字节至响应末字节：3.944 μs\n本次最近发送帧：VLID=0x12B4；SN=3；FCS=9E0140F3｜帧字节核对：通过\n本会话累计：发送 0 帧；交付 0 帧；SNMP 请求/响应 3/3",
+        "last_action": 3
+      },
+      "result": "PASS"
+    },
+    {
+      "stage": 6,
+      "case": "06 fresh request synchronization",
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185135_898702",
+      "action": 1,
+      "proof": {
+        "result": "PASS",
+        "scope": "independent manual-scenario RTL verification; not official full acceptance",
+        "clock_ns": 8,
+        "BAG_cycles": 125000,
+        "wire_frames": 1,
+        "application_messages": 0,
+        "minimum_per_VL_BAG_cycles": null,
+        "status": {
+          "cycle": "31744",
+          "accepted": "0",
+          "rejected": "0",
+          "sent": "0",
+          "delivered": "0",
+          "duplicates": "0",
+          "integrity": "0",
+          "dropa": "0",
+          "dropb": "0",
+          "parsea": "1",
+          "parseb": "1",
+          "requests": "0",
+          "responses": "0",
+          "errors": "0",
+          "sync": "1"
+        },
+        "rx_oracle": {
+          "duplicates": 0,
+          "integrity": 0,
+          "control": 0,
+          "malformed": {}
+        },
+        "rtc": [
+          {
+            "offset_us": 232.16777481138706,
+            "delay_us": 35.66429950296879
+          }
+        ],
+        "metrics": {},
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185135_898702",
+        "updated_utc": "2026-10-29T10:52:04.466687+00:00"
+      },
+      "display": "本次操作：发送模拟时间服务器响应｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+1/+1\nRTC 同步状态：0 → 1｜四时间戳计算核对：通过\n实际 RTC offset：232.167775 μs；delay：35.664300 μs\n绝对 UTC 精度：未测量（本次使用模拟时间服务器）。\n本次最近发送帧：VLID=0x12B5；SN=1；FCS=DCBE8D37｜帧字节核对：通过\n本会话累计：发送 0 帧；交付 0 帧；SNMP 请求/响应 0/0",
+      "coverage": {
+        "status": "完成",
+        "covered": [
+          "四时间戳校时"
+        ],
+        "required": [
+          "四时间戳校时"
+        ],
+        "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185135_898702",
+        "last_result": "本次操作：发送模拟时间服务器响应｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+1/+1\nRTC 同步状态：0 → 1｜四时间戳计算核对：通过\n实际 RTC offset：232.167775 μs；delay：35.664300 μs\n绝对 UTC 精度：未测量（本次使用模拟时间服务器）。\n本次最近发送帧：VLID=0x12B5；SN=1；FCS=DCBE8D37｜帧字节核对：通过\n本会话累计：发送 0 帧；交付 0 帧；SNMP 请求/响应 0/0",
+        "last_action": 1
+      },
+      "result": "PASS"
+    }
+  ],
+  "negative_checks": [
+    "untested stages remain unrun",
+    "partial tests do not complete a stage",
+    "SET alone does not count as readback",
+    "reset clears only the selected stage",
+    "failed proof cannot pass"
+  ],
+  "native_GUI_check": {
+    "result": "PASS",
+    "kind": "agent-operated GUI smoke check, not human acceptance",
+    "suite_run": "D:\\FPGA\\captain_integration\\build\\interactive_suite\\20261029_185212_477011",
+    "summary": {
+      "kind": "manual suite results; not full official acceptance",
+      "completed": 2,
+      "source_sha256": {
+        "scripts\\basic_demo.py": "d6b07e68afd18e8257e35af50c82b23834f9581872edc3f26590bb0a15863c91",
+        "scripts\\interactive_demo.py": "830803d9a34a9f933404ab6fb8ada07cc93bc3e556ab1ef506cfeca7d16df788"
+      },
+      "items": {
+        "1": {
+          "status": "完成",
+          "covered": [
+            "原样收发"
+          ],
+          "required": [
+            "原样收发"
+          ],
+          "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185722_969478",
+          "last_result": "本次操作：手动发送｜功能核对：通过\n本次计数变化：发送 +1 帧；交付 +1 帧；消重 +1 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+0/+0\n本次输入：起始 VLID=0x1234；1 帧；1 个 VL；每帧 11 字节\n本次输入内容：I LOVE FPGA\n已生效链路：双网正常；本次未交付：0 帧\n本次实际接收：VLID=0x1234；11 字节；内容：I LOVE FPGA\n本次接收 HEX：12 34 49 20 4C 4F 56 45 20 46 50 47 41\n本次各 VL 交付：1234=1 帧\n本次应用首字节至末字节最大观测时延：1.728 μs｜达标状态：达标（本次样本）\n本次同 VL 同长度时延极差：样本不足\n本次有效载荷交付吞吐：50.9259 Mbps\n本次同 VL 最小发送间隔：样本不足\n本次最近发送帧：VLID=0x1234；SN=1；FCS=EAA700AE｜帧字节核对：通过\n本会话累计：发送 1 帧；交付 1 帧；SNMP 请求/响应 0/0",
+          "last_action": 1
+        },
+        "2": {
+          "status": "未运行",
+          "covered": [],
+          "required": [
+            "多 VL 完整交付",
+            "同 VL BAG"
+          ],
+          "run": null,
+          "last_result": ""
+        },
+        "3": {
+          "status": "未运行",
+          "covered": [],
+          "required": [
+            "双网交付与消重",
+            "仅 A 交付",
+            "仅 B 交付",
+            "A 错误时 B 交付",
+            "双网断开无交付",
+            "恢复后交付"
+          ],
+          "run": null,
+          "last_result": ""
+        },
+        "4": {
+          "status": "未运行",
+          "covered": [],
+          "required": [
+            "正常报文交付",
+            "FCS 错误拒收",
+            "IP 错误拒收",
+            "UDP 错误拒收",
+            "异常序号拒收",
+            "错误后正常交付"
+          ],
+          "run": null,
+          "last_result": ""
+        },
+        "5": {
+          "status": "完成",
+          "covered": [
+            "GET 初始值",
+            "SET 新值",
+            "GET 读回新值"
+          ],
+          "required": [
+            "GET 初始值",
+            "SET 新值",
+            "GET 读回新值"
+          ],
+          "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_185330_055870",
+          "last_result": "本次操作：SNMP GET｜功能核对：通过\n本次计数变化：发送 +0 帧；交付 +0 帧；消重 +0 次；序号异常 +0 次\n本次 MAC 丢弃 A/B：+0/+0；业务解析器拒绝 A/B：+1/+1\n本次 SNMP 请求/响应：+1/+1；对象：sysContact\n实际 SNMP 响应值：I LOVE FPGA｜响应内容核对：通过\n实际响应请求编号：3；错误状态：0\n本次 SNMP 请求首字节至响应末字节：3.944 μs\n本次最近发送帧：VLID=0x12B4；SN=3；FCS=9E0140F3｜帧字节核对：通过\n本会话累计：发送 0 帧；交付 0 帧；SNMP 请求/响应 3/3",
+          "last_action": 3
+        },
+        "6": {
+          "status": "未运行",
+          "covered": [],
+          "required": [
+            "四时间戳校时"
+          ],
+          "run": null,
+          "last_result": ""
+        }
+      }
+    },
+    "checks": [
+      "one control window and six tabs plus summary",
+      "I LOVE FPGA prefilled",
+      "loading prevents page changes",
+      "default application message delivered",
+      "GET initial/SET I LOVE FPGA/GET actual readback updates summary",
+      "unrun stages remain unrun",
+      "review preserves results",
+      "rerun resets only the selected stage and executes queued click after fresh initialization"
+    ]
+  },
+  "delivery_check": {
+    "result": "PASS",
+    "main_launchers": [
+      "视频1_系统基础功能演示.cmd",
+      "视频2_系统性能展示.cmd",
+      "视频3_调度优化对照演示.cmd"
+    ],
+    "legacy_launcher_count": 9
+  }
+}

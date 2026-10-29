@@ -310,7 +310,7 @@ def focus_wave(run,previous=None):
     (run/'zoom.txt').write_text(f'{left} {right}')
 
 class Session:
-    def __init__(self, scenario=1, batch=False, arbiter=None, reference=None):
+    def __init__(self, scenario=1, batch=False, arbiter=None, reference=None, extra_helpers=()):
         if not (MS/'vsim.exe').is_file():raise RuntimeError(f'ModelSim missing: {MS}')
         self.run=ROOT/'build'/'interactive_demo'/datetime.now().strftime('%Y%m%d_%H%M%S_%f')
         self.run.mkdir(parents=True);self.batch=batch;self.index=0;self.sn={};self.msn=0;self.rid=0
@@ -329,6 +329,7 @@ class Session:
         if arbiter:files=[arbiter if p.name=='afdx_service_tx_arbiter_615a.v' else p for p in files]
         helpers=[Path(__file__),ROOT/'scripts/interactive_demo.tcl',ROOT/'scripts/run_competition.py',ROOT/'scripts/modelsim_support.py',
                  ROOT/'scripts/frozen_frame_reference.py',ROOT/'scripts/generate_stage2_mgmt_golden.py',ROOT/'scripts/generate_snmp_golden.py']
+        helpers += list(extra_helpers)
         self.plan=dict(scenario=scenario,created_utc=datetime.now(timezone.utc).isoformat(),wire=[],ingress=[],app=[],actions=[],
                        inputs={str(p.relative_to(ROOT)):sha(p) for p in files+helpers},clock_ns=8,BAG_cycles=125000)
         self.plan['production_reference']=str(reference) if reference else 'current rtl + vendor/frozen'
@@ -470,19 +471,23 @@ def self_test():
     print(json.dumps(dict(result='PASS',report=str(out)),ensure_ascii=False))
 
 class Controller:
-    def __init__(self,scenario):
+    def __init__(self,scenario,parent=None,suite=None):
         import tkinter as tk
         from tkinter import ttk, messagebox
-        self.tk=tk;self.ttk=ttk;self.mb=messagebox;self.window=tk.Tk();self.window.title(f'{scenario:02d} {TITLES[scenario-1]} · 真实 RTL 手动演示')
-        self.window.geometry(f"{min(1120,self.window.winfo_screenwidth()-80)}x{min(900,self.window.winfo_screenheight()-100)}");self.window.option_add('*Font',('Microsoft YaHei',10))
+        self.tk=tk;self.ttk=ttk;self.mb=messagebox;self.suite=suite;self.scenario=scenario
+        self.window=ttk.Frame(parent) if parent is not None else tk.Tk()
+        if parent is None:
+            self.window.title(f'{scenario:02d} {TITLES[scenario-1]} · 真实 RTL 手动演示')
+            self.window.geometry(f"{min(1120,self.window.winfo_screenwidth()-80)}x{min(900,self.window.winfo_screenheight()-100)}");self.window.option_add('*Font',('Microsoft YaHei',10))
         self.busy=True;self.failed=False;self.entries={};self.s=None;self.last_proof=None
-        ttk.Label(self.window,text=TITLES[scenario-1],font=('Microsoft YaHei',20,'bold')).pack(anchor='w',padx=18,pady=12)
-        ttk.Label(self.window,text='真实 RTL 仿真 · 125 MHz').pack(anchor='w',padx=18)
-        self.state=tk.StringVar(value='检查环境并启动 ModelSim；首次编译请稍候……')
+        if parent is None:
+            ttk.Label(self.window,text=TITLES[scenario-1],font=('Microsoft YaHei',20,'bold')).pack(anchor='w',padx=18,pady=12)
+            ttk.Label(self.window,text='真实 RTL 仿真 · 125 MHz').pack(anchor='w',padx=18)
+        self.state=tk.StringVar(value='尚未启动本项仿真' if suite else '检查环境并启动 ModelSim；首次编译请稍候……')
         ttk.Label(self.window,textvariable=self.state,wraplength=900).pack(anchor='w',padx=18,pady=8)
         self.body=ttk.Frame(self.window);self.body.pack(fill='x',padx=18)
         if scenario in (1,2,3,7):
-            self.field('VLID（十六进制）','vl','1234');self.field('单帧数据（UTF-8）','data','HELLO_FPGA' if scenario==1 else 'NET_TEST' if scenario==3 else 'VL_TEST')
+            self.field('VLID（十六进制）','vl','1234');self.field('单帧数据（UTF-8）','data','I LOVE FPGA')
             ttk.Button(self.body,text='发送本人输入的数据',command=self.send).pack(anchor='w',pady=4)
         if scenario in (2,7):
             self.field('批量帧数（1～512）','count','32' if scenario==2 else '64');self.field('批量 VL 数','vls','4' if scenario==2 else '16')
@@ -493,12 +498,12 @@ class Controller:
             ttk.Button(self.body,text='应用所选故障／恢复',command=self.fault).pack(anchor='w',pady=6)
         if scenario==4:
             self.field('对端 VLID（十六进制；建议单独使用 12A0）','vl','12A0')
-            self.field('对端数据（UTF-8）','data','CHECK_TEST');self.field('SN（十进制，0～255）','sn','1')
+            self.field('对端数据（UTF-8）','data','I LOVE FPGA');self.field('SN（十进制，0～255）','sn','1')
             self.choice('对端报文类型','mutation',['正常报文','FCS错误','IP校验错误','UDP长度错误'])
             ttk.Button(self.body,text='注入本人选择的对端报文',command=self.inject).pack(anchor='w',pady=4)
         if scenario==5:
             self.choice('MIB 对象','object',['4 · sysContact','5 · sysName','6 · sysLocation'])
-            self.field('SET 值（1～32 个 ASCII 字节）','value','FPGA_TEST_2026')
+            self.field('SET 值（1～32 个 ASCII 字节）','value','I LOVE FPGA')
             ttk.Button(self.body,text='GET：从真实响应读取',command=lambda:self.snmp(False)).pack(anchor='w',pady=4)
             ttk.Button(self.body,text='SET：写入本人填写的值',command=lambda:self.snmp(True)).pack(anchor='w',pady=4)
         if scenario==6:
@@ -511,8 +516,10 @@ class Controller:
         self.output.tag_configure('result',foreground='#135b34')
         self.output.tag_configure('attention',foreground='#9b3b12')
         self.log('本次测试：尚未运行。')
-        self.window.after(100,lambda:self.start(scenario));self.window.protocol('WM_DELETE_WINDOW',self.close)
-        self.window.mainloop()
+        if parent is None:
+            self.window.after(100,lambda:self.start(scenario));self.window.protocol('WM_DELETE_WINDOW',self.close)
+            self.window.mainloop()
+        else:self.window.pack(fill='both',expand=True)
     def field(self,label,key,value):
         row=self.ttk.Frame(self.body);row.pack(fill='x',pady=2)
         self.ttk.Label(row,text=label,width=46).pack(side='left')
@@ -528,19 +535,31 @@ class Controller:
             self.output.insert('end',line+'\n',tag)
         self.output.config(state='disabled');self.output.yview_moveto(0)
     def start(self,scenario):
-        try:self.s=Session(scenario);self.deadline=time.time()+240;self.await_ready()
-        except Exception as exc:self.state.set('启动失败');self.mb.showerror('启动失败',str(exc))
+        try:
+            self.s=Session(scenario,extra_helpers=(ROOT/'scripts/basic_demo.py',) if self.suite else ())
+            self.deadline=time.time()+240;self.await_ready()
+        except Exception as exc:
+            self.busy=False;self.failed=True;self.state.set('启动失败');self.mb.showerror('启动失败',str(exc))
+            if self.suite:self.suite.failed(self,str(exc))
     def await_ready(self):
         if (self.s.run/'ready.txt').exists():
-            self.busy=False;self.state.set('等待本人操作：仿真已加载并停在 100 μs');return
+            self.busy=False;self.state.set('等待本人操作：仿真已加载并停在 100 μs')
+            if self.suite:self.suite.ready(self)
+            return
         if self.s.process.poll() is not None or time.time()>self.deadline:
-            self.state.set('启动未完成，请查看 transcript.log');self.mb.showerror('启动未完成','ModelSim 未返回 READY。');return
+            self.busy=False;self.failed=True;self.state.set('启动未完成，请查看 transcript.log');self.mb.showerror('启动未完成','ModelSim 未返回 READY。')
+            if self.suite:self.suite.failed(self,'ModelSim 未返回 READY')
+            return
         self.window.after(300,self.await_ready)
     def action(self,callback):
+        if self.suite:return self.suite.dispatch(self,callback)
+        return self.execute(callback)
+    def execute(self,callback):
         if self.busy:self.mb.showinfo('请稍候','仿真启动或运行中，请等待结果。');return
         if self.failed:self.mb.showerror('本次核对失败','保留本次日志并重新启动入口；不要继续累积结果。');return
         try:
             duration=callback();self.busy=True;self.state.set('真实仿真运行中……');self.deadline=time.time()+240
+            self.log(f"本次操作：{self.s.plan['actions'][-1]['label']}｜仿真运行中，结果待生成。")
             (self.s.run/'response.txt').unlink(missing_ok=True)
             temp=self.s.run/'request.tmp';temp.write_text(str(duration));temp.replace(self.s.run/'request.txt')
             self.window.after(300,self.await_result)
@@ -554,18 +573,23 @@ class Controller:
             self.state.set('本次独立核对通过；等待下一次本人操作' if not self.failed else '本次核对失败，请保留日志')
             if self.failed:
                 self.log('本次功能核对：失败\n'+proof.get('error','查看 transcript.log'));self.mb.showerror('本次核对失败',proof.get('error','查看 transcript.log'))
+                if self.suite:self.suite.failed(self,proof.get('error','核对失败'))
             else:
                 try:
                     result=operation_result(self.s,proof,self.last_proof)
                     self.log(result)
                     (self.s.run/f'result_{self.s.index}.txt').write_text(result+'\n',encoding='utf-8')
                     if self.s.plan['actions'][-1]['label']!='选择链路故障或恢复':focus_wave(self.s.run,self.last_proof or {})
+                    if self.suite:self.suite.record(self,proof,self.last_proof,result)
                     self.last_proof=proof
                 except Exception as exc:
                     self.failed=True;self.state.set('结果显示失败，请保留日志');self.log('结果显示失败：'+str(exc))
+                    if self.suite:self.suite.failed(self,str(exc))
             return
         if self.s.process.poll() is not None or time.time()>self.deadline:
-            self.busy=False;self.failed=True;self.state.set('仿真退出或超时；本次未通过');self.log('本次功能核对：未通过（仿真退出或超时）');self.mb.showerror('仿真退出或超时','查看 transcript.log 与 plan.json。');return
+            self.busy=False;self.failed=True;self.state.set('仿真退出或超时；本次未通过');self.log('本次功能核对：未通过（仿真退出或超时）');self.mb.showerror('仿真退出或超时','查看 transcript.log 与 plan.json。')
+            if self.suite:self.suite.failed(self,'仿真退出或超时')
+            return
         self.window.after(300,self.await_result)
     def send(self):
         self.action(lambda:self.s.app(int(self.get('vl'),16),self.get('data').encode('utf-8'),interval=max(64,len(self.get('data').encode('utf-8'))+3)))
@@ -584,7 +608,7 @@ class Controller:
         def work():
             obj=int(self.get('object')[0])
             try:value=self.get('value').encode('ascii') if write else None
-            except UnicodeEncodeError:raise ValueError('SET 值只支持英文字母、数字、空格和英文标点；请移除中文，例如使用 FPGA_TEST_2026。')
+            except UnicodeEncodeError:raise ValueError('SET 值只支持英文字母、数字、空格和英文标点；请移除中文，例如使用 I LOVE FPGA。')
             return self.s.snmp(obj,value)
         self.action(work)
     def sync(self):self.action(lambda:self.s.sync(float(self.get('offset'))))
@@ -668,8 +692,11 @@ def comparison_gui():
     window.after(100,boot);window.mainloop()
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--scenario',type=int,choices=range(1,9),default=1);p.add_argument('--self-test',action='store_true');args=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--scenario',type=int,choices=range(1,9),default=1);p.add_argument('--self-test',action='store_true');p.add_argument('--basic',action='store_true');args=p.parse_args()
     if args.self_test:self_test()
+    elif args.basic:
+        from basic_demo import BasicDemo
+        BasicDemo()
     elif args.scenario==8:comparison_gui()
     else:Controller(args.scenario)
 
