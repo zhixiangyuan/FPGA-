@@ -1,0 +1,503 @@
+{
+  "result": "PASS",
+  "kind": "Windows UI interactions performed by agent for implementation verification; not human recording",
+  "runs": [
+    {
+      "result": "PASS",
+      "scope": "independent manual-scenario RTL verification; not official full acceptance",
+      "clock_ns": 8,
+      "BAG_cycles": 125000,
+      "wire_frames": 2,
+      "application_messages": 1,
+      "minimum_per_VL_BAG_cycles": null,
+      "status": {
+        "cycle": "407552",
+        "accepted": "1",
+        "rejected": "0",
+        "sent": "1",
+        "delivered": "1",
+        "duplicates": "1",
+        "integrity": "0",
+        "dropa": "0",
+        "dropb": "0",
+        "parsea": "0",
+        "parseb": "0",
+        "requests": "0",
+        "responses": "0",
+        "errors": "0",
+        "sync": "0"
+      },
+      "rx_oracle": {
+        "duplicates": 1,
+        "integrity": 0,
+        "control": 0,
+        "malformed": {}
+      },
+      "rtc": [],
+      "metrics": {
+        "delivered_payload_Mbps": 72.39819004524887,
+        "max_application_first_to_last_us": 1.768,
+        "max_same_VL_same_length_range_us": null,
+        "range_groups_with_at_least_2_samples": 0,
+        "matched_application_messages": 1
+      },
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_111111_185113",
+      "updated_utc": "2026-10-29T03:12:27.843680+00:00"
+    },
+    {
+      "result": "PASS",
+      "scope": "independent manual-scenario RTL verification; not official full acceptance",
+      "clock_ns": 8,
+      "BAG_cycles": 125000,
+      "wire_frames": 2,
+      "application_messages": 1,
+      "minimum_per_VL_BAG_cycles": null,
+      "status": {
+        "cycle": "409600",
+        "accepted": "1",
+        "rejected": "0",
+        "sent": "1",
+        "delivered": "1",
+        "duplicates": "0",
+        "integrity": "0",
+        "dropa": "0",
+        "dropb": "0",
+        "parsea": "0",
+        "parseb": "0",
+        "requests": "0",
+        "responses": "0",
+        "errors": "0",
+        "sync": "0"
+      },
+      "rx_oracle": {
+        "duplicates": 0,
+        "integrity": 0,
+        "control": 0,
+        "malformed": {}
+      },
+      "rtc": [],
+      "metrics": {
+        "delivered_payload_Mbps": 84.55882352941177,
+        "max_application_first_to_last_us": 2.176,
+        "max_same_VL_same_length_range_us": null,
+        "range_groups_with_at_least_2_samples": 0,
+        "matched_application_messages": 1,
+        "actual_application_input_start_interval_min_cycles": null,
+        "actual_application_input_start_interval_max_cycles": null
+      },
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_112223_418436",
+      "updated_utc": "2026-10-29T03:25:22.517300+00:00"
+    },
+    {
+      "result": "PASS",
+      "scope": "independent manual-scenario RTL verification; not official full acceptance",
+      "clock_ns": 8,
+      "BAG_cycles": 125000,
+      "wire_frames": 27,
+      "application_messages": 24,
+      "minimum_per_VL_BAG_cycles": 125003,
+      "status": {
+        "cycle": "944128",
+        "accepted": "24",
+        "rejected": "0",
+        "sent": "24",
+        "delivered": "24",
+        "duplicates": "24",
+        "integrity": "0",
+        "dropa": "0",
+        "dropb": "0",
+        "parsea": "3",
+        "parseb": "3",
+        "requests": "2",
+        "responses": "2",
+        "errors": "0",
+        "sync": "1"
+      },
+      "rx_oracle": {
+        "duplicates": 24,
+        "integrity": 0,
+        "control": 0,
+        "malformed": {}
+      },
+      "rtc": [
+        {
+          "offset_us": 225.9484026581049,
+          "delay_us": 36.38421185314655
+        }
+      ],
+      "metrics": {
+        "delivered_payload_Mbps": 125.88519715025352,
+        "max_application_first_to_last_us": 1060.224,
+        "max_same_VL_same_length_range_us": 24.656,
+        "range_groups_with_at_least_2_samples": 8,
+        "matched_application_messages": 24,
+        "actual_application_input_start_interval_min_cycles": 8100,
+        "actual_application_input_start_interval_max_cycles": 8100
+      },
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_112223_502198",
+      "updated_utc": "2026-10-29T03:26:52.568121+00:00"
+    },
+    {
+      "result": "PASS",
+      "scope": "independent manual-scenario RTL verification; not official full acceptance",
+      "clock_ns": 8,
+      "BAG_cycles": 125000,
+      "wire_frames": 27,
+      "application_messages": 24,
+      "minimum_per_VL_BAG_cycles": 126307,
+      "status": {
+        "cycle": "944128",
+        "accepted": "24",
+        "rejected": "0",
+        "sent": "24",
+        "delivered": "24",
+        "duplicates": "24",
+        "integrity": "0",
+        "dropa": "0",
+        "dropb": "0",
+        "parsea": "3",
+        "parseb": "3",
+        "requests": "2",
+        "responses": "2",
+        "errors": "0",
+        "sync": "1"
+      },
+      "rx_oracle": {
+        "duplicates": 24,
+        "integrity": 0,
+        "control": 0,
+        "malformed": {}
+      },
+      "rtc": [
+        {
+          "offset_us": 225.9484026581049,
+          "delay_us": 36.38421185314655
+        }
+      ],
+      "metrics": {
+        "delivered_payload_Mbps": 180.72363167270717,
+        "max_application_first_to_last_us": 72.4,
+        "max_same_VL_same_length_range_us": 0.0,
+        "range_groups_with_at_least_2_samples": 8,
+        "matched_application_messages": 24,
+        "actual_application_input_start_interval_min_cycles": 8100,
+        "actual_application_input_start_interval_max_cycles": 8100
+      },
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_112223_645169",
+      "updated_utc": "2026-10-29T03:26:53.009399+00:00"
+    },
+    {
+      "result": "PASS",
+      "scope": "independent manual-scenario RTL verification; not official full acceptance",
+      "clock_ns": 8,
+      "BAG_cycles": 125000,
+      "wire_frames": 65,
+      "application_messages": 64,
+      "minimum_per_VL_BAG_cycles": 129584,
+      "status": {
+        "cycle": "1308672",
+        "accepted": "64",
+        "rejected": "0",
+        "sent": "64",
+        "delivered": "64",
+        "duplicates": "64",
+        "integrity": "0",
+        "dropa": "0",
+        "dropb": "0",
+        "parsea": "0",
+        "parseb": "0",
+        "requests": "0",
+        "responses": "0",
+        "errors": "0",
+        "sync": "0"
+      },
+      "rx_oracle": {
+        "duplicates": 64,
+        "integrity": 0,
+        "control": 0,
+        "malformed": {}
+      },
+      "rtc": [],
+      "metrics": {
+        "delivered_payload_Mbps": 182.32982594768166,
+        "max_application_first_to_last_us": 48.56,
+        "max_same_VL_same_length_range_us": 0.256,
+        "range_groups_with_at_least_2_samples": 16,
+        "matched_application_messages": 64,
+        "actual_application_input_start_interval_min_cycles": 8100,
+        "actual_application_input_start_interval_max_cycles": 8100
+      },
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_112904_003951",
+      "updated_utc": "2026-10-29T03:35:25.424544+00:00"
+    },
+    {
+      "result": "PASS",
+      "scope": "independent manual-scenario RTL verification; not official full acceptance",
+      "clock_ns": 8,
+      "BAG_cycles": 125000,
+      "wire_frames": 1,
+      "application_messages": 1,
+      "minimum_per_VL_BAG_cycles": null,
+      "status": {
+        "cycle": "52224",
+        "accepted": "0",
+        "rejected": "0",
+        "sent": "0",
+        "delivered": "1",
+        "duplicates": "1",
+        "integrity": "0",
+        "dropa": "1",
+        "dropb": "1",
+        "parsea": "0",
+        "parseb": "0",
+        "requests": "0",
+        "responses": "0",
+        "errors": "0",
+        "sync": "0"
+      },
+      "rx_oracle": {
+        "duplicates": 1,
+        "integrity": 0,
+        "control": 0,
+        "malformed": {
+          "MAC": 2
+        }
+      },
+      "rtc": [],
+      "metrics": {},
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_112906_764034",
+      "updated_utc": "2026-10-29T03:35:50.111267+00:00"
+    },
+    {
+      "result": "PASS",
+      "scope": "independent manual-scenario RTL verification; not official full acceptance",
+      "clock_ns": 8,
+      "BAG_cycles": 125000,
+      "wire_frames": 4,
+      "application_messages": 0,
+      "minimum_per_VL_BAG_cycles": 159933,
+      "status": {
+        "cycle": "491520",
+        "accepted": "0",
+        "rejected": "0",
+        "sent": "0",
+        "delivered": "0",
+        "duplicates": "0",
+        "integrity": "0",
+        "dropa": "0",
+        "dropb": "0",
+        "parsea": "3",
+        "parseb": "3",
+        "requests": "3",
+        "responses": "3",
+        "errors": "0",
+        "sync": "0"
+      },
+      "rx_oracle": {
+        "duplicates": 0,
+        "integrity": 0,
+        "control": 0,
+        "malformed": {}
+      },
+      "rtc": [],
+      "metrics": {},
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_112909_640599",
+      "updated_utc": "2026-10-29T03:34:45.466711+00:00"
+    },
+    {
+      "result": "PASS",
+      "scope": "independent manual-scenario RTL verification; not official full acceptance",
+      "clock_ns": 8,
+      "BAG_cycles": 125000,
+      "wire_frames": 1,
+      "application_messages": 0,
+      "minimum_per_VL_BAG_cycles": null,
+      "status": {
+        "cycle": "31744",
+        "accepted": "0",
+        "rejected": "0",
+        "sent": "0",
+        "delivered": "0",
+        "duplicates": "0",
+        "integrity": "0",
+        "dropa": "0",
+        "dropb": "0",
+        "parsea": "1",
+        "parseb": "1",
+        "requests": "0",
+        "responses": "0",
+        "errors": "0",
+        "sync": "1"
+      },
+      "rx_oracle": {
+        "duplicates": 0,
+        "integrity": 0,
+        "control": 0,
+        "malformed": {}
+      },
+      "rtc": [
+        {
+          "offset_us": 282.16768987476826,
+          "delay_us": 35.66429950296879
+        }
+      ],
+      "metrics": {},
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_112912_957133",
+      "updated_utc": "2026-10-29T03:33:53.926183+00:00"
+    },
+    {
+      "result": "PASS",
+      "scope": "independent manual-scenario RTL verification; not official full acceptance",
+      "clock_ns": 8,
+      "BAG_cycles": 125000,
+      "wire_frames": 65,
+      "application_messages": 64,
+      "minimum_per_VL_BAG_cycles": 129584,
+      "status": {
+        "cycle": "1308672",
+        "accepted": "64",
+        "rejected": "0",
+        "sent": "64",
+        "delivered": "64",
+        "duplicates": "64",
+        "integrity": "0",
+        "dropa": "0",
+        "dropb": "0",
+        "parsea": "0",
+        "parseb": "0",
+        "requests": "0",
+        "responses": "0",
+        "errors": "0",
+        "sync": "0"
+      },
+      "rx_oracle": {
+        "duplicates": 64,
+        "integrity": 0,
+        "control": 0,
+        "malformed": {}
+      },
+      "rtc": [],
+      "metrics": {
+        "delivered_payload_Mbps": 182.32982594768166,
+        "max_application_first_to_last_us": 48.56,
+        "max_same_VL_same_length_range_us": 0.256,
+        "range_groups_with_at_least_2_samples": 16,
+        "matched_application_messages": 64,
+        "actual_application_input_start_interval_min_cycles": 8100,
+        "actual_application_input_start_interval_max_cycles": 8100
+      },
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_112916_066813",
+      "updated_utc": "2026-10-29T03:33:10.484632+00:00"
+    },
+    {
+      "result": "PASS",
+      "scope": "independent manual-scenario RTL verification; not official full acceptance",
+      "clock_ns": 8,
+      "BAG_cycles": 125000,
+      "wire_frames": 2,
+      "application_messages": 1,
+      "minimum_per_VL_BAG_cycles": null,
+      "status": {
+        "cycle": "407552",
+        "accepted": "1",
+        "rejected": "0",
+        "sent": "1",
+        "delivered": "1",
+        "duplicates": "1",
+        "integrity": "0",
+        "dropa": "0",
+        "dropb": "0",
+        "parsea": "0",
+        "parseb": "0",
+        "requests": "0",
+        "responses": "0",
+        "errors": "0",
+        "sync": "0"
+      },
+      "rx_oracle": {
+        "duplicates": 1,
+        "integrity": 0,
+        "control": 0,
+        "malformed": {}
+      },
+      "rtc": [],
+      "metrics": {
+        "delivered_payload_Mbps": 97.5609756097561,
+        "max_application_first_to_last_us": 2.296,
+        "max_same_VL_same_length_range_us": null,
+        "range_groups_with_at_least_2_samples": 0,
+        "matched_application_messages": 1,
+        "actual_application_input_start_interval_min_cycles": null,
+        "actual_application_input_start_interval_max_cycles": null
+      },
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_113711_965133",
+      "updated_utc": "2026-10-29T03:39:35.864329+00:00"
+    },
+    {
+      "result": "PASS",
+      "scope": "independent manual-scenario RTL verification; not official full acceptance",
+      "clock_ns": 8,
+      "BAG_cycles": 125000,
+      "wire_frames": 2,
+      "application_messages": 1,
+      "minimum_per_VL_BAG_cycles": null,
+      "status": {
+        "cycle": "419840",
+        "accepted": "1",
+        "rejected": "0",
+        "sent": "1",
+        "delivered": "1",
+        "duplicates": "1",
+        "integrity": "0",
+        "dropa": "0",
+        "dropb": "0",
+        "parsea": "0",
+        "parseb": "0",
+        "requests": "0",
+        "responses": "0",
+        "errors": "0",
+        "sync": "0"
+      },
+      "rx_oracle": {
+        "duplicates": 1,
+        "integrity": 0,
+        "control": 0,
+        "malformed": {}
+      },
+      "rtc": [],
+      "metrics": {
+        "delivered_payload_Mbps": 78.94736842105263,
+        "max_application_first_to_last_us": 2.128,
+        "max_same_VL_same_length_range_us": null,
+        "range_groups_with_at_least_2_samples": 0,
+        "matched_application_messages": 1,
+        "actual_application_input_start_interval_min_cycles": null,
+        "actual_application_input_start_interval_max_cycles": null
+      },
+      "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_114329_642880",
+      "updated_utc": "2026-10-29T03:43:38.813209+00:00"
+    }
+  ],
+  "observed_controls": [
+    "manual VLID and payload send",
+    "fault selection and application",
+    "FCS error injection and valid recovery",
+    "GET-SET-GET changed value",
+    "edited SNTP server timestamp parameter",
+    "batch parameters confirmation",
+    "dual new simulation comparison"
+  ],
+  "backend_extended_cases": "see 交互演示实现验证.json",
+  "final_presentation_and_input_messages_smoke": {
+    "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_113711_965133",
+    "result": "PASS",
+    "empty_input_rejected_without_command": true,
+    "controller_sha256": "909cfc50dea0fa27d2bb81e5608dd762b3f2a4ca9effd36425455492eba2f11c"
+  },
+  "evidence_entry_09": "PASS: exact cmd launch returned 0 and opened report/project locations; no EDA build run",
+  "final_exact_bytes_smoke": {
+    "result": "PASS",
+    "run": "D:\\FPGA\\captain_integration\\build\\interactive_demo\\20261029_114329_642880",
+    "note": "remove extra blank EOF only; functional tokens unchanged"
+  }
+}

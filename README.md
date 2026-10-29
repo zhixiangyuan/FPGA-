@@ -4,6 +4,14 @@
 
 正式开发工作区：`D:\FPGA\captain_integration`。日常开发使用`dev`；`main`仅接受队长批准的稳定版本。源码、测试、Golden和配置在同一工程持续维护，常规阶段不复制日期命名的完整工程。
 
+## 中文手动演示入口（2026-10-29）
+
+双击 `D:\FPGA\功能演示\01_业务收发与帧格式演示.cmd`，等待 ModelSim 编译、加载并停下后，本人输入 VLID 和载荷，再点击发送。01～08 分别覆盖业务帧、多 VL/BAG、双网故障与消重、错误与序号、SNMP、RTC/SNTP、性能和调度对照；09 只打开实现证据。入口由 `python scripts/install_demo_delivery.py` 安装，操作手册与 170 秒录屏分镜见 `docs/interactive_demo/`。
+
+01～07 只编译当前比赛顶层源码清单；08 为避免旧仲裁器与新流水化 MAC 接口混编，使用 `service_pressure_011` 历史 PASS 配套生产 RTL 快照，与 `service_pressure_010` 仲裁器作唯一源码差异对照。两侧在用户确认后执行新的相同负载，核对源码、Golden、实际应用输入和对端 GMII 周期。它不是当前新版 MAC 的优化前后结论。
+
+测试平台在 `sim/tb_interactive_demo.sv`，控制器与独立参考在 `scripts/interactive_demo.py`，GUI 仿真通道在 `scripts/interactive_demo.tcl`。只通过应用与 GMII 外部端口驱动，层次路径仅用于只读观测；没有 force/deposit。每次保存独立目录 `build/interactive_demo/<时间戳>`，保留输入、双网收发原始 CSV、应用输出、RTC 记录、源码快照和独立结果。自动实施自检入口为 `scripts/validate_interactive_demo.py`，结果与正式完整验收、历史 GUI 重放及用户人工录屏分别标注。生产 RTL、冻结核心及原有验收证据不改写。
+
 ## 当前已验收候选（2026-10-28）
 
 当前比赛入口为 `rtl/competition/AFDX_top.v`，规范源码清单由 `scripts/run_competition.py` 的 `sources()` 给出。使用真实 125 MHz 时钟、1 ms BAG、128 TX VL 和 4096 RX VL；下文旧入口和旧指标仅作历史对照。
