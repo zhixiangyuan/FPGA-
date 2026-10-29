@@ -174,7 +174,7 @@ def readable_result(run,proof,compact=False,data_only=False):
     if wire and not compact:
         start,end,w,_=wire[-1];vl=int.from_bytes(w[12:14],'big');length=int.from_bytes(w[46:48],'big')-8
         text.append(f"最近真实 GMII 帧：VLID=0x{vl:04X}，UDP 载荷={length}，SN={w[-5]}，FCS={w[-4:].hex().upper()}（独立 CRC 核对通过）")
-        if vl==0x12b4 and not data_only:
+        if vl==0x12b4:
             # Show OCTET STRING values from actual response bytes only after exact Golden comparison.
             p=w[50:50+length];strings=[];i=0
             while i+2<=len(p):
@@ -193,12 +193,120 @@ def readable_result(run,proof,compact=False,data_only=False):
     if not data_only:text.append('以上仅为本次声明输入条件的 RTL 场景结果；完整证据：'+str(run/'verification.json'))
     return '\n'.join(text)
 
-def focus_wave(run):
-    packets=app_packets(run/'application.csv')
+def snmp_response(w):
+    """Read the actual response BER, never the controller's expected MIB value."""
+    length=int.from_bytes(w[46:48],'big')-8
+    def children(blob):
+        result=[];i=0
+        while i<len(blob):
+            assert i+2<=len(blob),'truncated BER header'
+            tag=blob[i];n=blob[i+1];i+=2
+            if n&128:
+                width=n&127;assert 1<=width<=2 and i+width<=len(blob),'invalid BER length'
+                n=int.from_bytes(blob[i:i+width],'big');i+=width
+            assert i+n<=len(blob),'truncated BER value'
+            result.append((tag,blob[i:i+n]));i+=n
+        return result
+    root=children(w[50:50+length]);assert len(root)==1 and root[0][0]==0x30
+    msg=children(root[0][1]);assert len(msg)==3 and msg[2][0]==0xa2
+    pdu=children(msg[2][1]);assert len(pdu)==4 and pdu[3][0]==0x30
+    bindings=children(pdu[3][1]);assert len(bindings)==1 and bindings[0][0]==0x30
+    binding=children(bindings[0][1]);assert len(binding)==2 and binding[1][0]==4
+    return dict(request_id=int.from_bytes(pdu[0][1],'big'),error_status=int.from_bytes(pdu[1][1],'big'),
+                value=binding[1][1].decode('ascii'),object=binding[0][1][-2])
+
+
+def operation_result(session,proof,previous=None):
+    """Only describe this completed operation; cumulative evidence stays in verification.json."""
+    run=session.run;plan=session.plan;old=previous or {};status=proof['status'];before=old.get('status',{})
+    delta=lambda key:int(status[key])-int(before.get(key,0))
+    action=plan['actions'][-1];detail=action.get('detail') or {};label=action['label']
+    old_count=old.get('application_messages',0);packets=app_packets(run/'application.csv')[old_count:]
+    all_wire=frames(run/'wire_a.csv');wire=all_wire[old.get('wire_frames',0):]
+    text=[f"本次操作：{label}｜功能核对：通过",f"本次计数变化：发送 +{delta('sent')} 帧；交付 +{delta('delivered')} 帧；消重 +{delta('duplicates')} 次；序号异常 +{delta('integrity')} 次",
+          f"本次 MAC 丢弃 A/B：+{delta('dropa')}/+{delta('dropb')}；业务解析器拒绝 A/B：+{delta('parsea')}/+{delta('parseb')}"]
+    if label=='选择链路故障或恢复':
+        text.append(f"已生效链路：{ {0:'双网断开',1:'仅 A',2:'仅 B',3:'双网正常'}[session.mask]}；A 接收错误注入：{'开启' if session.error else '关闭'}")
+        text.append('本次只切换链路，未发送业务数据。')
+    elif label in ('手动发送','用户确认批量负载'):
+        text.append(f"本次输入：起始 VLID=0x{detail['vlid']:04X}；{detail['count']} 帧；{detail['VLs']} 个 VL；每帧 {detail['length']} 字节")
+        if detail['generated_pattern']:text.append('载荷来源：测试环境生成的批量字节。')
+        else:text.append('本次输入内容：'+bytes.fromhex(plan['app'][-1])[2:].decode('utf-8',errors='replace'))
+        text.append(f"已生效链路：{ {0:'双网断开',1:'仅 A',2:'仅 B',3:'双网正常'}[session.mask]}；本次未交付：{detail['count']-len(packets)} 帧")
+    elif label=='手动对端报文注入':
+        text.append(f"本次注入：{detail['mutation']}；VLID=0x{detail['vlid']:04X}；SN={detail['SN']}；内容："+bytes.fromhex(detail['payload']).decode('utf-8',errors='replace'))
     if packets:
+        for _,_,data in packets[-2:]:
+            content=data[2:82].decode('utf-8',errors='replace')
+            if not content.isprintable() or '\ufffd' in content:content='二进制载荷（见 HEX）'
+            text.append(f"本次实际接收：VLID=0x{data[:2].hex().upper()}；{len(data)-2} 字节；内容：{content}")
+            text.append('本次接收 HEX：'+data[:34].hex(' ').upper()+(' …' if len(data)>34 else ''))
+        counts=collections.Counter(int.from_bytes(p[2][:2],'big') for p in packets)
+        text.append('本次各 VL 交付：'+'；'.join(f'{vl:04X}={n} 帧' for vl,n in sorted(counts.items())))
+    elif label in ('手动发送','用户确认批量负载','手动对端报文注入'):
+        text.append('本次实际接收：无新数据（不显示上次接收内容）。')
+        if delta('integrity'):text.append('接收侧检测到序号异常；本次功能通过表示拒收行为符合独立参考。')
+    if label.startswith('SNMP'):
+        replies=[f for f in wire if int.from_bytes(f[2][12:14],'big')==0x12b4]
+        response=snmp_response(replies[-1][2])
+        obj={4:'sysContact',5:'sysName',6:'sysLocation'}.get(response['object'],str(response['object']))
+        text.append(f"本次 SNMP 请求/响应：+{delta('requests')}/+{delta('responses')}；对象：{obj}")
+        if detail['value'] is not None:text.append('本次 SET 输入：'+detail['value'])
+        text.append(f"实际 SNMP 响应值：{response['value']}｜响应内容核对：通过")
+        text.append(f"实际响应请求编号：{response['request_id']}；错误状态：{response['error_status']}")
+        ingress=frames(run/'ingress_a.csv')
+        elapsed=(replies[-1][1]-ingress[-1][0])*8/1000
+        text.append(f"本次 SNMP 请求首字节至响应末字节：{elapsed:.3f} μs｜达标状态：未判定（无单独数值判据）")
+    if label=='发送模拟时间服务器响应':
+        r=proof['rtc'][-1]
+        text.append(f"RTC 同步状态：{before.get('sync','0')} → {status['sync']}｜四时间戳计算核对：通过")
+        text.append(f"实际 RTC offset：{r['offset_us']:.6f} μs；delay：{r['delay_us']:.6f} μs")
+        text.append('绝对 UTC 精度达标状态：未测量（本次使用模拟时间服务器）。')
+    if label in ('手动发送','用户确认批量负载'):
+        offered=rows(run/'inputs.csv')[int(before.get('accepted',0)):]
+        remaining=list(packets);samples=[]
+        # Match only this action's inputs to this action's outputs, including repeated text.
+        wanted=plan['app'][-detail['count']:]
+        for row,h in zip(offered,wanted):
+            match=next((i for i,p in enumerate(remaining) if p[2]==bytes.fromhex(h)),None)
+            if match is not None:
+                p=remaining.pop(match);samples.append((int(row['vl']),len(p[2])-2,(p[1]-int(row['cycle']))*8,int(row['cycle']),p[1]))
+        if samples:
+            maximum=max(s[2] for s in samples)/1000
+            text.append(f"本次应用首字节至末字节最大观测时延：{maximum:.3f} μs｜达标状态：{'达标（本次样本）' if maximum<2000 else '未达标（本次样本）'}")
+            if len(samples)!=len(offered):text.append('时延仅统计已交付样本，未交付帧不参与时延达标判断。')
+            groups=collections.defaultdict(list)
+            for vl,length,ns,_,_ in samples:groups[(vl,length)].append(ns)
+            ranges=[max(g)-min(g) for g in groups.values() if len(g)>1]
+            text.append(f"本次同 VL 同长度时延极差：{max(ranges)/1000:.3f} μs｜达标状态：未判定（无明确数值判据）" if ranges else '本次同 VL 同长度时延极差：样本不足｜达标状态：未判定')
+            duration=max(s[4] for s in samples)-min(s[3] for s in samples)
+            rate=sum(s[1] for s in samples)*1000/duration
+            eligible=plan['scenario']==7 and len(samples)>=2 and len(samples)==len(offered) and session.mask==3 and not session.error
+            verdict=('达标（本次负载）' if rate>=100 else '未达标（本次负载）') if eligible else '未判定（非完整性能负载）'
+            text.append(f"本次有效载荷交付吞吐：{rate:.4f} Mbps｜达标状态：{verdict}")
+        else:text.append('本次时延／吞吐／极差：无交付样本｜达标状态：未判定')
+        gaps=[];last={}
+        for i,(start,_,w,_) in enumerate(all_wire):
+            vl=int.from_bytes(w[12:14],'big')
+            if vl<0x12b4 and vl in last and i>=old.get('wire_frames',0):gaps.append(start-last[vl])
+            last[vl]=start
+        text.append(f"本次同 VL 最小发送间隔：{min(gaps)*8/1e6:.6f} ms｜达标状态：{'达标' if min(gaps)>=125000 else '未达标'}" if gaps else '本次同 VL 最小发送间隔：样本不足｜达标状态：未判定')
+    if wire:
+        _,_,w,_=wire[-1]
+        text.append(f"本次最近发送帧：VLID=0x{int.from_bytes(w[12:14],'big'):04X}；SN={w[-5]}；FCS={w[-4:].hex().upper()}｜帧字节核对：通过")
+    text.append(f"本会话累计：发送 {status['sent']} 帧；交付 {status['delivered']} 帧；SNMP 请求/响应 {status['requests']}/{status['responses']}")
+    return '\n'.join(text)
+
+
+def focus_wave(run,previous=None):
+    packets=app_packets(run/'application.csv')
+    if packets and (previous is None or len(packets)>previous.get('application_messages',0)):
         first,last,_=packets[-1];left=max(0,first*8-18000);right=last*8+5000
     else:
-        w=frames(run/'wire_a.csv');first,last,_,_=w[-1];left=max(0,first*8-1000);right=last*8+2000
+        candidates=frames(run/'wire_a.csv')+frames(run/'ingress_a.csv')+frames(run/'ingress_b.csv')
+        if not candidates:return
+        first,last,_,_=max(candidates,key=lambda f:f[1])
+        left=max(0,first*8-1000);right=last*8+2000
     (run/'zoom.txt').write_text(f'{left} {right}')
 
 class Session:
@@ -366,38 +474,43 @@ class Controller:
         import tkinter as tk
         from tkinter import ttk, messagebox
         self.tk=tk;self.ttk=ttk;self.mb=messagebox;self.window=tk.Tk();self.window.title(f'{scenario:02d} {TITLES[scenario-1]} · 真实 RTL 手动演示')
-        self.window.geometry('950x760');self.window.option_add('*Font',('Microsoft YaHei',10))
-        self.busy=True;self.failed=False;self.entries={};self.s=None
+        self.window.geometry(f"{min(1120,self.window.winfo_screenwidth()-80)}x{min(900,self.window.winfo_screenheight()-100)}");self.window.option_add('*Font',('Microsoft YaHei',10))
+        self.busy=True;self.failed=False;self.entries={};self.s=None;self.last_proof=None
         ttk.Label(self.window,text=TITLES[scenario-1],font=('Microsoft YaHei',20,'bold')).pack(anchor='w',padx=18,pady=12)
-        ttk.Label(self.window,text='125 MHz · BAG ≥ 1 ms · 每次启动独立目录 · 仿真停下后等待本人操作').pack(anchor='w',padx=18)
+        ttk.Label(self.window,text='真实 RTL 仿真 · 125 MHz').pack(anchor='w',padx=18)
         self.state=tk.StringVar(value='检查环境并启动 ModelSim；首次编译请稍候……')
         ttk.Label(self.window,textvariable=self.state,wraplength=900).pack(anchor='w',padx=18,pady=8)
         self.body=ttk.Frame(self.window);self.body.pack(fill='x',padx=18)
         if scenario in (1,2,3,7):
-            self.field('VLID（十六进制）','vl','1234');self.field('单帧数据（UTF-8）','data','')
+            self.field('VLID（十六进制）','vl','1234');self.field('单帧数据（UTF-8）','data','HELLO_FPGA' if scenario==1 else 'NET_TEST' if scenario==3 else 'VL_TEST')
             ttk.Button(self.body,text='发送本人输入的数据',command=self.send).pack(anchor='w',pady=4)
         if scenario in (2,7):
-            self.field('批量帧数（1～512）','count','64');self.field('批量 VL 数','vls','16')
-            self.field('每帧有效载荷字节数','length','1471');self.field('应用输入间隔（125 MHz 周期）','interval','8100')
+            self.field('批量帧数（1～512）','count','32' if scenario==2 else '64');self.field('批量 VL 数','vls','4' if scenario==2 else '16')
+            self.field('每帧有效载荷字节数','length','64' if scenario==2 else '1471');self.field('应用输入间隔（125 MHz 周期）','interval','33000' if scenario==2 else '8100')
             ttk.Button(self.body,text='确认参数并生成批量负载',command=self.load).pack(anchor='w',pady=4)
         if scenario==3:
             self.choice('链路选择','fault',['双网正常','断开 B，仅 A','断开 A，仅 B','A 接收错误，B 正常','双网断开'])
             ttk.Button(self.body,text='应用所选故障／恢复',command=self.fault).pack(anchor='w',pady=6)
         if scenario==4:
             self.field('对端 VLID（十六进制；建议单独使用 12A0）','vl','12A0')
-            self.field('对端数据（UTF-8）','data','');self.field('SN（十进制，0～255）','sn','1')
+            self.field('对端数据（UTF-8）','data','CHECK_TEST');self.field('SN（十进制，0～255）','sn','1')
             self.choice('对端报文类型','mutation',['正常报文','FCS错误','IP校验错误','UDP长度错误'])
             ttk.Button(self.body,text='注入本人选择的对端报文',command=self.inject).pack(anchor='w',pady=4)
         if scenario==5:
             self.choice('MIB 对象','object',['4 · sysContact','5 · sysName','6 · sysLocation'])
-            self.field('SET 值（1～32 个 ASCII 字节）','value','')
+            self.field('SET 值（1～32 个 ASCII 字节）','value','FPGA_TEST_2026')
             ttk.Button(self.body,text='GET：从真实响应读取',command=lambda:self.snmp(False)).pack(anchor='w',pady=4)
             ttk.Button(self.body,text='SET：写入本人填写的值',command=lambda:self.snmp(True)).pack(anchor='w',pady=4)
         if scenario==6:
             self.field('服务器 t2 相对请求 t1 的偏移（微秒）','offset','250')
-            ttk.Label(self.body,text='测试环境模拟时间服务器；原始 t1 来自真实请求。实际 RTC 校正量按四时间戳核对。').pack(anchor='w')
             ttk.Button(self.body,text='发送本人确认的时间响应',command=self.sync).pack(anchor='w',pady=6)
-        self.output=tk.Text(self.window,height=16,wrap='word');self.output.pack(fill='both',expand=True,padx=18,pady=12)
+        result_frame=ttk.Frame(self.window);result_frame.pack(fill='both',expand=True,padx=18,pady=12)
+        scrollbar=ttk.Scrollbar(result_frame);scrollbar.pack(side='right',fill='y')
+        self.output=tk.Text(result_frame,height=16,wrap='word',yscrollcommand=scrollbar.set)
+        self.output.pack(side='left',fill='both',expand=True);scrollbar.config(command=self.output.yview)
+        self.output.tag_configure('result',foreground='#135b34')
+        self.output.tag_configure('attention',foreground='#9b3b12')
+        self.log('本次测试：尚未运行。')
         self.window.after(100,lambda:self.start(scenario));self.window.protocol('WM_DELETE_WINDOW',self.close)
         self.window.mainloop()
     def field(self,label,key,value):
@@ -408,7 +521,12 @@ class Controller:
         row=self.ttk.Frame(self.body);row.pack(fill='x',pady=2);self.ttk.Label(row,text=label,width=46).pack(side='left')
         v=self.tk.StringVar(value=values[0]);self.entries[key]=v;self.ttk.Combobox(row,textvariable=v,values=values,state='readonly',width=34).pack(side='left')
     def get(self,key):return self.entries[key].get()
-    def log(self,text):self.output.insert('end',text+'\n');self.output.see('end')
+    def log(self,text):
+        self.output.config(state='normal');self.output.delete('1.0','end')
+        for line in text.splitlines():
+            tag='attention' if any(word in line for word in ('未达标','无新数据','序号异常；')) else 'result' if any(word in line for word in ('实际接收：','实际 SNMP 响应值：','RTC 同步状态：','功能核对：')) else ''
+            self.output.insert('end',line+'\n',tag)
+        self.output.config(state='disabled');self.output.yview_moveto(0)
     def start(self,scenario):
         try:self.s=Session(scenario);self.deadline=time.time()+240;self.await_ready()
         except Exception as exc:self.state.set('启动失败');self.mb.showerror('启动失败',str(exc))
@@ -434,13 +552,20 @@ class Controller:
             proof=self.s.result() if response.strip()=='DONE' else dict(result='FAIL',error=response)
             self.failed=proof['result']!='PASS'
             self.state.set('本次独立核对通过；等待下一次本人操作' if not self.failed else '本次核对失败，请保留日志')
-            self.output.delete('1.0','end')
-            if self.failed:self.mb.showerror('本次核对失败',proof.get('error','查看 transcript.log'))
-            else:self.log(readable_result(self.s.run,proof,data_only=True))
-            if not self.failed:focus_wave(self.s.run)
+            if self.failed:
+                self.log('本次功能核对：失败\n'+proof.get('error','查看 transcript.log'));self.mb.showerror('本次核对失败',proof.get('error','查看 transcript.log'))
+            else:
+                try:
+                    result=operation_result(self.s,proof,self.last_proof)
+                    self.log(result)
+                    (self.s.run/f'result_{self.s.index}.txt').write_text(result+'\n',encoding='utf-8')
+                    if self.s.plan['actions'][-1]['label']!='选择链路故障或恢复':focus_wave(self.s.run,self.last_proof or {})
+                    self.last_proof=proof
+                except Exception as exc:
+                    self.failed=True;self.state.set('结果显示失败，请保留日志');self.log('结果显示失败：'+str(exc))
             return
         if self.s.process.poll() is not None or time.time()>self.deadline:
-            self.busy=False;self.failed=True;self.state.set('仿真退出或超时；本次未通过');self.output.delete('1.0','end');self.mb.showerror('仿真退出或超时','查看 transcript.log 与 plan.json。');return
+            self.busy=False;self.failed=True;self.state.set('仿真退出或超时；本次未通过');self.log('本次功能核对：未通过（仿真退出或超时）');self.mb.showerror('仿真退出或超时','查看 transcript.log 与 plan.json。');return
         self.window.after(300,self.await_result)
     def send(self):
         self.action(lambda:self.s.app(int(self.get('vl'),16),self.get('data').encode('utf-8'),interval=max(64,len(self.get('data').encode('utf-8'))+3)))
@@ -457,7 +582,9 @@ class Controller:
     def inject(self):self.action(lambda:self.s.inject(int(self.get('vl'),16),self.get('data').encode('utf-8'),int(self.get('sn')),self.get('mutation')))
     def snmp(self,write):
         def work():
-            obj=int(self.get('object')[0]);value=self.get('value').encode('ascii') if write else None
+            obj=int(self.get('object')[0])
+            try:value=self.get('value').encode('ascii') if write else None
+            except UnicodeEncodeError:raise ValueError('SET 值只支持英文字母、数字、空格和英文标点；请移除中文，例如使用 FPGA_TEST_2026。')
             return self.s.snmp(obj,value)
         self.action(work)
     def sync(self):self.action(lambda:self.s.sync(float(self.get('offset'))))
@@ -524,7 +651,15 @@ def comparison_gui():
             except Exception as exc:state.set('实际输入不一致，对照失败');log(str(exc));return
             result=dict(result='PASS' if all(p['result']=='PASS' for p in proofs) else 'FAIL',provenance=provenance,before=proofs[0],after=proofs[1])
             dump(sessions[1].run/'comparison.json',result);state.set('本次对照 '+result['result'])
-            for label,s,p in zip(('优化前','优化后'),sessions,proofs):log(label+'\n'+readable_result(s.run,p,compact=True));focus_wave(s.run)
+            output.delete('1.0','end')
+            for label,s,p in zip(('优化前','优化后'),sessions,proofs):
+                log(label+'\n'+readable_result(s.run,p,compact=True))
+                if p['result']=='PASS':
+                    m=p['metrics'];log(f"最大观测时延达标状态：{'达标（本次样本）' if m['max_application_first_to_last_us']<2000 else '未达标（本次样本）'}")
+                    log('吞吐／极差达标状态：未判定（本项为管理积压压力对照）。');focus_wave(s.run)
+            if result['result']=='PASS':
+                lm=proofs[0]['metrics'];rm=proofs[1]['metrics']
+                log(f"本次吞吐变化：{(rm['delivered_payload_Mbps']/lm['delivered_payload_Mbps']-1)*100:+.2f}%；最大观测时延变化：{(rm['max_application_first_to_last_us']/lm['max_application_first_to_last_us']-1)*100:+.2f}%")
             log('源码与 Golden 一致，仅仲裁器不同；实际应用和对端输入字节／周期一致。')
             log('完整对照证据：'+str(sessions[1].run/'comparison.json'));return
         if time.time()>deadline[0]:state.set('运行超时；本次未通过');return
