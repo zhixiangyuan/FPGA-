@@ -256,12 +256,12 @@ def operation_result(session,proof,previous=None):
         text.append(f"实际响应请求编号：{response['request_id']}；错误状态：{response['error_status']}")
         ingress=frames(run/'ingress_a.csv')
         elapsed=(replies[-1][1]-ingress[-1][0])*8/1000
-        text.append(f"本次 SNMP 请求首字节至响应末字节：{elapsed:.3f} μs｜达标状态：未判定（无单独数值判据）")
+        text.append(f"本次 SNMP 请求首字节至响应末字节：{elapsed:.3f} μs")
     if label=='发送模拟时间服务器响应':
         r=proof['rtc'][-1]
         text.append(f"RTC 同步状态：{before.get('sync','0')} → {status['sync']}｜四时间戳计算核对：通过")
         text.append(f"实际 RTC offset：{r['offset_us']:.6f} μs；delay：{r['delay_us']:.6f} μs")
-        text.append('绝对 UTC 精度达标状态：未测量（本次使用模拟时间服务器）。')
+        text.append('绝对 UTC 精度：未测量（本次使用模拟时间服务器）。')
     if label in ('手动发送','用户确认批量负载'):
         offered=rows(run/'inputs.csv')[int(before.get('accepted',0)):]
         remaining=list(packets);samples=[]
@@ -278,19 +278,19 @@ def operation_result(session,proof,previous=None):
             groups=collections.defaultdict(list)
             for vl,length,ns,_,_ in samples:groups[(vl,length)].append(ns)
             ranges=[max(g)-min(g) for g in groups.values() if len(g)>1]
-            text.append(f"本次同 VL 同长度时延极差：{max(ranges)/1000:.3f} μs｜达标状态：未判定（无明确数值判据）" if ranges else '本次同 VL 同长度时延极差：样本不足｜达标状态：未判定')
+            text.append(f"本次同 VL 同长度时延极差：{max(ranges)/1000:.3f} μs" if ranges else '本次同 VL 同长度时延极差：样本不足')
             duration=max(s[4] for s in samples)-min(s[3] for s in samples)
             rate=sum(s[1] for s in samples)*1000/duration
             eligible=plan['scenario']==7 and len(samples)>=2 and len(samples)==len(offered) and session.mask==3 and not session.error
-            verdict=('达标（本次负载）' if rate>=100 else '未达标（本次负载）') if eligible else '未判定（非完整性能负载）'
-            text.append(f"本次有效载荷交付吞吐：{rate:.4f} Mbps｜达标状态：{verdict}")
-        else:text.append('本次时延／吞吐／极差：无交付样本｜达标状态：未判定')
+            verdict=('｜达标状态：达标（本次负载）' if rate>=100 else '｜达标状态：未达标（本次负载）') if eligible else ''
+            text.append(f"本次有效载荷交付吞吐：{rate:.4f} Mbps{verdict}")
+        else:text.append('本次时延／吞吐／极差：无交付样本')
         gaps=[];last={}
         for i,(start,_,w,_) in enumerate(all_wire):
             vl=int.from_bytes(w[12:14],'big')
             if vl<0x12b4 and vl in last and i>=old.get('wire_frames',0):gaps.append(start-last[vl])
             last[vl]=start
-        text.append(f"本次同 VL 最小发送间隔：{min(gaps)*8/1e6:.6f} ms｜达标状态：{'达标' if min(gaps)>=125000 else '未达标'}" if gaps else '本次同 VL 最小发送间隔：样本不足｜达标状态：未判定')
+        text.append(f"本次同 VL 最小发送间隔：{min(gaps)*8/1e6:.6f} ms｜达标状态：{'达标' if min(gaps)>=125000 else '未达标'}" if gaps else '本次同 VL 最小发送间隔：样本不足')
     if wire:
         _,_,w,_=wire[-1]
         text.append(f"本次最近发送帧：VLID=0x{int.from_bytes(w[12:14],'big'):04X}；SN={w[-5]}；FCS={w[-4:].hex().upper()}｜帧字节核对：通过")
@@ -656,7 +656,7 @@ def comparison_gui():
                 log(label+'\n'+readable_result(s.run,p,compact=True))
                 if p['result']=='PASS':
                     m=p['metrics'];log(f"最大观测时延达标状态：{'达标（本次样本）' if m['max_application_first_to_last_us']<2000 else '未达标（本次样本）'}")
-                    log('吞吐／极差达标状态：未判定（本项为管理积压压力对照）。');focus_wave(s.run)
+                    focus_wave(s.run)
             if result['result']=='PASS':
                 lm=proofs[0]['metrics'];rm=proofs[1]['metrics']
                 log(f"本次吞吐变化：{(rm['delivered_payload_Mbps']/lm['delivered_payload_Mbps']-1)*100:+.2f}%；最大观测时延变化：{(rm['max_application_first_to_last_us']/lm['max_application_first_to_last_us']-1)*100:+.2f}%")

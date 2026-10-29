@@ -63,7 +63,7 @@ def main():
         ('05 SET other object',lambda s:s.snmp(5,b'FPGA_NODE_1'),['对象：sysName','实际 SNMP 响应值：FPGA_NODE_1']),
         ('05 GET other object',lambda s:s.snmp(5),['实际 SNMP 响应值：FPGA_NODE_1']),
     ])
-    scenario(6,[('06 synchronize',lambda s:s.sync(250),['RTC 同步状态：0 → 1','实际 RTC offset：','绝对 UTC 精度达标状态：未测量'])])
+    scenario(6,[('06 synchronize',lambda s:s.sync(250),['RTC 同步状态：0 → 1','实际 RTC offset：','绝对 UTC 精度：未测量'])])
     scenario(7,[('07 default performance',lambda s:s.app(0x1234,b'X'*1471,64,16,8100),['交付 +64 帧','达标状态：达标（本次负载）','本次同 VL 同长度时延极差：'])])
     baseline=ROOT/'build/logs/service_pressure_010/afdx_service_tx_arbiter_615a.v'
     reference=ROOT/'build/logs/service_pressure_011'
